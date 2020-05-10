@@ -1,0 +1,1896 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="true">
+
+
+
+  
+  
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.1.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":true,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: true,
+    fastclick: true,
+    lazyload: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"shrinkIn","post_header":"slideLeftIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideDownIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Scala高级一 高阶函数scala 混合了面向对象和函数式的特性，在函数式编程语言中，函数是“头等公民”，它和Int、String、Class等其他类型处于同等的地位，可以像其他类型的变量一样被传递和操作。 高阶函数包含  作为值的函数 匿名函数 闭包 柯里化等等  1作为值得函数在scala中，函数就像和数字、字符串一样，可以将函数传递给一个方法。我们可以对算法进行封装，然后将具体的动作传递给">
+<meta name="keywords" content="BigData">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Scala高级">
+<meta property="og:url" content="https://manzhong.github.io/2017/08/13/Scala高级.html">
+<meta property="og:site_name" content="春雨里洗过的太阳">
+<meta property="og:description" content="Scala高级一 高阶函数scala 混合了面向对象和函数式的特性，在函数式编程语言中，函数是“头等公民”，它和Int、String、Class等其他类型处于同等的地位，可以像其他类型的变量一样被传递和操作。 高阶函数包含  作为值的函数 匿名函数 闭包 柯里化等等  1作为值得函数在scala中，函数就像和数字、字符串一样，可以将函数传递给一个方法。我们可以对算法进行封装，然后将具体的动作传递给">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://manzhong.github.io/images/scala/klh.png">
+<meta property="og:image" content="https://manzhong.github.io/images/scala/klhgcjx.png">
+<meta property="og:image" content="https://manzhong.github.io/images/scala/akka.png">
+<meta property="og:image" content="https://manzhong.github.io/images/scala/akkabf.png">
+<meta property="og:image" content="https://manzhong.github.io/images/scala/jctx.png">
+<meta property="og:image" content="https://manzhong.github.io/images/scala/spark.png">
+<meta property="og:updated_time" content="2020-03-15T14:56:25.377Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Scala高级">
+<meta name="twitter:description" content="Scala高级一 高阶函数scala 混合了面向对象和函数式的特性，在函数式编程语言中，函数是“头等公民”，它和Int、String、Class等其他类型处于同等的地位，可以像其他类型的变量一样被传递和操作。 高阶函数包含  作为值的函数 匿名函数 闭包 柯里化等等  1作为值得函数在scala中，函数就像和数字、字符串一样，可以将函数传递给一个方法。我们可以对算法进行封装，然后将具体的动作传递给">
+<meta name="twitter:image" content="https://manzhong.github.io/images/scala/klh.png">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="春雨里洗过的太阳" type="application/atom+xml">
+
+
+
+  
+  
+  <link rel="canonical" href="https://manzhong.github.io/2017/08/13/Scala高级">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Scala高级 | 春雨里洗过的太阳</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+ 
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">春雨里洗过的太阳</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-bookmark"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-互动">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/guestbook/" rel="section"><i class="menu-item-icon fa fa-fw fa-comments"></i> <br>互动</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://manzhong.github.io/2017/08/13/Scala高级.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="丨HF丨">
+      <meta itemprop="description" content="第二名就是头号输家!!!">
+      <meta itemprop="image" content="/images/hexo.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="春雨里洗过的太阳">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Scala高级
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2017-08-13 21:37:29" itemprop="dateCreated datePublished" datetime="2017-08-13T21:37:29+08:00">2017-08-13</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2020-03-15 22:56:25" itemprop="dateModified" datetime="2020-03-15T22:56:25+08:00">2020-03-15</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">29k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">27 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Scala高级"><a href="#Scala高级" class="headerlink" title="Scala高级"></a>Scala高级</h1><h2 id="一-高阶函数"><a href="#一-高阶函数" class="headerlink" title="一 高阶函数"></a>一 高阶函数</h2><p>scala 混合了面向对象和函数式的特性，在函数式编程语言中，函数是“头等公民”，它和Int、String、Class等其他类型处于同等的地位，可以像其他类型的变量一样被传递和操作。</p>
+<p>高阶函数包含</p>
+<ul>
+<li>作为值的函数</li>
+<li>匿名函数</li>
+<li>闭包</li>
+<li>柯里化等等</li>
+</ul>
+<h3 id="1作为值得函数"><a href="#1作为值得函数" class="headerlink" title="1作为值得函数"></a>1作为值得函数</h3><p>在scala中，函数就像和数字、字符串一样，可以将函数传递给一个方法。我们可以对算法进行封装，然后将具体的动作传递给方法，这种特性很有用。</p>
+<p>我们之前学习过List的map方法，它就可以接收一个函数，完成List的转换。</p>
+<p><strong>例子</strong></p>
+<p><strong>示例说明</strong></p>
+<p>将一个整数列表中的每个元素转换为对应个数的小星星</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">List(1, 2, 3...) =&gt; *, **, ***</span><br></pre></td></tr></table></figure>
+<p><strong>步骤</strong></p>
+<ol>
+<li>创建一个函数，用于将数字转换为指定个数的小星星</li>
+<li>创建一个列表，调用map方法</li>
+<li>打印转换为的列表</li>
+</ol>
+<p><strong>参考代码</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.nicai.highlevel</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo01</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> fun: <span class="type">Int</span> =&gt; <span class="type">String</span> = (num:<span class="type">Int</span>) =&gt; <span class="string">"*"</span> * num</span><br><span class="line">    <span class="keyword">val</span> strings = (<span class="number">1</span> to <span class="number">10</span>).map(fun)</span><br><span class="line">    println(strings)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="2-匿名函数"><a href="#2-匿名函数" class="headerlink" title="2     匿名函数"></a>2     匿名函数</h3><p><strong>定义</strong></p>
+<p>上面的代码，给(num:Int) =&gt; “<em>“ </em> num函数赋值给了一个变量，但是这种写法有一些啰嗦。在scala中，可以不需要给函数赋值给变量，没有赋值给变量的函数就是*匿名函数</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> list = <span class="type">List</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 字符串*方法，表示生成指定数量的字符串</span></span><br><span class="line"><span class="keyword">val</span> func_num2star = (num:<span class="type">Int</span>) =&gt; <span class="string">"*"</span> * num</span><br><span class="line"></span><br><span class="line">print(list.map(func_num2star))</span><br></pre></td></tr></table></figure>
+<p>使用匿名函数优化上述代码</p>
+<p><strong>参考代码</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo02</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> strings = (<span class="number">1</span> to <span class="number">10</span>).map(x =&gt; <span class="string">"*"</span> * x)</span><br><span class="line"></span><br><span class="line">    println(strings)</span><br><span class="line"><span class="comment">// 因为此处num变量只使用了一次，而且只是进行简单的计算，所以可以省略参数列表，使用_替代参数</span></span><br><span class="line">    <span class="keyword">val</span> strings2 = (<span class="number">1</span> to <span class="number">10</span> ).map(<span class="string">"*"</span> * _)</span><br><span class="line">    println(strings2)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="3-柯里化"><a href="#3-柯里化" class="headerlink" title="3 柯里化"></a>3 柯里化</h3><p>在scala和spark的源代码中，大量使用到了柯里化。为了后续方便阅读源代码，我们需要来了解下柯里化。  </p>
+<p>定义:</p>
+<p>柯里化（Currying）是指将原先接受多个参数的方法转换为多个只有一个参数的参数列表的过程。</p>
+<p><img src="/images/scala/klh.png" alt="img"></p>
+<p><strong>柯里化过程解析</strong></p>
+<p><img src="/images/scala/klhgcjx.png" alt="img">    </p>
+<p><strong>例子</strong></p>
+<p><strong>示例说明</strong></p>
+<ul>
+<li>编写一个方法，用来完成两个Int类型数字的计算</li>
+<li>具体如何计算封装到函数中</li>
+<li>使用柯里化来实现上述操作</li>
+</ul>
+<p><strong>参考代码</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 柯里化：实现对两个数进行计算</span></span><br><span class="line"><span class="keyword">package</span> com.nicai.highlevel</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo3</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">add</span></span>(a:<span class="type">Int</span>,b:<span class="type">Int</span>)(cala:(<span class="type">Int</span>,<span class="type">Int</span>) =&gt; <span class="type">Int</span>)=&#123;</span><br><span class="line">    cala(a,b)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    println(add(<span class="number">1</span>, <span class="number">2</span>)(_ + _))</span><br><span class="line">    println(add(<span class="number">1</span>, <span class="number">2</span>)(_ * _))</span><br><span class="line"></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="闭包"><a href="#闭包" class="headerlink" title="闭包"></a>闭包</h3><p>闭包其实就是一个函数，只不过这个函数的返回值依赖于声明在函数外部的变量。</p>
+<p>可以简单认为，就是可以访问不在当前作用域范围的一个函数。</p>
+<p><strong>例子一</strong></p>
+<p>定义一个闭包</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.nicai.highlevel</span><br><span class="line"><span class="comment">//闭包</span></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo4</span> </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> x=<span class="number">4</span></span><br><span class="line">  <span class="keyword">val</span> add=(y:<span class="type">Int</span>) =&gt; x+y</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    println(add(<span class="number">5</span>))</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>add函数就是一个闭包</p>
+<p><strong>例子二</strong></p>
+<p>柯里化就是一个闭包</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add</span></span>(x:<span class="type">Int</span>)(y:<span class="type">Int</span>) = &#123;</span><br><span class="line">  x + y</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上述代码相当于</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">add</span></span>(x:<span class="type">Int</span>) = &#123;</span><br><span class="line">    (y:<span class="type">Int</span>) =&gt; x + y</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">总的:</span><br><span class="line"><span class="keyword">package</span> com.nicai.highlevel</span><br><span class="line"><span class="comment">//闭包二  柯里化就是一个闭包</span></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo5</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">add</span></span>(a:<span class="type">Int</span>)(b:<span class="type">Int</span>): <span class="type">Int</span> =&#123;</span><br><span class="line">    a+b</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">add2</span></span>(x:<span class="type">Int</span>)=&#123;</span><br><span class="line">    (y:<span class="type">Int</span>) =&gt; x+y</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    println(add(<span class="number">5</span>)(<span class="number">6</span>))  <span class="comment">//11</span></span><br><span class="line">    println(add2(<span class="number">5</span>)(<span class="number">6</span>))<span class="comment">//11</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="二-隐式转换与隐式参数"><a href="#二-隐式转换与隐式参数" class="headerlink" title="二 隐式转换与隐式参数"></a>二 隐式转换与隐式参数</h2><p>隐式转换和隐式参数是scala非常有特色的功能，也是Java等其他编程语言没有的功能。我们可以很方便地利用隐式转换来丰富现有类的功能。后面在编写Akka并发编程、Spark SQL、Flink都会看到隐式转换和隐式参数的身影。</p>
+<h3 id="1-使用隐式转换"><a href="#1-使用隐式转换" class="headerlink" title="1 使用隐式转换"></a>1 使用隐式转换</h3><p><strong>定义:</strong></p>
+<p>所谓<strong>隐式转换</strong>，是指以implicit关键字声明的带有<strong>单个参数</strong>的方法。它是<strong>自动被调用</strong>的，自动将某种类型转换为另外一种类型。</p>
+<p><strong>使用步骤</strong></p>
+<ol>
+<li>在object中定义隐式转换方法（使用implicit）</li>
+<li>在需要用到隐式转换的地方，引入隐式转换（使用import）</li>
+<li>自动调用隐式转化后的方法</li>
+</ol>
+<p><strong>例子</strong></p>
+<p><strong>示例说明</strong></p>
+<p>使用隐式转换，让File具备有read功能——实现将文本中的内容以字符串形式读取出来</p>
+<p><strong>步骤</strong></p>
+<ol>
+<li><figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">创建RichFile类，提供一个<span class="built_in">read</span>方法，用于将文件内容读取为字符串</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>定义一个隐式转换方法，将File隐式转换为RichFile对象</p>
+</li>
+<li><p>创建一个File，导入隐式转换，调用File的read方法</p>
+</li>
+</ol>
+<p><strong>参考代码</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.nicai.yinshizhuanhuan</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.<span class="type">File</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> scala.io.<span class="type">Source</span></span><br><span class="line"><span class="comment">//隐式转换</span></span><br><span class="line"><span class="comment">/*1. 创建RichFile类，提供一个read方法，用于将文件内容读取为字符串</span></span><br><span class="line"><span class="comment">2. 定义一个隐式转换方法，将File隐式转换为RichFile对象</span></span><br><span class="line"><span class="comment">3. 创建一个File，导入隐式转换，调用File的read方法*/</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo6</span> </span>&#123;</span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">RichFile</span>(<span class="params">f:<span class="type">File</span></span>)</span>&#123;</span><br><span class="line">      <span class="function"><span class="keyword">def</span> <span class="title">read</span></span>()=&#123;</span><br><span class="line">        <span class="type">Source</span>.fromFile(f).mkString</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  <span class="class"><span class="keyword">object</span> <span class="title">Im</span></span>&#123;</span><br><span class="line">    <span class="keyword">implicit</span> <span class="function"><span class="keyword">def</span> <span class="title">fileToRichFile</span></span>(file:<span class="type">File</span>) =<span class="keyword">new</span> <span class="type">RichFile</span>(file)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">  	<span class="keyword">val</span> file = <span class="keyword">new</span> <span class="type">File</span>(<span class="string">"day23Scala4/data/a.txt"</span>)</span><br><span class="line">    <span class="keyword">import</span> <span class="type">Im</span>.fileToRichFile</span><br><span class="line">    println(file.read())</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>  <strong>隐式转换的时机</strong></p>
+<ul>
+<li>当对象调用类中不存在的方法或者成员时，编译器会自动将对象进行隐式转换</li>
+<li>当方法中的参数的类型与目标类型不一致时</li>
+</ul>
+<h3 id="2-自动导入隐式转化方法"><a href="#2-自动导入隐式转化方法" class="headerlink" title="2 自动导入隐式转化方法"></a>2 自动导入隐式转化方法</h3><p>前面，我们手动使用了import来导入隐式转换。是否可以不手动import呢？</p>
+<p>在scala中，如果在当前作用域中有隐式转换方法，会自动导入隐式转换。</p>
+<p>示例：将隐式转换方法定义在main所在的object中</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.nicai.yinshizhuanhuan</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.<span class="type">File</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> scala.io.<span class="type">Source</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//自动导入隐式转换</span></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo7</span> </span>&#123;</span><br><span class="line">  <span class="class"><span class="keyword">class</span> <span class="title">RichFile</span>(<span class="params">f:<span class="type">File</span></span>)</span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">read</span></span>()=&#123;</span><br><span class="line">      <span class="type">Source</span>.fromFile(f).mkString</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> file = <span class="keyword">new</span> <span class="type">File</span>(<span class="string">"day23Scala4/data/a.txt"</span>)</span><br><span class="line">    <span class="keyword">implicit</span> <span class="function"><span class="keyword">def</span> <span class="title">fileToRichFile</span></span>(file:<span class="type">File</span>) =<span class="keyword">new</span> <span class="type">RichFile</span>(file)</span><br><span class="line">    println(file.read())</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="3-隐式参数"><a href="#3-隐式参数" class="headerlink" title="3 隐式参数"></a>3 隐式参数</h3><p>方法可以带有一个标记为implicit的参数列表。这种情况，编译器会查找缺省值，提供给该方法。</p>
+<p><strong>定义</strong></p>
+<ol>
+<li>在方法后面添加一个参数列表，参数使用implicit修饰</li>
+<li>在object中定义implicit修饰的隐式值</li>
+<li>调用方法，可以不传入implicit修饰的参数列表，编译器会自动查找缺省值</li>
+</ol>
+<p>  注意:</p>
+<ol>
+<li>和隐式转换一样，可以使用import手动导入隐式参数</li>
+<li>如果在当前作用域定义了隐式值，会自动进行导入</li>
+</ol>
+<p><strong>例子</strong></p>
+<p><strong>示例说明</strong></p>
+<ul>
+<li>定义一个方法，可将传入的值，使用一个分隔符前缀、后缀包括起来</li>
+<li>使用隐式参数定义分隔符</li>
+<li>调用该方法，并打印测试</li>
+</ul>
+<p><strong>参考代码</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.nicai.yinshizhuanhuan</span><br><span class="line"><span class="comment">//隐式参数</span></span><br><span class="line"><span class="comment">/*- 定义一个方法，可将传入的值，使用一个分隔符前缀、后缀包括起来</span></span><br><span class="line"><span class="comment">- 使用隐式参数定义分隔符</span></span><br><span class="line"><span class="comment">- 调用该方法，并打印测试*/</span></span><br><span class="line"><span class="comment">//与java中的动态代理  作用有点类似</span></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo8</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">qu</span></span>(str:<span class="type">String</span>)(<span class="keyword">implicit</span> im:(<span class="type">String</span>,<span class="type">String</span>)) =&#123;</span><br><span class="line">      im._1+str+im._2</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//定义隐式参数</span></span><br><span class="line">  <span class="class"><span class="keyword">object</span> <span class="title">Im</span></span>&#123;</span><br><span class="line">    <span class="keyword">implicit</span> <span class="keyword">val</span> delim= (<span class="string">"&lt;&lt;"</span>,<span class="string">"&gt;&gt;"</span>)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">import</span> <span class="type">Im</span>.delim</span><br><span class="line">    println(qu(<span class="string">"aa"</span>))</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="三-Akka-并发编程"><a href="#三-Akka-并发编程" class="headerlink" title="三 Akka 并发编程"></a>三 Akka 并发编程</h2><h3 id="1-介绍"><a href="#1-介绍" class="headerlink" title="1 介绍"></a>1 介绍</h3><p>Akka是一个用于构建高并发、分布式和可扩展的基于事件驱动的应用的工具包。Akka是使用scala开发的库，同时可以使用scala和Java语言来开发基于Akka的应用程序。</p>
+<h3 id="2-特性"><a href="#2-特性" class="headerlink" title="2 特性"></a>2 特性</h3><ul>
+<li>提供基于异步非阻塞、高性能的事件驱动编程模型</li>
+<li>内置容错机制，允许Actor在出错时进行恢复或者重置操作</li>
+<li>超级轻量级的事件处理（每GB堆内存几百万Actor）</li>
+<li>使用Akka可以在单机上构建高并发程序，也可以在网络中构建分布式程序。</li>
+</ul>
+<h3 id="3-Akka通信过程"><a href="#3-Akka通信过程" class="headerlink" title="3 Akka通信过程"></a>3 Akka通信过程</h3><p>以下图片说明了Akka Actor的并发编程模型的基本流程：</p>
+<ol>
+<li>学生创建一个ActorSystem</li>
+<li>通过ActorSystem来创建一个ActorRef（老师的引用），并将消息发送给ActorRef</li>
+<li>ActorRef将消息发送给Message Dispatcher（消息分发器）</li>
+<li>Message Dispatcher将消息按照顺序保存到目标Actor的MailBox中</li>
+<li>Message Dispatcher将MailBox放到一个线程中</li>
+<li><p>MailBox按照顺序取出消息，最终将它递给TeacherActor接受的方法中</p>
+<p><img src="/images/scala/akka.png" alt="img"></p>
+</li>
+</ol>
+<h3 id="4-入门案例"><a href="#4-入门案例" class="headerlink" title="4 入门案例"></a>4 入门案例</h3><p>基于Akka创建两个Actor，Actor之间可以互相发送消息。</p>
+<p><img src="/images/scala/akkabf.png" alt="img"></p>
+<h2 id="实现步骤"><a href="#实现步骤" class="headerlink" title="实现步骤"></a>实现步骤</h2><ol>
+<li>创建Maven模块</li>
+<li>创建并加载Actor</li>
+<li>发送/接收消息</li>
+</ol>
+<p><strong>1创建Maven模块</strong></p>
+<p>使用Akka需要导入Akka库，我们这里使用Maven来管理项目</p>
+<ol>
+<li>创建Maven模块</li>
+<li>打开pom.xml文件，导入akka Maven依赖和插件</li>
+</ol>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">properties</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">maven.compiler.source</span>&gt;</span>1.8<span class="tag">&lt;/<span class="name">maven.compiler.source</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">maven.compiler.target</span>&gt;</span>1.8<span class="tag">&lt;/<span class="name">maven.compiler.target</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">encoding</span>&gt;</span>UTF-8<span class="tag">&lt;/<span class="name">encoding</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">scala.version</span>&gt;</span>2.11.8<span class="tag">&lt;/<span class="name">scala.version</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">scala.compat.version</span>&gt;</span>2.11<span class="tag">&lt;/<span class="name">scala.compat.version</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;/<span class="name">properties</span>&gt;</span></span><br><span class="line"></span><br><span class="line">   <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.scala-lang<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>scala-library<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;scala.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line">       <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.typesafe.akka<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>akka-actor_2.11<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.3.14<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line">       <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.typesafe.akka<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>akka-remote_2.11<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.3.14<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line">   <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br><span class="line"></span><br><span class="line">   <span class="tag">&lt;<span class="name">build</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">sourceDirectory</span>&gt;</span>src/main/scala<span class="tag">&lt;/<span class="name">sourceDirectory</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">testSourceDirectory</span>&gt;</span>src/test/scala<span class="tag">&lt;/<span class="name">testSourceDirectory</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">plugins</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>net.alchim31.maven<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>scala-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.2.2<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">executions</span>&gt;</span></span><br><span class="line">                   <span class="tag">&lt;<span class="name">execution</span>&gt;</span></span><br><span class="line">                       <span class="tag">&lt;<span class="name">goals</span>&gt;</span></span><br><span class="line">                           <span class="tag">&lt;<span class="name">goal</span>&gt;</span>compile<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></span><br><span class="line">                           <span class="tag">&lt;<span class="name">goal</span>&gt;</span>testCompile<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></span><br><span class="line">                       <span class="tag">&lt;/<span class="name">goals</span>&gt;</span></span><br><span class="line">                       <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">                           <span class="tag">&lt;<span class="name">args</span>&gt;</span></span><br><span class="line">                               <span class="tag">&lt;<span class="name">arg</span>&gt;</span>-dependencyfile<span class="tag">&lt;/<span class="name">arg</span>&gt;</span></span><br><span class="line">                               <span class="tag">&lt;<span class="name">arg</span>&gt;</span>$&#123;project.build.directory&#125;/.scala_dependencies<span class="tag">&lt;/<span class="name">arg</span>&gt;</span></span><br><span class="line">                           <span class="tag">&lt;/<span class="name">args</span>&gt;</span></span><br><span class="line">                       <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">                   <span class="tag">&lt;/<span class="name">execution</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;/<span class="name">executions</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line"></span><br><span class="line">           <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-shade-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.4.3<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">executions</span>&gt;</span></span><br><span class="line">                   <span class="tag">&lt;<span class="name">execution</span>&gt;</span></span><br><span class="line">                       <span class="tag">&lt;<span class="name">phase</span>&gt;</span>package<span class="tag">&lt;/<span class="name">phase</span>&gt;</span></span><br><span class="line">                       <span class="tag">&lt;<span class="name">goals</span>&gt;</span></span><br><span class="line">                           <span class="tag">&lt;<span class="name">goal</span>&gt;</span>shade<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></span><br><span class="line">                       <span class="tag">&lt;/<span class="name">goals</span>&gt;</span></span><br><span class="line">                       <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">                           <span class="tag">&lt;<span class="name">filters</span>&gt;</span></span><br><span class="line">                               <span class="tag">&lt;<span class="name">filter</span>&gt;</span></span><br><span class="line">                                   <span class="tag">&lt;<span class="name">artifact</span>&gt;</span>*:*<span class="tag">&lt;/<span class="name">artifact</span>&gt;</span></span><br><span class="line">                                   <span class="tag">&lt;<span class="name">excludes</span>&gt;</span></span><br><span class="line">                                       <span class="tag">&lt;<span class="name">exclude</span>&gt;</span>META-INF/*.SF<span class="tag">&lt;/<span class="name">exclude</span>&gt;</span></span><br><span class="line">                                       <span class="tag">&lt;<span class="name">exclude</span>&gt;</span>META-INF/*.DSA<span class="tag">&lt;/<span class="name">exclude</span>&gt;</span></span><br><span class="line">                                       <span class="tag">&lt;<span class="name">exclude</span>&gt;</span>META-INF/*.RSA<span class="tag">&lt;/<span class="name">exclude</span>&gt;</span></span><br><span class="line">                                   <span class="tag">&lt;/<span class="name">excludes</span>&gt;</span></span><br><span class="line">                               <span class="tag">&lt;/<span class="name">filter</span>&gt;</span></span><br><span class="line">                           <span class="tag">&lt;/<span class="name">filters</span>&gt;</span></span><br><span class="line">                           <span class="tag">&lt;<span class="name">transformers</span>&gt;</span></span><br><span class="line">                               <span class="tag">&lt;<span class="name">transformer</span> <span class="attr">implementation</span>=<span class="string">"org.apache.maven.plugins.shade.resource.AppendingTransformer"</span>&gt;</span></span><br><span class="line">                                   <span class="tag">&lt;<span class="name">resource</span>&gt;</span>reference.conf<span class="tag">&lt;/<span class="name">resource</span>&gt;</span></span><br><span class="line">                               <span class="tag">&lt;/<span class="name">transformer</span>&gt;</span></span><br><span class="line">                               <span class="tag">&lt;<span class="name">transformer</span> <span class="attr">implementation</span>=<span class="string">"org.apache.maven.plugins.shade.resource.ManifestResourceTransformer"</span>&gt;</span></span><br><span class="line">                                   <span class="tag">&lt;<span class="name">mainClass</span>&gt;</span><span class="tag">&lt;/<span class="name">mainClass</span>&gt;</span></span><br><span class="line">                               <span class="tag">&lt;/<span class="name">transformer</span>&gt;</span></span><br><span class="line">                           <span class="tag">&lt;/<span class="name">transformers</span>&gt;</span></span><br><span class="line">                       <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">                   <span class="tag">&lt;/<span class="name">execution</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;/<span class="name">executions</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">plugins</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;/<span class="name">build</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p><strong>2创建并加载Actor</strong></p>
+<p>创建两个Actor</p>
+<ul>
+<li><p>SenderActor：用来发送消息</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.nicai.akkademo</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> akka.actor.<span class="type">Actor</span></span><br><span class="line"><span class="comment">//发送消息</span></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">SenderActor</span> <span class="keyword">extends</span> <span class="title">Actor</span></span>&#123;</span><br><span class="line">  <span class="comment">//不在使用loop+react了 在akka中直接在receive中编写偏函数直接处理消息就可以持续接受消息</span></span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">receive</span></span>: <span class="type">Receive</span> = &#123;</span><br><span class="line">    <span class="keyword">case</span> x =&gt; println(x)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<ul>
+<li><p>ReceiveActor：用来接收，回复消息</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.nicai.akkademo</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> akka.actor.<span class="type">Actor</span></span><br><span class="line"><span class="comment">//接收  回复消息</span></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">ReceiveActor</span> <span class="keyword">extends</span> <span class="title">Actor</span></span>&#123;</span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">receive</span></span>: <span class="type">Receive</span> = &#123;</span><br><span class="line">    <span class="keyword">case</span> x =&gt; println(x)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p><strong>创建Actor</strong></p>
+<ol>
+<li><p>创建ActorSystem</p>
+</li>
+<li><p>创建自定义Actor</p>
+</li>
+<li><p>ActorSystem加载Actor</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.nicai.akkademo</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> akka.actor.&#123;<span class="type">ActorSystem</span>, <span class="type">Props</span>&#125;</span><br><span class="line"><span class="keyword">import</span> com.typesafe.config.<span class="type">ConfigFactory</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Entrance</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="comment">//创建ActorSystem</span></span><br><span class="line">    <span class="keyword">val</span> actorSystem = <span class="type">ActorSystem</span>(<span class="string">"actorSystem"</span>, <span class="type">ConfigFactory</span>.load())</span><br><span class="line">    <span class="comment">//加载Actor</span></span><br><span class="line">    <span class="keyword">val</span> senderActor = actorSystem.actorOf(<span class="type">Props</span>(<span class="type">SenderActor</span>),<span class="string">"senderActor"</span>)</span><br><span class="line">    <span class="keyword">val</span> receiveActor = actorSystem.actorOf(<span class="type">Props</span>(<span class="type">ReceiveActor</span>),<span class="string">"receiveActor"</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p><strong>3发送/接收消息</strong></p>
+<ul>
+<li>使用样例类封装消息</li>
+<li>SubmitTaskMessage——提交任务消息</li>
+<li>SuccessSubmitTaskMessage——任务提交成功消息</li>
+<li>使用类似于之前学习的Actor方式，使用<code>!</code>发送异步消息</li>
+</ul>
+<p><strong>参考代码</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">完整版</span><br><span class="line"><span class="comment">//sender发送消息</span></span><br><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">MessageSub</span>(<span class="params">msg:<span class="type">String</span></span>)</span></span><br><span class="line"><span class="class"><span class="title">//receive回复消息</span></span></span><br><span class="line"><span class="class"><span class="title">case</span> <span class="title">class</span> <span class="title">MsgSuccess</span>(<span class="params">msg:<span class="type">String</span></span>)</span></span><br><span class="line"><span class="class">............................................................................</span></span><br><span class="line"><span class="class"><span class="title">import</span> <span class="title">akka</span>.<span class="title">actor</span>.<span class="title">Actor</span></span></span><br><span class="line"><span class="class"><span class="title">//发送消息</span></span></span><br><span class="line"><span class="class"><span class="title">object</span> <span class="title">SenderActor</span> <span class="keyword">extends</span> <span class="title">Actor</span></span>&#123;</span><br><span class="line">  <span class="comment">//不在使用loop+react了 在akka中直接在receive中编写偏函数直接处理消息就可以持续接受消息</span></span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">receive</span></span>: <span class="type">Receive</span> = &#123;</span><br><span class="line">    <span class="comment">//匹配 entrance 的消息</span></span><br><span class="line">    <span class="keyword">case</span> <span class="type">MessageSub</span>(<span class="string">"start"</span>) =&gt; &#123;</span><br><span class="line">      println(<span class="string">"收到消息"</span>)</span><br><span class="line">        <span class="comment">//格式akka://actorSystem的名字/user(固定)/receiveActor的名字  若是远程连接则加端口号等</span></span><br><span class="line">      <span class="keyword">val</span> receiveActor = context.actorSelection(<span class="string">"akka://actorSystem/user/receiveActor"</span>)</span><br><span class="line">      <span class="comment">//向receive发送消息</span></span><br><span class="line">      receiveActor ! <span class="type">MessageSub</span>(<span class="string">"nicai"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">      <span class="comment">//接收receive的消息</span></span><br><span class="line">    <span class="keyword">case</span> <span class="type">MsgSuccess</span>(name) =&gt;&#123;</span><br><span class="line">      println(name)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">...............................................................................</span><br><span class="line"><span class="keyword">import</span> akka.actor.<span class="type">Actor</span></span><br><span class="line"><span class="comment">//接收  回复消息</span></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">ReceiveActor</span> <span class="keyword">extends</span> <span class="title">Actor</span></span>&#123;</span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">receive</span></span>: <span class="type">Receive</span> = &#123;</span><br><span class="line">      <span class="comment">//匹配消息</span></span><br><span class="line">    <span class="keyword">case</span> <span class="type">MessageSub</span>(name) =&gt; &#123;</span><br><span class="line">      println(name)</span><br><span class="line">        <span class="comment">//回复消息</span></span><br><span class="line">      sender  ! <span class="type">MsgSuccess</span>(<span class="string">"我不猜"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">case</span> _ =&gt; println(<span class="string">"未匹配的消息类型"</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">............................................................................</span><br><span class="line"><span class="keyword">import</span> akka.actor.&#123;<span class="type">ActorSystem</span>, <span class="type">Props</span>&#125;</span><br><span class="line"><span class="keyword">import</span> com.typesafe.config.<span class="type">ConfigFactory</span></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Entrance</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="comment">//创建ActorSystem</span></span><br><span class="line">    <span class="keyword">val</span> actorSystem = <span class="type">ActorSystem</span>(<span class="string">"actorSystem"</span>, <span class="type">ConfigFactory</span>.load())</span><br><span class="line">    <span class="comment">//加载Actor</span></span><br><span class="line">    <span class="keyword">val</span> senderActor = actorSystem.actorOf(<span class="type">Props</span>(<span class="type">SenderActor</span>),<span class="string">"senderActor"</span>)</span><br><span class="line">    <span class="keyword">val</span> receiveActor = actorSystem.actorOf(<span class="type">Props</span>(<span class="type">ReceiveActor</span>),<span class="string">"receiveActor"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">//向senderActor发送消息</span></span><br><span class="line">    senderActor ! <span class="type">MessageSub</span>(<span class="string">"start"</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>程序输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">收到消息</span><br><span class="line">nicai</span><br><span class="line">我不猜</span><br></pre></td></tr></table></figure>
+<h3 id="5-Akka定时任务"><a href="#5-Akka定时任务" class="headerlink" title="5     Akka定时任务"></a>5     Akka定时任务</h3><p>如果我们想要使用Akka框架定时的执行一些任务，该如何处理呢？</p>
+<p>使用方式:</p>
+<p>  Akka中，提供一个<strong>scheduler</strong>对象来实现定时调度功能。使用ActorSystem.scheduler.schedule方法，可以启动一个定时任务。</p>
+<p>schedule方法针对scala提供两种使用形式：</p>
+<p><strong>第一种：发送消息</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">schedule</span></span>(</span><br><span class="line">    initialDelay: <span class="type">FiniteDuration</span>,        <span class="comment">// 延迟多久后启动定时任务</span></span><br><span class="line">    interval: <span class="type">FiniteDuration</span>,            <span class="comment">// 每隔多久执行一次</span></span><br><span class="line">    receiver: <span class="type">ActorRef</span>,                    <span class="comment">// 给哪个Actor发送消息</span></span><br><span class="line">    message: <span class="type">Any</span>)                        <span class="comment">// 要发送的消息</span></span><br><span class="line">(<span class="keyword">implicit</span> executor: <span class="type">ExecutionContext</span>)    <span class="comment">// 隐式参数：需要手动导入</span></span><br></pre></td></tr></table></figure>
+<p><strong>第二种：自定义实现</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">schedule</span></span>(</span><br><span class="line">    initialDelay: <span class="type">FiniteDuration</span>,            <span class="comment">// 延迟多久后启动定时任务</span></span><br><span class="line">    interval: <span class="type">FiniteDuration</span>                <span class="comment">// 每隔多久执行一次</span></span><br><span class="line">)(f: ⇒ <span class="type">Unit</span>)                                <span class="comment">// 定期要执行的函数，可以将逻辑写在这里</span></span><br><span class="line">(<span class="keyword">implicit</span> executor: <span class="type">ExecutionContext</span>)        <span class="comment">// 隐式参数：需要手动导入</span></span><br></pre></td></tr></table></figure>
+<h2 id="示例一"><a href="#示例一" class="headerlink" title="示例一"></a>示例一</h2><p><strong>示例说明</strong></p>
+<ul>
+<li>定义一个Actor，每1秒发送一个消息给Actor，Actor收到后打印消息</li>
+<li>使用发送消息方式实现</li>
+</ul>
+<p><strong>参考代码</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.actor.&#123;<span class="type">Actor</span>, <span class="type">ActorSystem</span>, <span class="type">Props</span>&#125;</span><br><span class="line"><span class="keyword">import</span> com.typesafe.config.<span class="type">ConfigFactory</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo1</span> </span>&#123;</span><br><span class="line"><span class="comment">//创建actor</span></span><br><span class="line">  <span class="class"><span class="keyword">object</span> <span class="title">ReceiveActor</span> <span class="keyword">extends</span> <span class="title">Actor</span> </span>&#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">receive</span></span>: <span class="type">Receive</span> = &#123;</span><br><span class="line">      <span class="keyword">case</span> x =&gt; println(x)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> actorSystem = <span class="type">ActorSystem</span>(<span class="string">"actorSystem"</span>,<span class="type">ConfigFactory</span>.load())</span><br><span class="line">    <span class="keyword">val</span> receiveActor = actorSystem.actorOf(<span class="type">Props</span>(<span class="type">ReceiveActor</span>))</span><br><span class="line"></span><br><span class="line">    <span class="comment">//导入 隐式转换</span></span><br><span class="line">    <span class="keyword">import</span>  scala.concurrent.duration._</span><br><span class="line">    <span class="comment">//导入隐式参数</span></span><br><span class="line">    <span class="keyword">import</span> actorSystem.dispatcher</span><br><span class="line"></span><br><span class="line">    actorSystem.scheduler.schedule(<span class="number">0</span> seconds, <span class="comment">//延迟后多久启动定时任务</span></span><br><span class="line">      <span class="number">1</span> seconds,   <span class="comment">//每隔多久执行一次</span></span><br><span class="line">      receiveActor,        <span class="comment">//给那个actor发送消息</span></span><br><span class="line">      <span class="string">"hello"</span>    <span class="comment">//消息正文</span></span><br><span class="line">    )</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="示例二"><a href="#示例二" class="headerlink" title="示例二"></a>示例二</h2><p><strong>示例说明</strong></p>
+<ul>
+<li>定义一个Actor，每1秒发送一个消息给Actor，Actor收到后打印消息</li>
+<li>使用自定义方式实现</li>
+</ul>
+<p><strong>参考代码</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> akka.actor.&#123;<span class="type">Actor</span>, <span class="type">ActorSystem</span>, <span class="type">Props</span>&#125;</span><br><span class="line"><span class="keyword">import</span> com.typesafe.config.<span class="type">ConfigFactory</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo2</span> </span>&#123;</span><br><span class="line">    <span class="class"><span class="keyword">object</span> <span class="title">ReceiceActor</span> <span class="keyword">extends</span> <span class="title">Actor</span></span>&#123;</span><br><span class="line">      <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">receive</span></span>: <span class="type">Receive</span> = &#123;</span><br><span class="line">        <span class="keyword">case</span> x =&gt; println(x)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> actorSystem = <span class="type">ActorSystem</span>(<span class="string">"actorSystem"</span>,<span class="type">ConfigFactory</span>.load())</span><br><span class="line">    <span class="keyword">val</span> receiveActor = actorSystem.actorOf(<span class="type">Props</span>(<span class="type">ReceiceActor</span>))</span><br><span class="line"></span><br><span class="line">    <span class="comment">//导入隐式装换 不到无法使用 0 seconds</span></span><br><span class="line">    <span class="keyword">import</span> scala.concurrent.duration._</span><br><span class="line">    <span class="comment">//导入隐式参数</span></span><br><span class="line">    <span class="keyword">import</span> actorSystem.dispatcher</span><br><span class="line"></span><br><span class="line">    actorSystem.scheduler.schedule(<span class="number">0</span> seconds,<span class="number">1</span> seconds)(</span><br><span class="line">      receiveActor ! <span class="string">" iac"</span></span><br><span class="line">    )</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> 注意:</p>
+<ol>
+<li>需要导入隐式转换<code>import scala.concurrent.duration._</code>才能调用0 seconds方法</li>
+<li>需要导入隐式参数<code>import actorSystem.dispatcher</code>才能启动定时任务</li>
+</ol>
+<h3 id="6-实现两个进程间的通信-master实现"><a href="#6-实现两个进程间的通信-master实现" class="headerlink" title="6 实现两个进程间的通信  master实现"></a>6 实现两个进程间的通信  master实现</h3><p>基于Akka实现在两个<strong>进程</strong>间发送、接收消息。Worker启动后去连接Master，并发送消息，Master接收到消息后，再回复Worker消息。 </p>
+<p><img src="/images/scala/jctx.png" alt="img"></p>
+<h2 id="1-Worker实现"><a href="#1-Worker实现" class="headerlink" title="1. Worker实现"></a>1. Worker实现</h2><p><strong>步骤</strong></p>
+<ol>
+<li><p>创建一个Maven模块，导入依赖和配置文件</p>
+</li>
+<li><p>创建配置文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">application.conf</span><br><span class="line"></span><br><span class="line">akka.actor.provider = &quot;akka.remote.RemoteActorRefProvider&quot;</span><br><span class="line">akka.remote.netty.tcp.hostname = &quot;127.0.0.1&quot;</span><br><span class="line">akka.remote.netty.tcp.port = &quot;8888&quot;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<ol start="3">
+<li><p>创建启动WorkerActor</p>
+</li>
+<li><p>发送”setup”消息给WorkerActor，WorkerActor接收打印消息</p>
+</li>
+<li><p>启动测试</p>
+</li>
+</ol>
+<p><strong>参考代码</strong></p>
+<p>Worker.scala</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.actor.&#123;<span class="type">Actor</span>, <span class="type">ActorSystem</span>, <span class="type">Props</span>&#125;</span><br><span class="line"><span class="keyword">import</span> com.typesafe.config.<span class="type">ConfigFactory</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Worker</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> actorSystem = <span class="type">ActorSystem</span>(<span class="string">"actorSystem"</span>,<span class="type">ConfigFactory</span>.load())</span><br><span class="line">    <span class="keyword">val</span> worker = actorSystem.actorOf(<span class="type">Props</span>(<span class="type">WorkerActor</span>))</span><br><span class="line">    <span class="comment">//发送消息</span></span><br><span class="line">    worker ! <span class="string">"nicai"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>WorkerActor.scala</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.actor.<span class="type">Actor</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">WorkerActor</span> <span class="keyword">extends</span> <span class="title">Actor</span></span>&#123;</span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">receive</span></span>: <span class="type">Receive</span> = &#123;</span><br><span class="line">    <span class="keyword">case</span> x =&gt; println(x)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="2-Master实现"><a href="#2-Master实现" class="headerlink" title="2. Master实现"></a>2. Master实现</h2><p><strong>步骤</strong></p>
+<ol>
+<li>创建Maven模块，导入依赖和配置文件</li>
+<li>创建启动MasterActor</li>
+<li>WorkerActor发送”connect”消息给MasterActor</li>
+<li>MasterActor回复”success”消息给WorkerActor</li>
+<li>WorkerActor接收并打印接收到的消息</li>
+<li>启动Master、Worker测试</li>
+</ol>
+<p><strong>参考代码</strong></p>
+<p>Master.scala</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.actor.&#123;<span class="type">ActorSystem</span>, <span class="type">Props</span>&#125;</span><br><span class="line"><span class="keyword">import</span> com.typesafe.config.<span class="type">ConfigFactory</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Master</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> actorSystem = <span class="type">ActorSystem</span>(<span class="string">"actorSystem"</span>,<span class="type">ConfigFactory</span>.load())</span><br><span class="line">    <span class="keyword">val</span> masterActor = actorSystem.actorOf(<span class="type">Props</span>(<span class="type">MasterActor</span>),<span class="string">"masterActor"</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>MasterActor.scala</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.actor.<span class="type">Actor</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">MasterActor</span>  <span class="keyword">extends</span> <span class="title">Actor</span></span>&#123;</span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">receive</span></span>: <span class="type">Receive</span> = &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">"connect"</span> =&gt; &#123;</span><br><span class="line">      println(<span class="string">"worker连接成功"</span>)</span><br><span class="line">      sender ! <span class="string">"success"</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>WorkerActor.scala</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> akka.actor.<span class="type">Actor</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">WorkerActor</span> <span class="keyword">extends</span> <span class="title">Actor</span></span>&#123;</span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">receive</span></span>: <span class="type">Receive</span> = &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">"start"</span> =&gt; &#123;</span><br><span class="line">      println(<span class="string">"start"</span>)</span><br><span class="line">        <span class="comment">//设置连接</span></span><br><span class="line">      <span class="keyword">val</span> masterActor = context.actorSelection(<span class="string">"akka.tcp://actorSystem@127.0.0.1:9999/user/masterActor"</span>)</span><br><span class="line">      masterActor ! <span class="string">"connect"</span></span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">"success"</span> =&gt; &#123;</span><br><span class="line">      println(<span class="string">"连接master成功"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="四-简易Spark通信框架案例"><a href="#四-简易Spark通信框架案例" class="headerlink" title="四 简易Spark通信框架案例"></a>四 简易Spark通信框架案例</h2><p><strong>案例介绍</strong></p>
+<p>模拟Spark的Master与Worker通信</p>
+<ul>
+<li>一个Master<ul>
+<li>管理Worker</li>
+</ul>
+</li>
+<li>若干个Worker（Worker可以按需添加）<ul>
+<li>注册</li>
+<li>发送心跳</li>
+</ul>
+</li>
+</ul>
+<p><img src="/images/scala/spark.png" alt="img"></p>
+<p><strong>实现思路</strong></p>
+<ol>
+<li>构建Master、Worker阶段<ul>
+<li>构建Master ActorSystem、Actor</li>
+<li>构建Worker ActorSystem、Actor</li>
+</ul>
+</li>
+<li>Worker注册阶段<ul>
+<li>Worker进程向Master注册（将自己的ID、CPU核数、内存大小(M)发送给Master）</li>
+</ul>
+</li>
+<li>Worker定时发送心跳阶段<ul>
+<li>Worker定期向Master发送心跳消息</li>
+</ul>
+</li>
+<li>Master定时心跳检测阶段<ul>
+<li>Master定期检查Worker心跳，将一些超时的Worker移除，并对Worker按照内存进行倒序排序</li>
+</ul>
+</li>
+<li>多个Worker测试阶段<ul>
+<li>启动多个Worker，查看是否能够注册成功，并停止某个Worker查看是否能够正确移除</li>
+</ul>
+</li>
+</ol>
+<p><strong>工程搭建</strong></p>
+<p>项目使用Maven搭建工程</p>
+<ol>
+<li>分别搭建几下几个项目</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">工程名</th>
+<th style="text-align:left">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">spark-demo-common</td>
+<td style="text-align:left">存放公共的消息、实体类</td>
+</tr>
+<tr>
+<td style="text-align:left">spark-demo-master</td>
+<td style="text-align:left">Akka Master节点</td>
+</tr>
+<tr>
+<td style="text-align:left">spark-demo-worker</td>
+<td style="text-align:left">Akka Worker节点</td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li><p>导入依赖</p>
+<ul>
+<li><p>master/worker添加common依赖,其余同上</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line">common依赖</span><br><span class="line"></span><br><span class="line"> <span class="tag">&lt;<span class="name">properties</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">maven.compiler.source</span>&gt;</span>1.8<span class="tag">&lt;/<span class="name">maven.compiler.source</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">maven.compiler.target</span>&gt;</span>1.8<span class="tag">&lt;/<span class="name">maven.compiler.target</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">encoding</span>&gt;</span>UTF-8<span class="tag">&lt;/<span class="name">encoding</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">scala.version</span>&gt;</span>2.11.8<span class="tag">&lt;/<span class="name">scala.version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">scala.compat.version</span>&gt;</span>2.11<span class="tag">&lt;/<span class="name">scala.compat.version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">properties</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.scala-lang<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>scala-library<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;scala.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">build</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">sourceDirectory</span>&gt;</span>src/main/scala<span class="tag">&lt;/<span class="name">sourceDirectory</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">testSourceDirectory</span>&gt;</span>src/test/scala<span class="tag">&lt;/<span class="name">testSourceDirectory</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">plugins</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>net.alchim31.maven<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>scala-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.2.2<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">executions</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">execution</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">goals</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">goal</span>&gt;</span>compile<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">goal</span>&gt;</span>testCompile<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;/<span class="name">goals</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">args</span>&gt;</span></span><br><span class="line">                                <span class="tag">&lt;<span class="name">arg</span>&gt;</span>-dependencyfile<span class="tag">&lt;/<span class="name">arg</span>&gt;</span></span><br><span class="line">                                <span class="tag">&lt;<span class="name">arg</span>&gt;</span>$&#123;project.build.directory&#125;/.scala_dependencies<span class="tag">&lt;/<span class="name">arg</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;/<span class="name">args</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">execution</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">executions</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line"></span><br><span class="line">            <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-shade-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.4.3<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">executions</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">execution</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">phase</span>&gt;</span>package<span class="tag">&lt;/<span class="name">phase</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">goals</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">goal</span>&gt;</span>shade<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;/<span class="name">goals</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">filters</span>&gt;</span></span><br><span class="line">                                <span class="tag">&lt;<span class="name">filter</span>&gt;</span></span><br><span class="line">                                    <span class="tag">&lt;<span class="name">artifact</span>&gt;</span>*:*<span class="tag">&lt;/<span class="name">artifact</span>&gt;</span></span><br><span class="line">                                    <span class="tag">&lt;<span class="name">excludes</span>&gt;</span></span><br><span class="line">                                        <span class="tag">&lt;<span class="name">exclude</span>&gt;</span>META-INF/*.SF<span class="tag">&lt;/<span class="name">exclude</span>&gt;</span></span><br><span class="line">                                        <span class="tag">&lt;<span class="name">exclude</span>&gt;</span>META-INF/*.DSA<span class="tag">&lt;/<span class="name">exclude</span>&gt;</span></span><br><span class="line">                                        <span class="tag">&lt;<span class="name">exclude</span>&gt;</span>META-INF/*.RSA<span class="tag">&lt;/<span class="name">exclude</span>&gt;</span></span><br><span class="line">                                    <span class="tag">&lt;/<span class="name">excludes</span>&gt;</span></span><br><span class="line">                                <span class="tag">&lt;/<span class="name">filter</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;/<span class="name">filters</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">transformers</span>&gt;</span></span><br><span class="line">                                <span class="tag">&lt;<span class="name">transformer</span> <span class="attr">implementation</span>=<span class="string">"org.apache.maven.plugins.shade.resource.AppendingTransformer"</span>&gt;</span></span><br><span class="line">                                    <span class="tag">&lt;<span class="name">resource</span>&gt;</span>reference.conf<span class="tag">&lt;/<span class="name">resource</span>&gt;</span></span><br><span class="line">                                <span class="tag">&lt;/<span class="name">transformer</span>&gt;</span></span><br><span class="line">                                <span class="tag">&lt;<span class="name">transformer</span> <span class="attr">implementation</span>=<span class="string">"org.apache.maven.plugins.shade.resource.ManifestResourceTransformer"</span>&gt;</span></span><br><span class="line">                                    <span class="tag">&lt;<span class="name">mainClass</span>&gt;</span><span class="tag">&lt;/<span class="name">mainClass</span>&gt;</span></span><br><span class="line">                                <span class="tag">&lt;/<span class="name">transformer</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;/<span class="name">transformers</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">execution</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">executions</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">plugins</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">build</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p>导入配置文件(同上)</p>
+<ul>
+<li>修改Master的端口为7000(或者自定义)</li>
+<li>修改Worker的端口为7100(或者自定义 最好 8000以上)</li>
+</ul>
+</li>
+</ol>
+<p><strong>构建master和worker</strong></p>
+<p>master和masterActor     worker和workerActor</p>
+<p>同上:</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//MasterActor</span></span><br><span class="line"><span class="keyword">import</span> akka.actor.<span class="type">Actor</span></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">MasterActor</span> <span class="keyword">extends</span> <span class="title">Actor</span></span>&#123;</span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">receive</span></span>: <span class="type">Receive</span> = &#123;</span><br><span class="line">    <span class="keyword">case</span> x =&gt; println(x)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">........................................</span><br><span class="line"><span class="comment">//MasterMain</span></span><br><span class="line"><span class="keyword">import</span> akka.actor.&#123;<span class="type">ActorSystem</span>, <span class="type">Props</span>&#125;</span><br><span class="line"><span class="keyword">import</span> com.typesafe.config.<span class="type">ConfigFactory</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">MasterMain</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> actorSystem = <span class="type">ActorSystem</span>(<span class="string">"actorSystem"</span>,<span class="type">ConfigFactory</span>.load())</span><br><span class="line">    <span class="keyword">val</span> masterActor = actorSystem.actorOf(<span class="type">Props</span>(<span class="type">MasterActor</span>),<span class="string">"masterActor"</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">.............................................................</span><br><span class="line"><span class="comment">//WorkerActor </span></span><br><span class="line"><span class="keyword">import</span> akka.actor.<span class="type">Actor</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">WorkerActor</span> <span class="keyword">extends</span> <span class="title">Actor</span></span>&#123;</span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">receive</span></span>: <span class="type">Receive</span> = &#123;</span><br><span class="line">    <span class="keyword">case</span> x =&gt; println(x)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">..............................</span><br><span class="line"><span class="comment">//WorkerMain </span></span><br><span class="line"><span class="keyword">import</span> akka.actor.&#123;<span class="type">ActorSystem</span>, <span class="type">Props</span>&#125;</span><br><span class="line"><span class="keyword">import</span> com.typesafe.config.<span class="type">ConfigFactory</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">WorkerMain</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> actorSystem = <span class="type">ActorSystem</span>(<span class="string">"actorSystem"</span>,<span class="type">ConfigFactory</span>.load())</span><br><span class="line">    <span class="keyword">val</span> workerActor = actorSystem.actorOf(<span class="type">Props</span>(<span class="type">WorkerActor</span>),<span class="string">"workerActor"</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>worker注册实现</strong></p>
+<p>在Worker启动时，发送注册消息给Master</p>
+<p><strong>步骤</strong></p>
+<ol>
+<li>Worker向Master发送注册消息（workerid、cpu核数、内存大小）<ul>
+<li>随机生成CPU核（1、2、3、4、6、8）</li>
+<li>随机生成内存大小（512、1024、2048、4096）（单位M）</li>
+</ul>
+</li>
+<li>Master保存Worker信息，并给Worker回复注册成功消息</li>
+<li>启动测试</li>
+</ol>
+<p><strong>参考代码</strong></p>
+<p>MasterActor.scala</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> akka.actor.<span class="type">Actor</span></span><br><span class="line"><span class="keyword">import</span> com.nicai.common.&#123;<span class="type">MsgRegin</span>, <span class="type">MsgSuccess</span>, <span class="type">Pojo</span>&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> scala.collection.mutable</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">MasterActor</span> <span class="keyword">extends</span> <span class="title">Actor</span></span>&#123;</span><br><span class="line">  <span class="comment">//保存消息</span></span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">var</span> stringToPojo: mutable.<span class="type">Map</span>[<span class="type">String</span>, <span class="type">Pojo</span>] = collection.mutable.<span class="type">Map</span>[<span class="type">String</span>,<span class="type">Pojo</span>]()</span><br><span class="line"></span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">receive</span></span>: <span class="type">Receive</span> = &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="type">MsgRegin</span>(workid,cpu,mem) =&gt; &#123;</span><br><span class="line">      println(<span class="string">"收到注册消息"</span>+workid+<span class="string">"-"</span>+cpu+<span class="string">"-"</span>+mem)</span><br><span class="line">      <span class="comment">//保存消息到实体类</span></span><br><span class="line">      stringToPojo += workid -&gt; <span class="type">Pojo</span>(workid,cpu,mem)</span><br><span class="line">      <span class="comment">//回复消息</span></span><br><span class="line">      sender ! <span class="type">MsgSuccess</span>(<span class="string">"success"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Pojo.scala</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//实体类保存 worker的注册信息</span></span><br><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">Pojo</span>(<span class="params">wokid:<span class="type">String</span>,cpu:<span class="type">Int</span>,mem:<span class="type">Int</span></span>)</span></span><br></pre></td></tr></table></figure>
+<p>MsgPackage.scala</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//注册消息</span></span><br><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">MsgRegin</span>(<span class="params">workid:<span class="type">String</span>,cpu:<span class="type">Int</span>,mem:<span class="type">Int</span></span>)</span></span><br><span class="line"><span class="class"><span class="title">//注册成功回复消息</span></span></span><br><span class="line"><span class="class"><span class="title">case</span> <span class="title">class</span> <span class="title">MsgSuccess</span>(<span class="params">success:<span class="type">String</span></span>)</span></span><br></pre></td></tr></table></figure>
+<p>WorkerActor.scala</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.<span class="type">UUID</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> akka.actor.&#123;<span class="type">Actor</span>, <span class="type">ActorSelection</span>, <span class="type">ActorSystem</span>&#125;</span><br><span class="line"><span class="keyword">import</span> com.nicai.common.&#123;<span class="type">MsgRegin</span>, <span class="type">MsgSuccess</span>&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> scala.util.<span class="type">Random</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">WorkerActor</span> <span class="keyword">extends</span> <span class="title">Actor</span></span>&#123;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">var</span> actorSelection:<span class="type">ActorSelection</span>=_</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">var</span> <span class="type">CPU_lIST</span>:<span class="type">Int</span>=_</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">var</span> <span class="type">MEM_LIST</span>:<span class="type">Int</span>=_</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">var</span> cpuList=<span class="type">List</span>(<span class="number">1</span>,<span class="number">2</span>,<span class="number">4</span>,<span class="number">8</span>)</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">var</span> memList=<span class="type">List</span>(<span class="number">128</span>,<span class="number">256</span>,<span class="number">512</span>,<span class="number">1024</span>,<span class="number">2048</span>)</span><br><span class="line">  <span class="comment">//在actor启动前要做的事</span></span><br><span class="line"> <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">preStart</span></span>()=&#123;</span><br><span class="line">    <span class="comment">//1 获取发送的对象</span></span><br><span class="line">   actorSelection = context.system.actorSelection(<span class="string">"akka.tcp://actorSystem@127.0.0.1:7000/user/masterActor"</span>)</span><br><span class="line">    <span class="comment">//2  封装消息</span></span><br><span class="line">    <span class="keyword">val</span> workerid:<span class="type">String</span>=<span class="type">UUID</span>.randomUUID().toString</span><br><span class="line">    <span class="keyword">var</span> a=<span class="keyword">new</span> <span class="type">Random</span>()</span><br><span class="line">    <span class="type">CPU_lIST</span>=cpuList(a.nextInt(cpuList.length))</span><br><span class="line">    <span class="type">MEM_LIST</span>=memList(a.nextInt(memList.length))</span><br><span class="line">    <span class="keyword">val</span> regin = <span class="type">MsgRegin</span>(workerid,<span class="type">CPU_lIST</span>,<span class="type">MEM_LIST</span>)</span><br><span class="line">    <span class="comment">//3 发送消息</span></span><br><span class="line">    actorSelection ! regin</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">receive</span></span>: <span class="type">Receive</span> = &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="type">MsgSuccess</span>(name) =&gt; &#123;</span><br><span class="line">      println(<span class="string">"注册后的回复"</span>+name)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>worker定时发送心跳</strong></p>
+<p>Worker接收到Master返回注册成功后，发送心跳消息。而Master收到Worker发送的心跳消息后，需要更新对应Worker的最后心跳时间。</p>
+<p><strong>步骤</strong></p>
+<ol>
+<li>编写工具类读取心跳发送时间间隔</li>
+<li>创建心跳消息</li>
+<li>Worker接收到注册成功后，定时发送心跳消息</li>
+<li>Master收到心跳消息，更新Worker最后心跳时间</li>
+<li>启动测试</li>
+</ol>
+<p><strong>参考代码</strong></p>
+<p>修改配置文件:</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">添加 workerActor中的</span><br><span class="line"><span class="comment">//定时发送消息</span></span><br><span class="line">worker<span class="selector-class">.heartbeat</span><span class="selector-class">.interval</span>=<span class="number">5</span></span><br></pre></td></tr></table></figure>
+<p>在workerActor中ConfUtil.scala</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> com.typesafe.config.&#123;<span class="type">Config</span>, <span class="type">ConfigFactory</span>&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">ConfUtil</span></span>&#123;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">val</span> config: <span class="type">Config</span> = <span class="type">ConfigFactory</span>.load()</span><br><span class="line"></span><br><span class="line">  <span class="keyword">val</span> `worker.heartbeat.interval` = config.getInt(<span class="string">"worker.heartbeat.interval"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>MsgPackage.scala</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//心跳信息</span></span><br><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">MsgHeartBeat</span>(<span class="params">workid:<span class="type">String</span>,cpu:<span class="type">Int</span>,mem:<span class="type">Int</span></span>)</span></span><br></pre></td></tr></table></figure>
+<p>WorkerActor.scala</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.<span class="type">UUID</span></span><br><span class="line"><span class="keyword">import</span> akka.actor.&#123;<span class="type">Actor</span>, <span class="type">ActorSelection</span>, <span class="type">ActorSystem</span>&#125;</span><br><span class="line"><span class="keyword">import</span> com.nicai.common.&#123;<span class="type">MsgHeartBeat</span>, <span class="type">MsgRegin</span>, <span class="type">MsgSuccess</span>&#125;</span><br><span class="line"><span class="keyword">import</span> scala.util.<span class="type">Random</span></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">WorkerActor</span> <span class="keyword">extends</span> <span class="title">Actor</span> </span>&#123;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">var</span> actorSelection: <span class="type">ActorSelection</span> = _</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">var</span> workerid: <span class="type">String</span> = _</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">var</span> <span class="type">CPU_lIST</span>: <span class="type">Int</span> = _</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">var</span> <span class="type">MEM_LIST</span>: <span class="type">Int</span> = _</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">var</span> cpuList = <span class="type">List</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">4</span>, <span class="number">8</span>)</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">var</span> memList = <span class="type">List</span>(<span class="number">128</span>, <span class="number">256</span>, <span class="number">512</span>, <span class="number">1024</span>, <span class="number">2048</span>)</span><br><span class="line"></span><br><span class="line">  <span class="comment">//在actor启动前要做的事</span></span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">preStart</span></span>() = &#123;</span><br><span class="line">    <span class="comment">//1 获取发送的对象</span></span><br><span class="line">    actorSelection = context.system.actorSelection(<span class="string">"akka.tcp://actorSystem@127.0.0.1:7000/user/masterActor"</span>)</span><br><span class="line">    <span class="comment">//2  封装消息</span></span><br><span class="line">    workerid = <span class="type">UUID</span>.randomUUID().toString</span><br><span class="line">    <span class="keyword">var</span> a = <span class="keyword">new</span> <span class="type">Random</span>()</span><br><span class="line">    <span class="type">CPU_lIST</span> = cpuList(a.nextInt(cpuList.length))</span><br><span class="line">    <span class="type">MEM_LIST</span> = memList(a.nextInt(memList.length))</span><br><span class="line">    <span class="keyword">val</span> regin = <span class="type">MsgRegin</span>(workerid, <span class="type">CPU_lIST</span>, <span class="type">MEM_LIST</span>)</span><br><span class="line">    <span class="comment">//3 发送消息</span></span><br><span class="line">    actorSelection ! regin</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">receive</span></span>: <span class="type">Receive</span> = &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="type">MsgSuccess</span>(name) =&gt; &#123;</span><br><span class="line">      println(<span class="string">"注册后的回复"</span> + name)</span><br><span class="line">      <span class="comment">//导入隐式转换</span></span><br><span class="line">      <span class="keyword">import</span> scala.concurrent.duration._</span><br><span class="line">      <span class="comment">//导入隐式参数</span></span><br><span class="line">      <span class="keyword">import</span> context.dispatcher</span><br><span class="line">      <span class="comment">//心跳发送</span></span><br><span class="line">      context.system.scheduler.schedule(<span class="number">0</span> seconds,</span><br><span class="line">        <span class="type">ConfUtil</span>.`worker.heartbeat.interval` seconds</span><br><span class="line">      ) &#123;</span><br><span class="line">        actorSelection ! <span class="type">MsgHeartBeat</span>(workerid,<span class="type">CPU_lIST</span>,<span class="type">MEM_LIST</span>)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>MasterActor.scala</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.<span class="type">Date</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> akka.actor.<span class="type">Actor</span></span><br><span class="line"><span class="keyword">import</span> com.nicai.common.&#123;<span class="type">MsgHeartBeat</span>, <span class="type">MsgRegin</span>, <span class="type">MsgSuccess</span>, <span class="type">Pojo</span>&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> scala.collection.mutable</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">MasterActor</span> <span class="keyword">extends</span> <span class="title">Actor</span></span>&#123;</span><br><span class="line">  <span class="comment">//保存消息</span></span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">var</span> stringToPojo: mutable.<span class="type">Map</span>[<span class="type">String</span>, <span class="type">Pojo</span>] = collection.mutable.<span class="type">Map</span>[<span class="type">String</span>,<span class="type">Pojo</span>]()</span><br><span class="line"></span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">receive</span></span>: <span class="type">Receive</span> = &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="type">MsgRegin</span>(workid,cpu,mem) =&gt; &#123;</span><br><span class="line">      println(<span class="string">"收到注册消息"</span>+workid+<span class="string">"-"</span>+cpu+<span class="string">"-"</span>+mem)</span><br><span class="line">      <span class="comment">//保存消息到实体类</span></span><br><span class="line">      stringToPojo += workid -&gt; <span class="type">Pojo</span>(workid,cpu,mem,<span class="keyword">new</span> <span class="type">Date</span>().getTime)</span><br><span class="line">      <span class="comment">//回复消息</span></span><br><span class="line">      sender ! <span class="type">MsgSuccess</span>(<span class="string">"success"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">      <span class="comment">//心跳</span></span><br><span class="line">    <span class="keyword">case</span> <span class="type">MsgHeartBeat</span>(workid,cpu,mem)=&gt;&#123;</span><br><span class="line">      println(<span class="string">"接收到心跳"</span>)</span><br><span class="line">      <span class="comment">//更新消息</span></span><br><span class="line">      stringToPojo += workid -&gt; <span class="type">Pojo</span>(workid,cpu,mem,<span class="keyword">new</span> <span class="type">Date</span>().getTime)</span><br><span class="line">      println(stringToPojo)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>master定时心跳检测</strong></p>
+<p>如果某个worker超过一段时间没有发送心跳，Master需要将该worker从当前的Worker集合中移除。可以通过Akka的定时任务，来实现心跳超时检查。</p>
+<p><strong>步骤</strong></p>
+<ol>
+<li>编写工具类，读取检查心跳间隔时间间隔、超时时间</li>
+<li>定时检查心跳，过滤出来大于超时时间的Worker</li>
+<li>移除超时的Worker</li>
+<li>对现有Worker按照内存进行降序排序，打印可用Worker</li>
+</ol>
+<p><strong>参考代码</strong></p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">修改 master的配置文件</span><br><span class="line"></span><br><span class="line"><span class="comment">//检查worker心跳的时间周期</span></span><br><span class="line">master<span class="selector-class">.heartbeat</span><span class="selector-class">.check</span><span class="selector-class">.interval</span>=<span class="number">6</span></span><br><span class="line"><span class="comment">//配置worker的心跳超时时间</span></span><br><span class="line">master<span class="selector-class">.heartbeat</span><span class="selector-class">.check</span><span class="selector-class">.timeout</span>=<span class="number">15</span></span><br></pre></td></tr></table></figure>
+<p>ConfigUtil.scala</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> com.typesafe.config.&#123;<span class="type">Config</span>, <span class="type">ConfigFactory</span>&#125;</span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">ConfigUtil</span> </span>&#123;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">val</span> config: <span class="type">Config</span> = <span class="type">ConfigFactory</span>.load()</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 心跳检查时间间隔</span></span><br><span class="line">  <span class="keyword">val</span> `master.heartbeat.check.interval` = config.getInt(<span class="string">"master.heartbeat.check.interval"</span>)</span><br><span class="line">  <span class="comment">// 心跳超时时间</span></span><br><span class="line">  <span class="keyword">val</span> `master.heartbeat.check.timeout` = config.getInt(<span class="string">"master.heartbeat.check.timeout"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>MasterActor.scala</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.<span class="type">Date</span></span><br><span class="line"><span class="keyword">import</span> akka.actor.<span class="type">Actor</span></span><br><span class="line"><span class="keyword">import</span> com.nicai.common.&#123;<span class="type">MsgHeartBeat</span>, <span class="type">MsgRegin</span>, <span class="type">MsgSuccess</span>, <span class="type">Pojo</span>&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> scala.collection.mutable</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">MasterActor</span> <span class="keyword">extends</span> <span class="title">Actor</span></span>&#123;</span><br><span class="line">  <span class="comment">//保存消息</span></span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">var</span> stringToPojo: mutable.<span class="type">Map</span>[<span class="type">String</span>, <span class="type">Pojo</span>] = collection.mutable.<span class="type">Map</span>[<span class="type">String</span>,<span class="type">Pojo</span>]()</span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">preStart</span></span>(): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="comment">// 导入时间单位隐式转换</span></span><br><span class="line">    <span class="keyword">import</span> scala.concurrent.duration._</span><br><span class="line">    <span class="comment">// 导入隐式参数</span></span><br><span class="line">    <span class="keyword">import</span> context.dispatcher</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 1. 启动定时任务</span></span><br><span class="line">    context.system.scheduler.schedule(<span class="number">0</span> seconds,</span><br><span class="line">      <span class="type">ConfigUtil</span>.`master.heartbeat.check.interval` seconds)&#123;</span><br><span class="line">      <span class="comment">// 2. 过滤大于超时时间的Worker</span></span><br><span class="line">      <span class="keyword">val</span> timeoutWorkerMap = stringToPojo.filter &#123;</span><br><span class="line">        keyval =&gt;</span><br><span class="line">          <span class="comment">// 获取最后一次心跳更新时间</span></span><br><span class="line">          <span class="keyword">val</span> lastHeartBeatTime = keyval._2.heartBeat</span><br><span class="line">          <span class="comment">// 当前系统时间 - 最后一次心跳更新时间 &gt; 超时时间（配置文件） * 1000，返回true，否则返回false</span></span><br><span class="line">          <span class="keyword">if</span> (<span class="keyword">new</span> <span class="type">Date</span>().getTime - lastHeartBeatTime &gt; <span class="type">ConfigUtil</span>.`master.heartbeat.check.timeout` * <span class="number">1000</span>) &#123;</span><br><span class="line">            <span class="literal">true</span></span><br><span class="line">          &#125;</span><br><span class="line">          <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="literal">false</span></span><br><span class="line">          &#125;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="comment">// 3. 移除超时Worker</span></span><br><span class="line">      <span class="keyword">if</span>(!timeoutWorkerMap.isEmpty) &#123;</span><br><span class="line">        stringToPojo --= timeoutWorkerMap.map(_._1)</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 4. 对Worker按照内存进行降序排序，打印Worker</span></span><br><span class="line">        <span class="keyword">val</span> workerList = stringToPojo.map(_._2).toList</span><br><span class="line">        <span class="keyword">val</span> sortedWorkerList = workerList.sortBy(_.mem).reverse</span><br><span class="line">        println(<span class="string">"按照内存降序排序后的Worker列表："</span>)</span><br><span class="line">        println(sortedWorkerList)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">receive</span></span>: <span class="type">Receive</span> = &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="type">MsgRegin</span>(workid,cpu,mem) =&gt; &#123;</span><br><span class="line">      println(<span class="string">"收到注册消息"</span>+workid+<span class="string">"-"</span>+cpu+<span class="string">"-"</span>+mem)</span><br><span class="line">      <span class="comment">//保存消息到实体类</span></span><br><span class="line">      stringToPojo += workid -&gt; <span class="type">Pojo</span>(workid,cpu,mem,<span class="keyword">new</span> <span class="type">Date</span>().getTime)</span><br><span class="line">      <span class="comment">//回复消息</span></span><br><span class="line">      sender ! <span class="type">MsgSuccess</span>(<span class="string">"success"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">      <span class="comment">//心跳</span></span><br><span class="line">    <span class="keyword">case</span> <span class="type">MsgHeartBeat</span>(workid,cpu,mem)=&gt;&#123;</span><br><span class="line">      println(<span class="string">"接收到心跳"</span>)</span><br><span class="line">      <span class="comment">//更新消息</span></span><br><span class="line">      stringToPojo += workid -&gt; <span class="type">Pojo</span>(workid,cpu,mem,<span class="keyword">new</span> <span class="type">Date</span>().getTime)</span><br><span class="line">      println(stringToPojo)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>多个worker测试</strong></p>
+<p>修改配置文件，启动多个worker进行测试。</p>
+<p><strong>步骤</strong></p>
+<ol>
+<li>测试启动新的Worker是否能够注册成功 (修改worker的端口号即可)</li>
+<li>停止Worker，测试是否能够从现有列表删除</li>
+</ol>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+      <div>
+        <div id="reward-container">
+  <div>Thank you for your accept. mua！</div>
+  <button id="reward-button" disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/reward/wechatpay.jpg" alt="丨HF丨 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/reward/alipay.jpg" alt="丨HF丨 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        
+
+
+
+
+  
+
+
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>丨HF丨</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    
+    <a href="https://manzhong.github.io/2017/08/13/Scala高级.html" title="Scala高级">https://manzhong.github.io/2017/08/13/Scala高级.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+    <div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:16px;">-------------本文结束<i class="fa fa-heart"></i>感谢您的阅读-------------</div>
+    
+</div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/BigData/" rel="tag"><i class="fa fa-tag"></i> BigData</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/08/12/Scala进阶2.html" rel="next" title="Scala进阶2">
+                <i class="fa fa-chevron-left"></i> Scala进阶2
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/08/14/ElSearch.html" rel="prev" title="ElSearch">
+                ElSearch <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC81MDA2Mi8yNjU1Mw=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/hexo.jpg" alt="丨HF丨">
+            
+              <p class="site-author-name" itemprop="name">丨HF丨</p>
+              <div class="site-description motion-element" itemprop="description">第二名就是头号输家!!!</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">54</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/ipyker" title="GitHub &rarr; https://github.com/ipyker" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:pyker@qq.com" title="E-Mail &rarr; mailto:pyker@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://weibo.com/viszhang" title="Weibo &rarr; https://weibo.com/viszhang" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="tencent://message/?uin=123435796&Site=&menu=yes" title="QQ &rarr; tencent://message/?uin=123435796&Site=&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i>QQ</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-book"></i>
+                推荐阅读
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://www.54tianzhisheng.cn/tags/Flink/" title="http://www.54tianzhisheng.cn/tags/Flink/" rel="noopener" target="_blank">Flink</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://nginxconfig.io/" title="https://nginxconfig.io/" rel="noopener" target="_blank">Nginxconfig</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://linux.51yip.com/" title="http://linux.51yip.com/" rel="noopener" target="_blank">Linux命令手册</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://echarts.baidu.com/index.html" title="https://echarts.baidu.com/index.html" rel="noopener" target="_blank">echarts可视化库</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+        </div>
+      </div>
+
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" style=" text-align:center;">&copy; 2017 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HF</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"> 站点字数合计:</i>
+    </span>
+    
+    <span title="站点总字数">961k</span>
+  
+  
+  <span class="post-meta-divider">|</span>
+  <a href="http://www.beian.miit.gov.cn" rel="noopener" target="_blank">粤ICP备19028706号 </a>
+
+</div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+
+<div class="run_time" style=" text-align:center;">
+  <span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+  <script>
+    var now = new Date(); 
+    function createtime() { 
+        var grt= new Date("07/23/2017 10:00:00");//此处修改你的建站时间或者网站上线时间 
+        now.setTime(now.getTime()+250); 
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days); 
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours); 
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum); 
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;} 
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum); 
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;} 
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 "; 
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒"; 
+    } 
+    setInterval("createtime()",250);
+  </script>
+</div>
+        
+<div class="busuanzi-count" style=" text-align:center;">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      我的第 <span class="busuanzi-value" id="busuanzi_value_site_uv"></span> 位朋友，
+    </span>
+  
+
+
+
+  
+    <span class="site-pv">
+      历经 <span class="busuanzi-value" id="busuanzi_value_site_pv"></span> 次回眸才与你相遇
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+  
+    
+    
+      
+    
+  
+  <script color="255,0,255" opacity="0.7" zindex="-1" count="140" src="//cdn.jsdelivr.net/gh/theme-next/theme-next-canvas-nest@1.0.0/canvas-nest.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.1"></script>
+
+  <script src="/js/motion.js?v=7.1.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/schemes/muse.js?v=7.1.1"></script>
+
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.1"></script>
+<script src="/js/post-details.js?v=7.1.1"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.1"></script>
+
+
+  
+
+  
+
+  
+  
+  
+
+  
+
+  
+  
+  
+
+
+  
+
+
+  
+    <script>
+  window.livereOptions = {
+    refer: '2017/08/13/Scala高级.html'
+  };
+  (function(d, s) {
+    var j, e = d.getElementsByTagName(s)[0];
+    if (typeof LivereTower === 'function') { return; }
+    j = d.createElement(s);
+    j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+    j.async = true;
+    e.parentNode.insertBefore(j, e);
+  })(document, 'script');
+</script>
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <script src="/lib/bookmark/bookmark.min.js?v=1.0"></script>
+  <script>
+  
+    bookmark.scrollToMark('auto', "#更多");
+  
+  </script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

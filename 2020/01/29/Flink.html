@@ -1,0 +1,2195 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="true">
+
+
+
+  
+  
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.1.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":true,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: true,
+    fastclick: true,
+    lazyload: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"shrinkIn","post_header":"slideLeftIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideDownIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Flink目标:  批数据处理编程ExecutionEnviroment 流数据处理编程StreamExecutionEnviroment Flink原理 checkpoint、watermark  Flink是什么 Flink是什么  Flink是一个分布式计算引擎   MapReduce Tez Spark Storm  同时支持流计算和批处理,Spark也能做批和流 和Spark不同, Fl">
+<meta name="keywords" content="BigData">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Flink">
+<meta property="og:url" content="https://manzhong.github.io/2020/01/29/Flink.html">
+<meta property="og:site_name" content="春雨里洗过的太阳">
+<meta property="og:description" content="Flink目标:  批数据处理编程ExecutionEnviroment 流数据处理编程StreamExecutionEnviroment Flink原理 checkpoint、watermark  Flink是什么 Flink是什么  Flink是一个分布式计算引擎   MapReduce Tez Spark Storm  同时支持流计算和批处理,Spark也能做批和流 和Spark不同, Fl">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://manzhong.github.io/images/flink/1562028424379.png">
+<meta property="og:image" content="https://manzhong.github.io/images/flink/1552262880777.png">
+<meta property="og:image" content="https://manzhong.github.io/images/flink/1562030371983.png">
+<meta property="og:image" content="https://manzhong.github.io/images/flink/1562030558179.png">
+<meta property="og:image" content="https://manzhong.github.io/images/flink/1551371410207.png">
+<meta property="og:image" content="https://manzhong.github.io/images/flink/1562031534374.png">
+<meta property="og:image" content="https://manzhong.github.io/images/flink/1562032031225.png">
+<meta property="og:image" content="https://manzhong.github.io/images/flink/1549597292752.png">
+<meta property="og:image" content="https://manzhong.github.io/images/flink/1552262977056.png">
+<meta property="og:image" content="https://manzhong.github.io/images/flink/1552235254266.png">
+<meta property="og:image" content="https://manzhong.github.io/images/flink/1552235561890.png">
+<meta property="og:image" content="https://manzhong.github.io/images/flink/1552235588450.png">
+<meta property="og:image" content="j:/bigdata/flink/%E5%8D%95%E8%AE%B2flink/Flink_Day01/%E7%AC%94%E8%AE%B0/assets/1556163566631.png">
+<meta property="og:image" content="https://manzhong.github.io/images/flink/image-20190310032347894.png">
+<meta property="og:image" content="https://manzhong.github.io/images/flink/1552237399762.png">
+<meta property="og:image" content="https://manzhong.github.io/images/flink/1556113247963.png">
+<meta property="og:image" content="j:/bigdata/flink/%E5%8D%95%E8%AE%B2flink/Flink_Day01/%E7%AC%94%E8%AE%B0/assets/1556113313917.png">
+<meta property="og:image" content="https://manzhong.github.io/images/flink/1556105954132.png">
+<meta property="og:image" content="https://manzhong.github.io/images/flink/1552237668392.png">
+<meta property="og:image" content="https://manzhong.github.io/images/flink/1552237681751.png">
+<meta property="og:image" content="https://manzhong.github.io/images/flink/1556117026180.png">
+<meta property="og:image" content="https://manzhong.github.io/images/flink/1552238687243.png">
+<meta property="og:image" content="https://manzhong.github.io/images/flink/1552238935817.png">
+<meta property="og:image" content="https://manzhong.github.io/images/flink/1552239345226.png">
+<meta property="og:image" content="https://manzhong.github.io/images/flink/1552239660524.png">
+<meta property="og:image" content="https://manzhong.github.io/images/flink/1552239700782.png">
+<meta property="og:image" content="https://manzhong.github.io/images/flink/1552239709601.png">
+<meta property="og:image" content="https://manzhong.github.io/images/flink/1552240900014.png">
+<meta property="og:image" content="https://manzhong.github.io/images/flink/1552241036506.png">
+<meta property="og:image" content="https://manzhong.github.io/images/flink/1552241154668.png">
+<meta property="og:updated_time" content="2020-02-03T09:03:42.437Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Flink">
+<meta name="twitter:description" content="Flink目标:  批数据处理编程ExecutionEnviroment 流数据处理编程StreamExecutionEnviroment Flink原理 checkpoint、watermark  Flink是什么 Flink是什么  Flink是一个分布式计算引擎   MapReduce Tez Spark Storm  同时支持流计算和批处理,Spark也能做批和流 和Spark不同, Fl">
+<meta name="twitter:image" content="https://manzhong.github.io/images/flink/1562028424379.png">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="春雨里洗过的太阳" type="application/atom+xml">
+
+
+
+  
+  
+  <link rel="canonical" href="https://manzhong.github.io/2020/01/29/Flink">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Flink | 春雨里洗过的太阳</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+ 
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">春雨里洗过的太阳</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-bookmark"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-互动">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/guestbook/" rel="section"><i class="menu-item-icon fa fa-fw fa-comments"></i> <br>互动</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://manzhong.github.io/2020/01/29/Flink.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="丨HF丨">
+      <meta itemprop="description" content="第二名就是头号输家!!!">
+      <meta itemprop="image" content="/images/hexo.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="春雨里洗过的太阳">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Flink
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2020-01-29 09:20:09" itemprop="dateCreated datePublished" datetime="2020-01-29T09:20:09+08:00">2020-01-29</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2020-02-03 17:03:42" itemprop="dateModified" datetime="2020-02-03T17:03:42+08:00">2020-02-03</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/BigData/" itemprop="url" rel="index"><span itemprop="name">BigData</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">37k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">34 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Flink"><a href="#Flink" class="headerlink" title="Flink"></a>Flink</h1><p>目标:</p>
+<ol>
+<li>批数据处理编程ExecutionEnviroment</li>
+<li>流数据处理编程StreamExecutionEnviroment</li>
+<li>Flink原理</li>
+<li>checkpoint、watermark</li>
+</ol>
+<h2 id="Flink是什么"><a href="#Flink是什么" class="headerlink" title="Flink是什么"></a>Flink是什么</h2><ul>
+<li><p>Flink是什么</p>
+<ul>
+<li><p>Flink是一个分布式计算引擎   MapReduce Tez Spark Storm</p>
+<ul>
+<li>同时支持流计算和批处理,Spark也能做批和流</li>
+<li>和Spark不同, Flink是使用流的思想做批, Spark是采用做批的思想做流</li>
+</ul>
+</li>
+<li><p>Flink的优势</p>
+<ul>
+<li>和Hadoop相比, Flink使用内存进行计算, 速度明显更优</li>
+<li>和同样使用内存的Spark相比, Flink对于流的计算是实时的, <strong>延迟更低</strong></li>
+<li>和同样使用实时流的Storm相比, Flink明显具有更优秀的API, 以及更多的支持, 并且支持批量计算</li>
+</ul>
+</li>
+<li><p>速度</p>
+<p>测试环境：<br>1.CPU：7000个； </p>
+<p>2.内存：单机128GB； </p>
+<p>3.版本：Hadoop 2.3.0，Spark 1.4，Flink 0.9 </p>
+<p>4.数据：800MB，8GB，8TB； </p>
+<p>5.算法：K-means：以空间中K个点为中心进行聚类，对最靠近它们的对象归类。通过迭代的方法，逐次<br>更新各聚类中心的值，直至得到最好的聚类结果。</p>
+<p> 6.迭代：K=10，3组数据</p>
+<p>纵坐标是秒，横坐标是次数</p>
+<p><img src="/images/flink/1562028424379.png" alt="img"></p>
+<p>结论:</p>
+<p>Spark和Flink全部都运行在Hadoop YARN上，性能为Flink &gt; Spark &gt; Hadoop(MR)，迭代次数越多越明显,<strong>性能上，Flink优于Spark和Hadoop最主要的原因是Flink支持增量迭代，具有对迭代自动优化的功能</strong></p>
+<ul>
+<li>在单机上, Storm大概能达到30万条/秒的吞吐量, Flink的吞吐量大概是Storm得3-5倍.在阿里中,Flink集群能达到每秒能处理17亿数据量,一天可处理上万亿条数据</li>
+<li>在单机上, Flink消息处理的延迟大概在50毫秒左右, 这个数据大概是Spark的3-5倍</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>Flink的发展现状</p>
+</li>
+<li><p>08年Flink在德国柏林大学</p>
+</li>
+<li><p>14年Apache立为顶级项目.阿里15年开始使用</p>
+<ul>
+<li>Flink在很多公司的生产环境中得到了使用, 例如: ebay, 腾讯, 阿里, 亚马逊, 华为等</li>
+<li>Blink</li>
+</ul>
+</li>
+<li><p>Flink的母公司被阿里全资收购, 阿里一直致力于Flink在国内的推广使用</p>
+</li>
+<li><p>Flink的适用场景</p>
+<ul>
+<li>零售业和市场营销(运营)</li>
+<li>物联网,5G 300M/s  延迟低  50ms  100ms 无人驾驶</li>
+</ul>
+<p>华人运通:hiphi1 10万辆 560个  没200ms采集一次数据 2800条</p>
+<ul>
+<li>电信业</li>
+<li>银行和金融业</li>
+</ul>
+</li>
+<li><p>对比Flink、Spark、Storm</p>
+<p>Flink、Spark Streaming、Storm都可以进行实时计算，但各有特点</p>
+<p>| 计算框架            | 处理模型                  | 保证次数                    | 容错机制                | 延时   | 吞吐量  |<br>| ————— | ——————— | ———————– | ——————- | —- | —- |<br>| Storm           | native（数据进入立即处理）      | At-least-once<br>至少一次 | ACK机制               | 低    | 低    |<br>| Spark Streaming | micro-batching        | Exactly-once            | 基于RDD和 checkpoint   | 中    | 高    |<br>| Flink           | native、micro-batching | Exactly-once            | checkpoint（Flink快照） | 低    | 高    |</p>
+</li>
+</ul>
+<h2 id="Flink的体系架构"><a href="#Flink的体系架构" class="headerlink" title="Flink的体系架构"></a>Flink的体系架构</h2><p><img src="/images/flink/1552262880777.png" alt="1552262880777"></p>
+<h2 id="有界流和无界流"><a href="#有界流和无界流" class="headerlink" title="有界流和无界流"></a>有界流和无界流</h2><p>无界流：意思很明显，只有开始没有结束。必须连续的处理无界流数据，也即是在事件注入之后立即要对其<br>进行处理。不能等待数据到达了再去全部处理，因为数据是无界的并且永远不会结束数据注入。处理无界流数<br>据往往要求事件注入的时候有一定的顺序性，例如可以以事件产生的顺序注入，这样会使得处理结果完整。</p>
+<p>有界流：也即是有明确的开始和结束的定义。有界流可以等待数据全部注入完成了再开始处理。注入的顺序<br>不是必须的了，因为对于一个静态的数据集，我们是可以对其进行排序的。有界流的处理也可以称为批处<br>理。</p>
+<p>Data Streams ，Flink认为有界数据集是无界数据流的一种特例，所以说有界数据集也是一种数据流，事件流<br>也是一种数据流。Everything is streams ，即Flink可以用来处理任何的数据，可以支持批处理、流处理、<br>AI、MachineLearning等等。<br>Stateful Computations，即有状态计算。有状态计算是最近几年来越来越被用户需求的一个功能。比如说一个<br>网站一天内访问UV数，那么这个UV数便为状态。Flink提供了内置的对状态的一致性的处理，即如果任务发生<br>了Failover，其状态不会丢失、不会被多算少算，同时提供了非常高的性能。</p>
+<p>其它特点:<br>​    性能优秀(尤其在流计算领域)<br>​    高可扩展性<br>​    支持容错<br>​    纯内存式的计算引擎，做了内存管理方面的大量优化<br>​    支持eventime 的处理<br>​    支持超大状态的Job(在阿里巴巴中作业的state大小超过TB的是非常常见的)<br>​    <strong>支持exactly-once 的处理。</strong></p>
+<h2 id="Flink安装及任务提交"><a href="#Flink安装及任务提交" class="headerlink" title="Flink安装及任务提交"></a>Flink安装及任务提交</h2><p>三种:</p>
+<p>1 local（本地）——单机模式，一般不使用<br>2 standalone——独立模式，Flink自带集群，开发测试环境使用<br>3 yarn——计算资源统一由Hadoop YARN管理，生产测试环境使用</p>
+<ul>
+<li>Standalone单机模式</li>
+<li>Standalone集群模式 </li>
+<li>Standalone的高可用HA模式</li>
+</ul>
+<h3 id="Standalone方式安装"><a href="#Standalone方式安装" class="headerlink" title="Standalone方式安装"></a>Standalone方式安装</h3><ol>
+<li><p>将Flink解压到指定目录，</p>
+</li>
+<li><p><img src="/images/flink/1562030371983.png" alt="1562030371983"></p>
+</li>
+<li><p>进入到Flink目录，使用以下命令启动Flink</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./bin/start-cluster.sh</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><img src="/images/flink/1562030558179.png" alt="1562030558179"></p>
+</li>
+<li><p>打开浏览器，使用<code>http://服务器地址:8081</code>，进入到Flink的Web UI中</p>
+<p><img src="/images/flink/1551371410207.png" alt="1551371410207"></p>
+</li>
+</ol>
+<h3 id="standalone集群方式安装"><a href="#standalone集群方式安装" class="headerlink" title="standalone集群方式安装"></a>standalone集群方式安装</h3><ol>
+<li><p>下载Flink，并解压到指定目录</p>
+</li>
+<li><p>配置<code>conf/flink-conf.yaml</code></p>
+</li>
+<li><p><img src="/images/flink/1562031534374.png" alt="1562031534374"></p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 配置Master的机器名（IP地址）</span></span><br><span class="line"><span class="string">jobmanager.rpc.address:</span> <span class="string">node01</span></span><br><span class="line"><span class="comment"># 配置Master的端口号</span></span><br><span class="line"><span class="string">jobmanager.rpc.port:</span> <span class="number">6123</span></span><br><span class="line"><span class="comment"># 配置Master的堆大小（默认MB）</span></span><br><span class="line"><span class="string">jobmanager.heap.size:</span> <span class="number">1024</span><span class="string">m</span></span><br><span class="line"><span class="comment"># 配置每个TaskManager的堆大小（默认MB）</span></span><br><span class="line"><span class="string">taskmanager.heap.size:</span> <span class="number">1024</span><span class="string">m</span></span><br><span class="line"><span class="comment"># 配置每个TaskManager可以运行的槽</span></span><br><span class="line"><span class="string">taskmanager.numberOfTaskSlots:</span> <span class="number">4</span></span><br><span class="line"><span class="comment"># 配置每个taskmanager生成的临时文件夹</span></span><br><span class="line"><span class="string">taskmanager.tmp.dirs:</span> <span class="string">/export/data/flink</span></span><br><span class="line"><span class="comment"># 配置webui启动的机器名（IP地址）</span></span><br><span class="line"><span class="string">web.address:</span> <span class="string">node01</span></span><br><span class="line"><span class="comment"># 配置webui启动的端口号</span></span><br><span class="line"><span class="string">rest.port:</span> <span class="number">8081</span></span><br><span class="line"><span class="comment"># 是否支持通过web ui提交Flink作业</span></span><br><span class="line"><span class="string">web.submit.enable:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>配置<code>masters</code></p>
+</li>
+</ol>
+<figure class="highlight avrasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">node01:</span><span class="number">8081</span></span><br></pre></td></tr></table></figure>
+<ol>
+<li><p>配置<code>slaves</code>文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">node01</span><br><span class="line">node02</span><br><span class="line">node03</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>分发Flink到集群中的其他节点</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">scp -r flink-1.7.2 node02:$PWD</span><br><span class="line">scp -r flink-1.7.2 node03:$PWD</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>启动集群</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./bin/start-cluster.sh</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><img src="/images/flink/1562032031225.png" alt="1562032031225"></p>
+</li>
+<li><p>浏览Flink UI界面</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://node01:8081</span><br></pre></td></tr></table></figure>
+<p>Flink主界面：通过主界面可以查看到当前的TaskManager和多少个Slots</p>
+<p><img src="/images/flink/1549597292752.png" alt="1549597292752"></p>
+<p>TaskManager界面：可以查看到当前Flink集群中有多少个TaskManager，每个TaskManager的slots、内存、CPU Core是多少。</p>
+<p>​</p>
+</li>
+</ol>
+<h3 id="HA集群搭建"><a href="#HA集群搭建" class="headerlink" title="HA集群搭建"></a>HA集群搭建</h3><p>Flink的JobManager存在单点故障，在生产环境中，需要对JobManager进行高可用部署。JobManager高可用基于<code>ZooKeeper</code>实现，同时HA的信息需要存储在<code>HDFS</code>中，故也需要HDFS集群。</p>
+<ol>
+<li>前提：启动ZooKeeper—&gt;zkServer.sh start</li>
+<li>前提：启动HDFS —&gt;start-dfs.sh</li>
+<li>修改node02的<code>conf/flink-conf.yaml</code>配置文件</li>
+</ol>
+<blockquote>
+<p>web.address: node02</p>
+<p>rest.port: 8081</p>
+</blockquote>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#node01/02/03的每个flink-conf.yaml配置文件开启HA</span></span><br><span class="line"><span class="string">state.backend:</span> <span class="string">filesystem</span></span><br><span class="line"><span class="string">state.backend.fs.checkpointdir:</span> <span class="attr">hdfs://node01:8020/flink-checkpoints</span></span><br><span class="line"><span class="attr">high-availability:</span> <span class="string">zookeeper</span></span><br><span class="line"><span class="string">high-availability.storageDir:</span> <span class="attr">hdfs://node01:8020/flink/ha/</span></span><br><span class="line"><span class="string">high-availability.zookeeper.quorum:</span> <span class="attr">node01:2181,node02:2181,node03:2181</span></span><br><span class="line"><span class="string">high-availability.zookeeper.client.acl:</span> <span class="string">open</span></span><br></pre></td></tr></table></figure>
+<ol>
+<li><p>修改3台机器的<code>conf/masters</code>配置文件</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">node01:</span><span class="number">8081</span></span><br><span class="line"><span class="attr">node02:</span><span class="number">8081</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>启动Zookeeper集群</p>
+</li>
+<li><p>启动HDFS集群</p>
+</li>
+<li><p>启动Flink集群</p>
+</li>
+</ol>
+<h3 id="Flink程序提交方式"><a href="#Flink程序提交方式" class="headerlink" title="Flink程序提交方式"></a>Flink程序提交方式</h3><p>​    在企业生产中,为了最大化利用资源,一般都会在一个集群中同时运行多种类型的任务,我们Flink也是支持在Yarn/Mesos等平台运行.Flink的任务提交有两种方式,分别是Session和Job</p>
+<p><img src="/images/flink/1552262977056.png" alt="1552262977056"></p>
+<ul>
+<li>首先需要配置相关Hadoop的环境</li>
+</ul>
+<ol>
+<li>修改yarn-site.xml</li>
+</ol>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim <span class="variable">$HADOOP_HOME</span><span class="regexp">/etc/</span>hadoop<span class="regexp">/yarn-site.xml</span></span><br></pre></td></tr></table></figure>
+<p>添加如下配置,<strong>并拷贝到node02/node03</strong>:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.nodemanager.vmem-check-enabled<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">value</span>&gt;</span>false<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>是否启动一个线程检查每个任务正使用的虚拟内存量，如果任务超出分配值，则直接将其杀掉，默认是true。在这里面我们需要关闭，因为对于flink使用yarn模式下，很容易内存超标，这个时候yarn会自动杀掉job</p>
+</blockquote>
+<ol>
+<li>添加HADOOP_CONF_DIR环境变量</li>
+</ol>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/profile</span><br><span class="line"><span class="comment"># 此处的路径为服务器上的hadoop路径</span></span><br><span class="line"><span class="builtin-name">export</span> <span class="attribute">HADOOP_CONF_DIR</span>=/export/servers/hadoop路径/etc/hadoop</span><br><span class="line"><span class="builtin-name">export</span> <span class="attribute">HADOOP_CONF_DIR</span>=/export/servers/hadoop-2.7.5/etc/hadoop</span><br><span class="line"><span class="builtin-name">export</span> <span class="attribute">HADOOP_CONF_DIR</span>=/export/servers/hadoop-2.7.5/etc/hadoop</span><br><span class="line">修改后记得:</span><br><span class="line">将node02和node03的环境变量都做修改.</span><br><span class="line">source /etc/profle</span><br></pre></td></tr></table></figure>
+<h4 id="方式1-session"><a href="#方式1-session" class="headerlink" title="方式1:session"></a>方式1:session</h4><ul>
+<li><p>在<code>yarn</code>上启动一个Flink Job，执行以下命令</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">启动Yarn集群</span></span><br><span class="line">start-yarn.sh</span><br><span class="line"><span class="meta">#</span><span class="bash">通过-h参数可以查看yarn-session的参数功能</span></span><br><span class="line">bin/yarn-session.sh -h</span><br><span class="line"><span class="meta">#</span><span class="bash">使用Flink自带yarn-session.sh脚本开启Yarn会话</span></span><br><span class="line">bin/yarn-session.sh -n 2 -tm 800 -s 2</span><br><span class="line"><span class="meta">#</span><span class="bash">可以事先关闭  否则会出现程序跑不完</span></span><br><span class="line">./bin/stop-cluster.sh</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>-n</code> 表示分配多少个container，这里指的就是多少个taskmanager</li>
+<li><code>-tm</code> 表示每个TaskManager的内存大小</li>
+<li><code>-s</code> 表示每个TaskManager的slots数量</li>
+</ul>
+<blockquote>
+<p>上面的命令的意思是，同时向Yarn申请3个container（<strong>即便只申请了两个，因为ApplicationMaster和Job Manager有一个额外的容器。一旦将Flink部署到YARN群集中，它就会显示Job Manager的连接详细信息。</strong>），其中 2 个 Container 启动 TaskManager（-n 2），每个 TaskManager 拥有两个 Task Slot（-s 2），并且向每个 TaskManager 的 Container 申请 800M 的内存，以及一个ApplicationMaster（Job Manager）。</p>
+<p>如果不想让Flink YARN客户端始终运行，那么也可以启动分离的 YARN会话。该参数被称为-d或–detached。在这种情况下，Flink YARN客户端只会将Flink提交给群集，然后关闭它自己</p>
+</blockquote>
+<p><img src="/images/flink/1552235254266.png" alt="1552235254266"></p>
+</li>
+<li><p>然后使用flink提交任务：</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bin/flink <span class="keyword">run</span><span class="bash"> examples/batch/WordCount.jar</span></span><br></pre></td></tr></table></figure>
+<p><img src="/images/flink/1552235561890.png" alt="1552235561890"></p>
+<p>通过上方的ApplicationMaster可以进入Flink的管理界面:</p>
+<p><img src="/images/flink/1552235588450.png" alt="1552235588450"></p>
+</li>
+<li><p>停止当前任务:</p>
+<p>yarn application -kill application_1562034096080_0001</p>
+</li>
+</ul>
+<h4 id="方式2-job"><a href="#方式2-job" class="headerlink" title="方式2:job"></a>方式2:job</h4><p>上面的YARN session是在Hadoop YARN环境下启动一个Flink cluster集群，里面的资源是可以共享给其他的Flink作业。我们还可以在YARN上启动一个Flink作业，这里我们还是使用./bin/flink，但是不需要事先启动YARN session：</p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bin/flink run -m yarn-cluster -yn 2 ./examples/batch/WordCount.jar</span><br></pre></td></tr></table></figure>
+<p>以上命令在参数前加上y前缀，-yn表示TaskManager个数</p>
+<ul>
+<li><p>停止yarn-cluster</p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yarn <span class="built_in">application</span> -kill <span class="built_in">application</span>的ID</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>这种方式一般适用于长时间工作的任务,如果任务比较小,或者工作时间短,建议适用session方式,减少资源创建的时间.实际生产环境中,job方式适用较多.</p>
+<p>区别:</p>
+<p>Session方式适合提交小任务,因为资源的开辟需要的时间比较长,session方式资源是共享的,</p>
+<p>Job适合提交长时间运行的任务,大作业,资源是独有的.</p>
+<h2 id="入门案例"><a href="#入门案例" class="headerlink" title="入门案例"></a>入门案例</h2><h4 id="创建工程"><a href="#创建工程" class="headerlink" title="创建工程"></a>创建工程</h4><h4 id="导入pom文件"><a href="#导入pom文件" class="headerlink" title="导入pom文件"></a>导入pom文件</h4><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">properties</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">maven.compiler.source</span>&gt;</span>1.8<span class="tag">&lt;/<span class="name">maven.compiler.source</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">maven.compiler.target</span>&gt;</span>1.8<span class="tag">&lt;/<span class="name">maven.compiler.target</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">encoding</span>&gt;</span>UTF-8<span class="tag">&lt;/<span class="name">encoding</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">scala.version</span>&gt;</span>2.11.2<span class="tag">&lt;/<span class="name">scala.version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">scala.compat.version</span>&gt;</span>2.11<span class="tag">&lt;/<span class="name">scala.compat.version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">hadoop.version</span>&gt;</span>2.6.0<span class="tag">&lt;/<span class="name">hadoop.version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">flink.version</span>&gt;</span>1.6.0<span class="tag">&lt;/<span class="name">flink.version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">properties</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.scala-lang<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>scala-library<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;scala.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.flink<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>flink-streaming-scala_2.11<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;flink.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.flink<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>flink-scala_2.11<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;flink.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.flink<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>flink-clients_2.11<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;flink.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.flink<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>flink-table_2.11<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;flink.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.hadoop<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>hadoop-client<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;hadoop.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">exclusions</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">exclusion</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>xml-apis<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>xml-apis<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">exclusion</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">exclusions</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>mysql<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>mysql-connector-java<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>5.1.38<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.alibaba<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>fastjson<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.2.22<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.flink<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>flink-connector-kafka-0.9_2.11<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;flink.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">build</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">sourceDirectory</span>&gt;</span>src/main/scala<span class="tag">&lt;/<span class="name">sourceDirectory</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">testSourceDirectory</span>&gt;</span>src/test/scala<span class="tag">&lt;/<span class="name">testSourceDirectory</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">plugins</span>&gt;</span></span><br><span class="line"></span><br><span class="line">            <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-compiler-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.5.1<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">source</span>&gt;</span>$&#123;maven.compiler.source&#125;<span class="tag">&lt;/<span class="name">source</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">target</span>&gt;</span>$&#123;maven.compiler.target&#125;<span class="tag">&lt;/<span class="name">target</span>&gt;</span></span><br><span class="line">                    <span class="comment">&lt;!--&lt;encoding&gt;$&#123;project.build.sourceEncoding&#125;&lt;/encoding&gt;--&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line"></span><br><span class="line">            <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>net.alchim31.maven<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>scala-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.2.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">executions</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">execution</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">goals</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">goal</span>&gt;</span>compile<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">goal</span>&gt;</span>testCompile<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;/<span class="name">goals</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">args</span>&gt;</span></span><br><span class="line">                                <span class="comment">&lt;!--&lt;arg&gt;-make:transitive&lt;/arg&gt;--&gt;</span></span><br><span class="line">                                <span class="tag">&lt;<span class="name">arg</span>&gt;</span>-dependencyfile<span class="tag">&lt;/<span class="name">arg</span>&gt;</span></span><br><span class="line">                                <span class="tag">&lt;<span class="name">arg</span>&gt;</span>$&#123;project.build.directory&#125;/.scala_dependencies<span class="tag">&lt;/<span class="name">arg</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;/<span class="name">args</span>&gt;</span></span><br><span class="line"></span><br><span class="line">                        <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">execution</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">executions</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-surefire-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.18.1<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">useFile</span>&gt;</span>false<span class="tag">&lt;/<span class="name">useFile</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">disableXmlReport</span>&gt;</span>true<span class="tag">&lt;/<span class="name">disableXmlReport</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">includes</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">include</span>&gt;</span>**/*Test.*<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">include</span>&gt;</span>**/*Suite.*<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">includes</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line"></span><br><span class="line">            <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-shade-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.3<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">executions</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">execution</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">phase</span>&gt;</span>package<span class="tag">&lt;/<span class="name">phase</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">goals</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">goal</span>&gt;</span>shade<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;/<span class="name">goals</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">filters</span>&gt;</span></span><br><span class="line">                                <span class="tag">&lt;<span class="name">filter</span>&gt;</span></span><br><span class="line">                                    <span class="tag">&lt;<span class="name">artifact</span>&gt;</span>*:*<span class="tag">&lt;/<span class="name">artifact</span>&gt;</span></span><br><span class="line">                                    <span class="tag">&lt;<span class="name">excludes</span>&gt;</span></span><br><span class="line">                                        <span class="comment">&lt;!--</span></span><br><span class="line"><span class="comment">                                        zip -d learn_spark.jar META-INF/*.RSA META-INF/*.DSA META-INF/*.SF</span></span><br><span class="line"><span class="comment">                                        --&gt;</span></span><br><span class="line">                                        <span class="tag">&lt;<span class="name">exclude</span>&gt;</span>META-INF/*.SF<span class="tag">&lt;/<span class="name">exclude</span>&gt;</span></span><br><span class="line">                                        <span class="tag">&lt;<span class="name">exclude</span>&gt;</span>META-INF/*.DSA<span class="tag">&lt;/<span class="name">exclude</span>&gt;</span></span><br><span class="line">                                        <span class="tag">&lt;<span class="name">exclude</span>&gt;</span>META-INF/*.RSA<span class="tag">&lt;/<span class="name">exclude</span>&gt;</span></span><br><span class="line">                                    <span class="tag">&lt;/<span class="name">excludes</span>&gt;</span></span><br><span class="line">                                <span class="tag">&lt;/<span class="name">filter</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;/<span class="name">filters</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">transformers</span>&gt;</span></span><br><span class="line">                                <span class="tag">&lt;<span class="name">transformer</span> <span class="attr">implementation</span>=<span class="string">"org.apache.maven.plugins.shade.resource.ManifestResourceTransformer"</span>&gt;</span></span><br><span class="line">                                    <span class="tag">&lt;<span class="name">mainClass</span>&gt;</span>com.itheima.batch.WordCount<span class="tag">&lt;/<span class="name">mainClass</span>&gt;</span></span><br><span class="line">                                <span class="tag">&lt;/<span class="name">transformer</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;/<span class="name">transformers</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">execution</span>&gt;</span></span><br><span class="line"></span><br><span class="line">                <span class="tag">&lt;/<span class="name">executions</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">plugins</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">build</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h4 id="编写代码"><a href="#编写代码" class="headerlink" title="编写代码"></a>编写代码</h4><ul>
+<li><p>WordCount</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">  <span class="keyword">val</span> env: <span class="type">ExecutionEnvironment</span> = <span class="type">ExecutionEnvironment</span>.getExecutionEnvironment</span><br><span class="line">  <span class="keyword">val</span> dataSet: <span class="type">DataSet</span>[<span class="type">String</span>] = env.fromElements(<span class="string">"hello"</span>, <span class="string">"world"</span>, <span class="string">"java"</span>, <span class="string">"hello"</span>, <span class="string">"java"</span>)</span><br><span class="line">  <span class="keyword">val</span> mapData: <span class="type">DataSet</span>[(<span class="type">String</span>, <span class="type">Int</span>)] = dataSet.map(line =&gt; (line, <span class="number">1</span>))</span><br><span class="line">  <span class="keyword">val</span> groupData: <span class="type">GroupedDataSet</span>[(<span class="type">String</span>, <span class="type">Int</span>)] = mapData.groupBy(<span class="number">0</span>)</span><br><span class="line">  <span class="keyword">val</span> sumData: <span class="type">AggregateDataSet</span>[(<span class="type">String</span>, <span class="type">Int</span>)] = groupData.sum(<span class="number">1</span>)</span><br><span class="line">  sumData.print()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p><img src="J:/bigdata/flink/%E5%8D%95%E8%AE%B2flink/Flink_Day01/%E7%AC%94%E8%AE%B0/assets/1556163566631.png" alt="1556163566631"></p>
+<h4 id="在Yarn上运行WordCount"><a href="#在Yarn上运行WordCount" class="headerlink" title="在Yarn上运行WordCount"></a>在Yarn上运行WordCount</h4><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> env: <span class="type">ExecutionEnvironment</span> = <span class="type">ExecutionEnvironment</span>.getExecutionEnvironment</span><br><span class="line">    <span class="keyword">val</span> dataSet: <span class="type">DataSet</span>[<span class="type">String</span>] = env.fromElements(<span class="string">"hello"</span>, <span class="string">"world"</span>, <span class="string">"java"</span>, <span class="string">"hello"</span>, <span class="string">"java"</span>)</span><br><span class="line">    <span class="keyword">val</span> result: <span class="type">AggregateDataSet</span>[(<span class="type">String</span>, <span class="type">Int</span>)] = dataSet.map(line =&gt; (line, <span class="number">1</span>)).groupBy(<span class="number">0</span>).sum(<span class="number">1</span>)</span><br><span class="line">    result.setParallelism(<span class="number">1</span>)</span><br><span class="line">    result.writeAsText(<span class="string">"hdfs://node01:8020/wordcount"</span>)</span><br><span class="line">    env.execute()</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>修改pom.xml中的主类名</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">transformers</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">transformer</span> <span class="attr">implementation</span>=<span class="string">"org.apache.maven.plugins.shade.resource.ManifestResourceTransformer"</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">mainClass</span>&gt;</span>cn.itcast.flink.WorldCount_02<span class="tag">&lt;/<span class="name">mainClass</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">transformer</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">transformers</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>打包</li>
+</ul>
+<p><img src="/images/flink/image-20190310032347894.png" alt="image-20190310032347894"></p>
+<ul>
+<li><p>提交执行</p>
+<ul>
+<li>将打出的jar放入服务器</li>
+</ul>
+<p><img src="/images/flink/1552237399762.png" alt="1552237399762"></p>
+</li>
+</ul>
+<p>使用session方式提交</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span>.先启动yarnsession</span><br><span class="line"> bin/yarn-session<span class="selector-class">.sh</span> -n <span class="number">2</span> -tm <span class="number">800</span> -s <span class="number">2</span></span><br><span class="line"><span class="number">2</span>.去web界面提交jar包.或者  bin/flink run /home/elasticsearch/flinkjar/itcast_learn_flink-<span class="number">1.0</span>-SNAPSHOT<span class="selector-class">.jar</span> com<span class="selector-class">.itcast</span><span class="selector-class">.DEMO</span><span class="selector-class">.WordCount</span></span><br></pre></td></tr></table></figure>
+<p>使用job方式提交</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bin/flink run -m yarn-cluster -yn 2 /home/elasticsearch/flinkjar/itcast_learn_flink-1.0-SNAPSHOT.jar com.itcast.DEMO.WordCount</span><br></pre></td></tr></table></figure>
+<h2 id="任务调度与执行"><a href="#任务调度与执行" class="headerlink" title="任务调度与执行"></a>任务调度与执行</h2><p>Flink的所有操作都称之为Operator,客户端在提交任务的时候会对Operator进行优化操作,能进行合并的Operator会被合并为一个Operator,合并后的Operator称为Operator chain</p>
+<p><img src="/images/flink/1556113247963.png" alt="1556113247963"></p>
+<p><img src="J:/bigdata/flink/%E5%8D%95%E8%AE%B2flink/Flink_Day01/%E7%AC%94%E8%AE%B0/assets/1556113313917.png" alt="1556113313917"></p>
+<ul>
+<li>客户端<ul>
+<li>主要职责是提交任务, 提交后可以结束进程, 也可以等待结果返回</li>
+</ul>
+</li>
+<li><code>JobManager</code><ul>
+<li>主要职责是调度工作并协调任务做检查点</li>
+<li><code>JobManager</code>从客户端接收到任务以后, 首先生成优化过的执行计划, 再调度到<code>TaskManager</code>中执行</li>
+</ul>
+</li>
+<li><code>TaskManager</code><ul>
+<li>主要职责是从<code>JobManager</code>处接收任务, 并部署和启动任务, 接收上游的数据并处理</li>
+<li><code>TaskManager</code>在创建之初就设置好了<code>Slot</code>, 每个<code>Slot</code>可以执行一个任务</li>
+</ul>
+</li>
+</ul>
+<p><img src="/images/flink/1556105954132.png" alt="1556105954132"></p>
+<h2 id="Flink的API"><a href="#Flink的API" class="headerlink" title="Flink的API"></a>Flink的API</h2><h3 id="DataSet的转换操作"><a href="#DataSet的转换操作" class="headerlink" title="DataSet的转换操作"></a>DataSet的转换操作</h3><table>
+<thead>
+<tr>
+<th>Transformation</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Map</strong></td>
+<td>在算子中得到一个元素并生成一个新元素<br><code>data.map { x =&gt; x.toInt }</code></td>
+</tr>
+<tr>
+<td><strong>FlatMap</strong></td>
+<td>在算子中获取一个元素, 并生成任意个数的元素<br><code>data.flatMap { str =&gt; str.split(&quot; &quot;) }</code></td>
+</tr>
+<tr>
+<td><strong>MapPartition</strong></td>
+<td>类似Map, 但是一次Map一整个并行分区<br><code>data.mapPartition { in =&gt; in map { (_, 1) } }</code></td>
+</tr>
+<tr>
+<td><strong>Filter</strong></td>
+<td>如果算子返回<code>true</code>则包含进数据集, 如果不是则被过滤掉<br><code>data.filter { _ &gt; 100 }</code></td>
+</tr>
+<tr>
+<td><strong>Reduce</strong></td>
+<td>通过将两个元素合并为一个元素, 从而将一组元素合并为一个元素<br><code>data.reduce { _ + _ }</code></td>
+</tr>
+<tr>
+<td><strong>ReduceGroup</strong></td>
+<td>将一组元素合并为一个或者多个元素<br><code>data.reduceGroup { elements =&gt; elements.sum }</code></td>
+</tr>
+<tr>
+<td><strong>Aggregate</strong></td>
+<td>讲一组值聚合为一个值, 聚合函数可以看作是内置的<code>Reduce</code>函数<br><code>data.aggregate(SUM, 0).aggregate(MIN, 2)</code><br><code>data.sum(0).min(2)</code></td>
+</tr>
+<tr>
+<td><strong>Distinct</strong></td>
+<td>去重</td>
+</tr>
+<tr>
+<td><strong>Join</strong></td>
+<td>按照相同的Key合并两个数据集<br><code>input1.join(input2).where(0).equalTo(1)</code><br>同时也可以选择进行合并的时候的策略, 是分区还是广播, 是基于排序的算法还是基于哈希的算法<br><code>input1.join(input2, JoinHint.BROADCAST_HASH_FIRST).where(0).equalTo(1)</code></td>
+</tr>
+<tr>
+<td><strong>OuterJoin</strong></td>
+<td>外连接, 包括左外, 右外, 完全外连接等<br><code>left.leftOuterJoin(right).where(0).equalTo(1) { (left, right) =&gt; ... }</code></td>
+</tr>
+<tr>
+<td><strong>CoGroup</strong></td>
+<td>二维变量的Reduce运算, 对每个输入数据集中的字段进行分组, 然后join这些组<br><code>input1.coGroup(input2).where(0).equalTo(1)</code></td>
+</tr>
+<tr>
+<td><strong>Cross</strong></td>
+<td>笛卡尔积<br><code>input1.cross(input2)</code></td>
+</tr>
+<tr>
+<td><strong>Union</strong></td>
+<td>并集<br><code>input1.union(input2)</code></td>
+</tr>
+<tr>
+<td><strong>Rebalance</strong></td>
+<td>分区重新平衡, 以消除数据倾斜<br><code>input.rebalance()</code></td>
+</tr>
+<tr>
+<td><strong>Hash-Partition</strong></td>
+<td>按照Hash分区<br><code>input.partitionByHash(0)</code></td>
+</tr>
+<tr>
+<td><strong>Range-Partition</strong></td>
+<td>按照Range分区<br><code>input.partitionByRange(0)</code></td>
+</tr>
+<tr>
+<td><strong>CustomParititioning</strong></td>
+<td>自定义分区<br><code>input.partitionCustom(partitioner: Partitioner[K], key)</code></td>
+</tr>
+<tr>
+<td><strong>First-n</strong></td>
+<td>返回数据集中的前n个元素<br><code>input.first(3)</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="flatmap"><a href="#flatmap" class="headerlink" title="flatmap"></a><code>flatmap</code></h4><p>map =&gt; 1 =&gt; 1</p>
+<p>flatmap =&gt; 1 =&gt; 多个数据</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">  <span class="keyword">val</span> env: <span class="type">ExecutionEnvironment</span> = <span class="type">ExecutionEnvironment</span>.getExecutionEnvironment</span><br><span class="line">  <span class="keyword">val</span> dataSet: <span class="type">DataSet</span>[(<span class="type">String</span>, <span class="type">Int</span>)] = env.fromElements((<span class="string">"A"</span> , <span class="number">1</span>) , (<span class="string">"B"</span> , <span class="number">1</span>) , (<span class="string">"C"</span> , <span class="number">1</span>))</span><br><span class="line">  dataSet.map(line =&gt; line._1 + <span class="string">"="</span> + line._2).print()</span><br><span class="line">  println(<span class="string">"------------------"</span>)</span><br><span class="line">  dataSet.flatMap(line =&gt; line._1 + <span class="string">"="</span> + line._2).print()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="filter"><a href="#filter" class="headerlink" title="filter"></a><code>filter</code></h4><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//TODO fileter=&gt;</span></span><br><span class="line"><span class="keyword">val</span> filter:<span class="type">DataSet</span>[<span class="type">String</span>] = elements.filter(line =&gt; line.contains(<span class="string">"java"</span>))<span class="comment">//过滤出带java的数据</span></span><br><span class="line">filter.print()</span><br></pre></td></tr></table></figure>
+<h4 id="reduce"><a href="#reduce" class="headerlink" title="reduce"></a><code>reduce</code></h4><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//默认并行度为8,全局并行度设为1</span></span><br><span class="line"><span class="comment">//    env.setParallelism(1)</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//加载数据</span></span><br><span class="line">    <span class="keyword">val</span> sourceData: <span class="type">DataSet</span>[<span class="type">String</span>] = env.readTextFile(<span class="string">"access.log"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> mapData: <span class="type">DataSet</span>[<span class="type">Array</span>[<span class="type">String</span>]] = sourceData.map(line =&gt; line.split(<span class="string">" "</span>))</span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> flatMapData: <span class="type">DataSet</span>[<span class="type">String</span>] = mapData.flatMap(line =&gt; line)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> mData: <span class="type">DataSet</span>[(<span class="type">String</span>, <span class="type">Int</span>)] = flatMapData.map(line =&gt; (line, <span class="number">1</span>))</span><br><span class="line"></span><br><span class="line">    <span class="comment">//对数据进行分组操作,groupBy()可以指定要按照哪个来进行分组</span></span><br><span class="line">    <span class="keyword">val</span> groupData: <span class="type">GroupedDataSet</span>[(<span class="type">String</span>, <span class="type">Int</span>)] = mData.groupBy(<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">//reduce((之前的数据,最新的数据) =&gt; )</span></span><br><span class="line">    <span class="keyword">val</span> reduceData: <span class="type">DataSet</span>[(<span class="type">String</span>, <span class="type">Int</span>)] = groupData.reduce((x, y) =&gt; (x._1, x._2 + y._2))</span><br><span class="line"></span><br><span class="line">    reduceData</span><br><span class="line">      <span class="comment">//将结果输出到本地文件</span></span><br><span class="line">      .writeAsText(<span class="string">"result"</span>)</span><br><span class="line">      <span class="comment">//设置输出的并行度为1</span></span><br><span class="line">      .setParallelism(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">    env.execute()</span><br></pre></td></tr></table></figure>
+<h4 id="reduceGroup"><a href="#reduceGroup" class="headerlink" title="reduceGroup"></a><code>reduceGroup</code></h4><blockquote>
+<p>reduceGroup是reduce的一种优化方案；</p>
+<p>它会先分组reduce，然后在做整体的reduce；这样做的好处就是可以减少网络IO；</p>
+</blockquote>
+<p><img src="/images/flink/1552237668392.png" alt="1552237668392"></p>
+<p><img src="/images/flink/1552237681751.png" alt="1552237681751"></p>
+<h4 id="join"><a href="#join" class="headerlink" title="join"></a><code>join</code></h4><ul>
+<li>求每个班级最高分</li>
+</ul>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">  <span class="comment">//TODO join</span></span><br><span class="line">  <span class="keyword">val</span> data1 = <span class="keyword">new</span> mutable.<span class="type">MutableList</span>[(<span class="type">Int</span>, <span class="type">String</span>, <span class="type">Double</span>)]</span><br><span class="line">  <span class="comment">//学生学号---学科---分数</span></span><br><span class="line">  data1.+=((<span class="number">1</span>, <span class="string">"yuwen"</span>, <span class="number">90.0</span>))</span><br><span class="line">  data1.+=((<span class="number">2</span>, <span class="string">"shuxue"</span>, <span class="number">20.0</span>))</span><br><span class="line">  data1.+=((<span class="number">3</span>, <span class="string">"yingyu"</span>, <span class="number">30.0</span>))</span><br><span class="line">  data1.+=((<span class="number">4</span>, <span class="string">"yuwen"</span>, <span class="number">40.0</span>))</span><br><span class="line">  data1.+=((<span class="number">5</span>, <span class="string">"shuxue"</span>, <span class="number">50.0</span>))</span><br><span class="line">  data1.+=((<span class="number">6</span>, <span class="string">"yingyu"</span>, <span class="number">60.0</span>))</span><br><span class="line">  data1.+=((<span class="number">7</span>, <span class="string">"yuwen"</span>, <span class="number">70.0</span>))</span><br><span class="line">  data1.+=((<span class="number">8</span>, <span class="string">"yuwen"</span>, <span class="number">20.0</span>))</span><br><span class="line">  <span class="keyword">val</span> data2 = <span class="keyword">new</span> mutable.<span class="type">MutableList</span>[(<span class="type">Int</span>, <span class="type">String</span>)]</span><br><span class="line">  <span class="comment">//学号 ---班级</span></span><br><span class="line">  data2.+=((<span class="number">1</span>,<span class="string">"class_1"</span>))</span><br><span class="line">  data2.+=((<span class="number">2</span>,<span class="string">"class_1"</span>))</span><br><span class="line">  data2.+=((<span class="number">3</span>,<span class="string">"class_2"</span>))</span><br><span class="line">  data2.+=((<span class="number">4</span>,<span class="string">"class_2"</span>))</span><br><span class="line">  data2.+=((<span class="number">5</span>,<span class="string">"class_3"</span>))</span><br><span class="line">  data2.+=((<span class="number">6</span>,<span class="string">"class_3"</span>))</span><br><span class="line">  data2.+=((<span class="number">7</span>,<span class="string">"class_4"</span>))</span><br><span class="line">  data2.+=((<span class="number">8</span>,<span class="string">"class_1"</span>))</span><br><span class="line"></span><br><span class="line">  <span class="keyword">val</span> env: <span class="type">ExecutionEnvironment</span> = <span class="type">ExecutionEnvironment</span>.getExecutionEnvironment</span><br><span class="line">  <span class="keyword">val</span> input1: <span class="type">DataSet</span>[(<span class="type">Int</span>, <span class="type">String</span>, <span class="type">Double</span>)] = env.fromCollection(<span class="type">Random</span>.shuffle(data1))</span><br><span class="line">  <span class="keyword">val</span> input2: <span class="type">DataSet</span>[(<span class="type">Int</span>, <span class="type">String</span>)] = env.fromCollection(<span class="type">Random</span>.shuffle(data2))</span><br><span class="line">  <span class="keyword">val</span> data = input2.join(input1).where(<span class="number">0</span>).equalTo(<span class="number">0</span>)&#123;</span><br><span class="line">    (input2, input1) =&gt; (input2._1,input2._2, input1._2, input1._3)</span><br><span class="line">  &#125;</span><br><span class="line">  data.groupBy(<span class="number">1</span>).aggregate(<span class="type">Aggregations</span>.<span class="type">MAX</span>, <span class="number">3</span>).print()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="distinct去重"><a href="#distinct去重" class="headerlink" title="distinct去重"></a><code>distinct</code>去重</h4><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> data = <span class="keyword">new</span> mutable.<span class="type">MutableList</span>[(<span class="type">Int</span>, <span class="type">String</span>, <span class="type">Double</span>)]</span><br><span class="line">data.+=((<span class="number">1</span>, <span class="string">"yuwen"</span>, <span class="number">90.0</span>))</span><br><span class="line">data.+=((<span class="number">2</span>, <span class="string">"shuxue"</span>, <span class="number">20.0</span>))</span><br><span class="line">data.+=((<span class="number">3</span>, <span class="string">"yingyu"</span>, <span class="number">30.0</span>))</span><br><span class="line">data.+=((<span class="number">4</span>, <span class="string">"wuli"</span>, <span class="number">40.0</span>))</span><br><span class="line">data.+=((<span class="number">5</span>, <span class="string">"yuwen"</span>, <span class="number">50.0</span>))</span><br><span class="line">data.+=((<span class="number">6</span>, <span class="string">"wuli"</span>, <span class="number">60.0</span>))</span><br><span class="line">data.+=((<span class="number">7</span>, <span class="string">"yuwen"</span>, <span class="number">70.0</span>))</span><br><span class="line"><span class="comment">//    //fromCollection将数据转化成DataSet</span></span><br><span class="line"><span class="keyword">val</span> input: <span class="type">DataSet</span>[(<span class="type">Int</span>, <span class="type">String</span>, <span class="type">Double</span>)] = env.fromCollection(<span class="type">Random</span>.shuffle(data))</span><br><span class="line"><span class="keyword">val</span> distinct = input.distinct(<span class="number">1</span>)</span><br><span class="line">distinct.print()</span><br></pre></td></tr></table></figure>
+<h3 id="DataStream的转换操作"><a href="#DataStream的转换操作" class="headerlink" title="DataStream的转换操作"></a>DataStream的转换操作</h3><p>Flink中的DataStream程序是实现数据流转换（例如，过滤，更新状态，定义窗口，聚合）的常规程序。数据流最初由各种来源（例如，消息队列，套接字流，文件）创建。结果通过接收器返回，例如可以将数据写入文件，或者写入标准输出（例如命令行终端）。Flink程序可以在各种情况下运行，可以独立运行，也可以嵌入其他程序中。执行可以发生在本地JVM或许多机器的集群中。</p>
+<table>
+<thead>
+<tr>
+<th>Transformation</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Map</strong><br>DataStream → DataStream</td>
+<td><code>dataStream.map { x =&gt; x * 2 }</code></td>
+</tr>
+<tr>
+<td><strong>FlatMap</strong><br>DataStream → DataStream</td>
+<td><code>dataStream.flatMap { x =&gt; x.split(&quot;,&quot;) }</code></td>
+</tr>
+<tr>
+<td><strong>Filter</strong><br>DataStream → DataStream</td>
+<td><code>dataStream.filter { _ != 0 }</code></td>
+</tr>
+<tr>
+<td><strong>KeyBy</strong><br>DataStream → KeyedStream</td>
+<td>将一个流分为不相交的区, 可以按照名称指定Key, 也可以按照角标来指定<br>`dataStream.keyBy(“key”</td>
+</tr>
+<tr>
+<td><strong>Reduce</strong><br>KeyedStream → DataStream</td>
+<td><strong>滚动</strong>Reduce, 合并当前值和历史结果, 并发出新的结果值<br><code>keyedStream.reduce { _ + _ }</code></td>
+</tr>
+<tr>
+<td><strong>Fold</strong><br>KeyedStream → DataStream</td>
+<td>按照初始值进行<strong>滚动</strong>折叠<br><code>keyedStream.fold(&quot;start&quot;)((str, i) =&gt; { str + &quot;-&quot; + i })</code></td>
+</tr>
+<tr>
+<td><strong>Aggregations</strong><br>KeyedStream → DataStream</td>
+<td><strong>滚动</strong>聚合, <code>sum</code>, <code>min</code>, <code>max</code>等<br><code>keyedStream.sum(0)</code></td>
+</tr>
+<tr>
+<td><strong>Window</strong><br>KeyedStream → DataStream</td>
+<td>窗口函数, 根据一些特点对数据进行分组, 注意: 有可能是非并行的, 所有记录可能在一个任务中收集<br><code>.window(TumblingEventTimeWindows.of(Time.seconds(5)))</code></td>
+</tr>
+<tr>
+<td><strong>WindowAll</strong><br>DataStream → AllWindowedStream</td>
+<td>窗口函数, 根据一些特点对数据进行分组, 和window函数的主要区别在于可以不按照Key分组<br><code>dataStream.windowAll (TumblingEventTimeWindows.of(Time.seconds(5)))</code></td>
+</tr>
+<tr>
+<td><strong>WindowApply</strong><br>WindowedStream → DataStream</td>
+<td>将一个函数作用于整个窗口<br><code>windowedStream.apply { WindowFunction }</code></td>
+</tr>
+<tr>
+<td><strong>WindowReduce</strong><br>WindowedStream → DataStream</td>
+<td>在整个窗口上做一次reduce<br><code>windowedStream.reduce { _ + _ }</code></td>
+</tr>
+<tr>
+<td><strong>WindowFold</strong><br>WindowedStream → DataStream</td>
+<td>在整个窗口上做一次fold<br><code>windowedStream.fold(&quot;start&quot;, (str, i) =&gt; { str + &quot;-&quot; + i })</code></td>
+</tr>
+<tr>
+<td><strong>Aggregations on windows</strong><br>WindowedStream → DataStream</td>
+<td>在窗口上统计, <code>sub</code>, <code>max</code>, <code>min</code><br><code>windowedStream.sum(10)</code></td>
+</tr>
+<tr>
+<td><strong>Union</strong><br>DataStream* → DataStream</td>
+<td>合并多个流<br><code>dataStream.union(dataStream1, dataStream2, ...)</code></td>
+</tr>
+<tr>
+<td><strong>Window Join</strong><br>DataStream → DataStream</td>
+<td><code>dataStream.join(otherStream).where(...).equalTo(...) .window(TumblingEventTimeWindows.of(Time.seconds(3))).apply{..}</code></td>
+</tr>
+<tr>
+<td><strong>Window CoGroup</strong><br>DataStream, DataStream → DataStream</td>
+<td><code>dataStream.coGroup(otherStream).where(0).equalTo(1).window(...).apply{...}</code></td>
+</tr>
+<tr>
+<td><strong>Connect</strong><br>DataStream, DataStream → DataStream</td>
+<td>连接两个流, 并且保留各自的数据类型, 在这个连接中可以共享状态<br><code>someStream.connect(otherStream)</code></td>
+</tr>
+<tr>
+<td><strong>Split</strong><br>DataStream → SplitStream</td>
+<td>将一个流切割为多个流<br><code>someDataStream.split((x: Int) =&gt; x match ...)</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="入门案例-1"><a href="#入门案例-1" class="headerlink" title="入门案例"></a>入门案例</h4><p>编写代码:</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">  <span class="keyword">val</span> env: <span class="type">StreamExecutionEnvironment</span> = <span class="type">StreamExecutionEnvironment</span>.getExecutionEnvironment</span><br><span class="line">  <span class="keyword">val</span> data: <span class="type">DataStream</span>[<span class="type">String</span>] = env.socketTextStream(<span class="string">"node01"</span>, <span class="number">9999</span>)<span class="comment">//netcat</span></span><br><span class="line">  <span class="keyword">val</span> mapData: <span class="type">DataStream</span>[(<span class="type">String</span>, <span class="type">Int</span>)] = data.map(line =&gt; (line, <span class="number">1</span>))</span><br><span class="line">  mapData.keyBy(<span class="number">0</span>).sum(<span class="number">1</span>).print()</span><br><span class="line">  env.execute()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在Linux窗口中发送消息:</p>
+<figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nc -lk <span class="number">9999</span></span><br></pre></td></tr></table></figure>
+<h4 id="keyby"><a href="#keyby" class="headerlink" title="keyby"></a><code>keyby</code></h4><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">   <span class="keyword">val</span> env: <span class="type">StreamExecutionEnvironment</span> = <span class="type">StreamExecutionEnvironment</span>.getExecutionEnvironment</span><br><span class="line">   env.setParallelism(<span class="number">3</span>)</span><br><span class="line">   <span class="keyword">val</span> textStream: <span class="type">DataStream</span>[<span class="type">String</span>] = env.socketTextStream(<span class="string">"localhost"</span> , <span class="number">12345</span>)</span><br><span class="line">   <span class="keyword">val</span> flatMap_data: <span class="type">DataStream</span>[<span class="type">String</span>] = textStream.flatMap(line =&gt; line.split(<span class="string">"\t"</span>))</span><br><span class="line">   <span class="keyword">val</span> map_data: <span class="type">DataStream</span>[(<span class="type">String</span>, <span class="type">Int</span>)] = flatMap_data.map(line =&gt; (line , <span class="number">1</span>))</span><br><span class="line">   <span class="comment">//TODO 逻辑上将一个流分成不相交的分区，每个分区包含相同键的元素。在内部，这是通过散列分区来实现的</span></span><br><span class="line">   <span class="keyword">val</span> keyByData: <span class="type">KeyedStream</span>[(<span class="type">String</span>, <span class="type">Int</span>), <span class="type">String</span>] = map_data.keyBy(line =&gt; line._1)</span><br><span class="line">   keyByData.writeAsText(<span class="string">"keyByData"</span>)</span><br><span class="line">   env.execute()</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Flink-SQL"><a href="#Flink-SQL" class="headerlink" title="Flink SQL"></a>Flink SQL</h2><p>Flink SQL可以让我们通过基于Table API和SQL来进行数据处理。Flink的批处理和流处理都支持Table API。Flink SQL完全遵循ANSI SQL标准。</p>
+<h3 id="批数据SQL"><a href="#批数据SQL" class="headerlink" title="批数据SQL"></a>批数据SQL</h3><hr>
+<p><strong>用法</strong></p>
+<ol>
+<li>构建Table运行环境</li>
+<li>将DataSet注册为一张表</li>
+<li>使用Table运行环境的<code>sqlQuery</code>方法来执行SQL语句</li>
+</ol>
+<p><strong>示例</strong></p>
+<p>使用Flink SQL统计用户消费订单的总金额、最大金额、最小金额、订单总数。</p>
+<table>
+<thead>
+<tr>
+<th>订单id</th>
+<th>用户名</th>
+<th>订单日期</th>
+<th>消费基恩</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>zhangsan</td>
+<td>2018-10-20 15:30</td>
+<td>358.5</td>
+</tr>
+</tbody>
+</table>
+<p>测试数据（订单ID、用户名、订单日期、订单金额）</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">(1,"zhangsan","2018-10-20 15:30",358.5),</span><br><span class="line">(2,"zhangsan","2018-10-20 16:30",131.5),</span><br><span class="line">(3,"lisi","2018-10-20 16:30",127.5),</span><br><span class="line">(4,"lisi","2018-10-20 16:30",328.5),</span><br><span class="line">(5,"lisi","2018-10-20 16:30",432.5),</span><br><span class="line">(6,"zhaoliu","2018-10-20 22:30",451.0),</span><br><span class="line">(7,"zhaoliu","2018-10-20 22:30",362.0),</span><br><span class="line">(8,"zhaoliu","2018-10-20 22:30",364.0),</span><br><span class="line">(9,"zhaoliu","2018-10-20 22:30",341.0)</span><br></pre></td></tr></table></figure>
+<p><strong>步骤</strong></p>
+<ol>
+<li>获取一个批处理运行环境</li>
+<li>获取一个Table运行环境</li>
+<li>创建一个样例类<code>Order</code>用来映射数据（订单名、用户名、订单日期、订单金额）</li>
+<li>基于本地<code>Order</code>集合创建一个DataSet source</li>
+<li>使用Table运行环境将DataSet注册为一张表</li>
+<li>使用SQL语句来操作数据（统计用户消费订单的总金额、最大金额、最小金额、订单总数）</li>
+<li>使用TableEnv.toDataSet将Table转换为DataSet</li>
+<li>打印测试</li>
+</ol>
+<p><strong>参考代码</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> env = <span class="type">ExecutionEnvironment</span>.getExecutionEnvironment</span><br><span class="line"><span class="keyword">val</span> tableEnv = <span class="type">TableEnvironment</span>.getTableEnvironment(env)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> orderDataSet = env.fromElements(</span><br><span class="line">    <span class="type">Order</span>(<span class="number">1</span>, <span class="string">"zhangsan"</span>, <span class="string">"2018-10-20 15:30"</span>, <span class="number">358.5</span>),</span><br><span class="line">    <span class="type">Order</span>(<span class="number">2</span>, <span class="string">"zhangsan"</span>, <span class="string">"2018-10-20 16:30"</span>, <span class="number">131.5</span>),</span><br><span class="line">    <span class="type">Order</span>(<span class="number">3</span>, <span class="string">"lisi"</span>, <span class="string">"2018-10-20 16:30"</span>, <span class="number">127.5</span>),</span><br><span class="line">    <span class="type">Order</span>(<span class="number">4</span>, <span class="string">"lisi"</span>, <span class="string">"2018-10-20 16:30"</span>, <span class="number">328.5</span>),</span><br><span class="line">    <span class="type">Order</span>(<span class="number">5</span>, <span class="string">"lisi"</span>, <span class="string">"2018-10-20 16:30"</span>, <span class="number">432.5</span>),</span><br><span class="line">    <span class="type">Order</span>(<span class="number">6</span>, <span class="string">"zhaoliu"</span>, <span class="string">"2018-10-20 22:30"</span>, <span class="number">451.0</span>),</span><br><span class="line">    <span class="type">Order</span>(<span class="number">7</span>, <span class="string">"zhaoliu"</span>, <span class="string">"2018-10-20 22:30"</span>, <span class="number">362.0</span>),</span><br><span class="line">    <span class="type">Order</span>(<span class="number">8</span>, <span class="string">"zhaoliu"</span>, <span class="string">"2018-10-20 22:30"</span>, <span class="number">364.0</span>),</span><br><span class="line">    <span class="type">Order</span>(<span class="number">9</span>, <span class="string">"zhaoliu"</span>, <span class="string">"2018-10-20 22:30"</span>, <span class="number">341.0</span>)</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">tableEnv.registerDataSet(<span class="string">"t_order"</span>, orderDataSet)</span><br><span class="line"><span class="keyword">val</span> allOrderTable: <span class="type">Table</span> = tableEnv.sqlQuery&#123;</span><br><span class="line">    <span class="string">""</span><span class="string">"</span></span><br><span class="line"><span class="string">        |select </span></span><br><span class="line"><span class="string">        | userName,</span></span><br><span class="line"><span class="string">        | count(1) as totalCount, -- 订单总数</span></span><br><span class="line"><span class="string">        | max(money) as maxMoney, -- 最大订单金额</span></span><br><span class="line"><span class="string">        | min(money) as minMoney  -- 最小订单金额</span></span><br><span class="line"><span class="string">        |from</span></span><br><span class="line"><span class="string">        | t_order</span></span><br><span class="line"><span class="string">        |group by</span></span><br><span class="line"><span class="string">        | userName</span></span><br><span class="line"><span class="string">      "</span><span class="string">""</span>.stripMargin</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">allOrderTable.printSchema()</span><br><span class="line">tableEnv.toDataSet[<span class="type">Row</span>](allOrderTable).print()</span><br></pre></td></tr></table></figure>
+<h3 id="流数据SQL"><a href="#流数据SQL" class="headerlink" title="流数据SQL"></a>流数据SQL</h3><hr>
+<p>流处理中也可以支持SQL。但是需要注意以下几点：</p>
+<ol>
+<li>要使用流处理的SQL，必须要添加水印时间</li>
+<li>使用<code>registerDataStream</code>注册表的时候，使用<code>&#39;</code>来指定字段</li>
+<li>注册表的时候，必须要指定一个rowtime，否则无法在SQL中使用窗口</li>
+<li>必须要导入<code>import org.apache.flink.table.api.scala._</code>隐式参数</li>
+<li>SQL中使用<code>tumble(时间列名, interval &#39;时间&#39; sencond)</code>来进行定义窗口<ol>
+<li>TUMBLE(time_attr, interval)固定时间窗口</li>
+<li>HOP(time_attr, interval, interval)滑动窗口,</li>
+<li>SESSION(time_attr, interval)会话窗口</li>
+</ol>
+</li>
+</ol>
+<p><strong>示例</strong></p>
+<p>使用Flink SQL来统计5秒内<code>用户的</code>订单总数、订单的最大金额、订单的最小金额。</p>
+<p><strong>步骤</strong></p>
+<ol>
+<li>获取流处理运行环境</li>
+<li>获取Table运行环境</li>
+<li>设置处理时间为<code>EventTime</code></li>
+<li>创建一个订单样例类<code>Order</code>，包含四个字段（订单ID、用户ID、订单金额、时间戳）</li>
+<li>创建一个自定义数据源<ul>
+<li>使用for循环生成1000个订单</li>
+<li>随机生成订单ID（UUID）</li>
+<li>随机生成用户ID（0-2）</li>
+<li>随机生成订单金额（0-100）</li>
+<li>时间戳为当前系统时间</li>
+<li>每隔1秒生成一个订单</li>
+</ul>
+</li>
+<li>添加水印，允许延迟2秒</li>
+<li>导入<code>import org.apache.flink.table.api.scala._</code>隐式参数</li>
+<li>使用<code>registerDataStream</code>注册表，并分别指定字段，还要指定rowtime字段</li>
+<li>编写SQL语句统计用户订单总数、最大金额、最小金额<ul>
+<li>分组时要使用<code>tumble(时间列, interval &#39;窗口时间&#39; second)</code>来创建窗口</li>
+</ul>
+</li>
+<li>使用<code>tableEnv.sqlQuery</code>执行sql语句</li>
+<li>将SQL的执行结果转换成DataStream再打印出来</li>
+<li>启动流处理程序</li>
+</ol>
+<p><strong>参考代码</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 3. 创建一个订单样例类`Order`，包含四个字段（订单ID、用户ID、订单金额、时间戳）</span></span><br><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">Order</span>(<span class="params">orderId:<span class="type">String</span>, userId:<span class="type">Int</span>, money:<span class="type">Long</span>, timestamp:<span class="type">Long</span></span>)</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">def</span> <span class="title">main</span>(<span class="params">args: <span class="type">Array</span>[<span class="type">String</span>]</span>)</span>: <span class="type">Unit</span> = &#123;</span><br><span class="line">  <span class="comment">// 1. 创建流处理运行环境</span></span><br><span class="line">  <span class="keyword">val</span> env = <span class="type">StreamExecutionEnvironment</span>.getExecutionEnvironment</span><br><span class="line"></span><br><span class="line">  <span class="comment">//   2. 设置处理时间为`EventTime`</span></span><br><span class="line">  env.setStreamTimeCharacteristic(<span class="type">TimeCharacteristic</span>.<span class="type">EventTime</span>)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">val</span> tableEnv = <span class="type">TableEnvironment</span>.getTableEnvironment(env)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  <span class="comment">// 4. 创建一个自定义数据源</span></span><br><span class="line">  <span class="keyword">val</span> orderDataStream = env.addSource(<span class="keyword">new</span> <span class="type">RichSourceFunction</span>[<span class="type">Order</span>] &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">run</span></span>(ctx: <span class="type">SourceFunction</span>.<span class="type">SourceContext</span>[<span class="type">Order</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">      <span class="comment">//   - 随机生成订单ID（UUID）</span></span><br><span class="line">      <span class="comment">// - 随机生成用户ID（0-2）</span></span><br><span class="line">      <span class="comment">// - 随机生成订单金额（0-100）</span></span><br><span class="line">      <span class="comment">// - 时间戳为当前系统时间</span></span><br><span class="line">      <span class="comment">// - 每隔1秒生成一个订单</span></span><br><span class="line">      <span class="keyword">for</span> (i &lt;- <span class="number">0</span> until <span class="number">1000</span>) &#123;</span><br><span class="line">        <span class="keyword">val</span> order = <span class="type">Order</span>(<span class="type">UUID</span>.randomUUID().toString, <span class="type">Random</span>.nextInt(<span class="number">3</span>), <span class="type">Random</span>.nextInt(<span class="number">101</span>), <span class="type">System</span>.currentTimeMillis())</span><br><span class="line">        <span class="type">TimeUnit</span>.<span class="type">SECONDS</span>.sleep(<span class="number">1</span>)</span><br><span class="line">        ctx.collect(order)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">cancel</span></span>(): <span class="type">Unit</span> = &#123;&#125;</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  <span class="comment">// 5. 添加水印，允许延迟2秒</span></span><br><span class="line">  <span class="keyword">val</span> watermarkDataStream: <span class="type">DataStream</span>[<span class="type">Order</span>] = orderDataStream.assignTimestampsAndWatermarks(<span class="keyword">new</span> <span class="type">AssignerWithPeriodicWatermarks</span>[<span class="type">Order</span>] &#123;</span><br><span class="line">    <span class="keyword">var</span> currentTimestamp = <span class="number">0</span>L</span><br><span class="line">    <span class="keyword">val</span> delayTime = <span class="number">2000</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">getCurrentWatermark</span></span>: <span class="type">Watermark</span> = &#123;</span><br><span class="line">      <span class="keyword">new</span> <span class="type">Watermark</span>(currentTimestamp - delayTime)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">extractTimestamp</span></span>(element: <span class="type">Order</span>, previousElementTimestamp: <span class="type">Long</span>): <span class="type">Long</span> = &#123;</span><br><span class="line">      <span class="keyword">val</span> timestamp = element.timestamp</span><br><span class="line">      currentTimestamp = <span class="type">Math</span>.max(currentTimestamp, timestamp)</span><br><span class="line">      currentTimestamp</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  <span class="comment">// 6. 导入`import org.apache.flink.table.api.scala._`隐式参数</span></span><br><span class="line">  <span class="comment">//   7. 使用`registerDataStream`注册表，并分别指定字段，还要指定rowtime字段</span></span><br><span class="line">  tableEnv.registerDataStream(<span class="string">"t_order"</span>, watermarkDataStream, <span class="symbol">'orderId</span>, <span class="symbol">'userId</span>, <span class="symbol">'money</span>, <span class="symbol">'orderDate</span>.rowtime)</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 8. 编写SQL语句统计用户订单总数、最大金额、最小金额</span></span><br><span class="line">  <span class="comment">// - 分组时要使用`tumble(时间列, interval '窗口时间' second)`来创建窗口</span></span><br><span class="line">  <span class="keyword">val</span> sql =</span><br><span class="line">    <span class="string">""</span><span class="string">"</span></span><br><span class="line"><span class="string">      |select</span></span><br><span class="line"><span class="string">      | userId,</span></span><br><span class="line"><span class="string">      | count(1) as totalCount,</span></span><br><span class="line"><span class="string">      | max(money) as maxMoney,</span></span><br><span class="line"><span class="string">      | min(money) as minMoney</span></span><br><span class="line"><span class="string">      |from</span></span><br><span class="line"><span class="string">      | t_order</span></span><br><span class="line"><span class="string">      |group by</span></span><br><span class="line"><span class="string">      | tumble(orderDate, interval '5' second),</span></span><br><span class="line"><span class="string">      | userId</span></span><br><span class="line"><span class="string">    "</span><span class="string">""</span>.stripMargin</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 9. 使用`tableEnv.sqlQuery`执行sql语句</span></span><br><span class="line">  <span class="keyword">val</span> table: <span class="type">Table</span> = tableEnv.sqlQuery(sql)</span><br><span class="line"></span><br><span class="line">  <span class="comment">//   10. 将SQL的执行结果转换成DataStream再打印出来</span></span><br><span class="line">  table.toRetractStream[<span class="type">Row</span>].print()</span><br><span class="line"></span><br><span class="line">  env.execute(<span class="string">"StreamSQLApp"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>在SQL语句中，不要将名字取成SQL中的关键字，例如：timestamp。</p>
+</blockquote>
+<h4 id="Table转换为DataStream或DataSet"><a href="#Table转换为DataStream或DataSet" class="headerlink" title="Table转换为DataStream或DataSet"></a>Table转换为DataStream或DataSet</h4><hr>
+<p><strong>转换为DataSet</strong></p>
+<ul>
+<li>直接使用<code>tableEnv.toDataSet</code>方法就可以将Table转换为DataSet</li>
+<li>转换的时候，需要指定泛型，可以是一个样例类，也可以是指定为<code>Row</code>类型</li>
+</ul>
+<p><strong>转换为DataStream</strong></p>
+<ul>
+<li>使用<code>tableEnv.toAppendStream</code>，将表直接附加在流上</li>
+<li>使用<code>tableEnv.toRetractStream</code>，返回一个元组（Boolean, DataStream），Boolean表示数据是否被成功获取</li>
+<li>转换的时候，需要指定泛型，可以是一个样例类，也可以是指定为<code>Row</code>类型</li>
+</ul>
+<h2 id="窗口-水印"><a href="#窗口-水印" class="headerlink" title="窗口/水印"></a>窗口/水印</h2><ul>
+<li>源源不断地数据是无法进行统计工作的，因为数据流<code>没有边界</code>，无法统计到底有多少数据经过了这个流</li>
+<li>window操作就是在数据流上，截取固定大小的一部分，这个部分是可以统计的</li>
+<li>截取方式有两种<ul>
+<li>按照<code>时间</code>截取，例如：10秒钟、10分钟统计一次</li>
+<li>按照<code>消息数量</code>截取，例如：每5个数据、或者50个数据统计一次</li>
+</ul>
+</li>
+</ul>
+<p><img src="/images/flink/1556117026180.png" alt="1556117026180"></p>
+<h3 id="窗口"><a href="#窗口" class="headerlink" title="窗口"></a>窗口</h3><p>Flink的窗口划分方式分为2种:time/count,即按时间划分和数量划分</p>
+<h5 id="tumbling-time-window-无重叠数据"><a href="#tumbling-time-window-无重叠数据" class="headerlink" title="tumbling-time-window (无重叠数据)"></a>tumbling-time-window (无重叠数据)</h5><blockquote>
+<p>1.红绿灯路口会有汽车通过，一共会有多少汽车通过，无法计算。因为车流源源不断，计算没有边界。</p>
+<p>2.统计每15秒钟通过红路灯的汽车数量，第一个15秒为2辆，第二个15秒为3辆，第三个15秒为1辆。。。</p>
+</blockquote>
+<p><img src="/images/flink/1552238687243.png" alt="1552238687243"></p>
+<figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">发送内容</span><br><span class="line"><span class="number">9</span>,<span class="number">3</span></span><br><span class="line"><span class="number">9</span>,<span class="number">2</span></span><br><span class="line"><span class="number">9</span>,<span class="number">7</span></span><br><span class="line"><span class="number">4</span>,<span class="number">9</span></span><br><span class="line"><span class="number">2</span>,<span class="number">6</span></span><br><span class="line"><span class="number">1</span>,<span class="number">5</span></span><br><span class="line"><span class="number">2</span>,<span class="number">3</span></span><br><span class="line"><span class="number">5</span>,<span class="number">7</span></span><br><span class="line"><span class="number">5</span>,<span class="number">4</span></span><br></pre></td></tr></table></figure>
+<p>编码:</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">  <span class="comment">//TODO time-window</span></span><br><span class="line">  <span class="comment">//1.创建运行环境</span></span><br><span class="line">  <span class="keyword">val</span> env = <span class="type">StreamExecutionEnvironment</span>.getExecutionEnvironment</span><br><span class="line"></span><br><span class="line">  <span class="comment">//2.定义数据流来源</span></span><br><span class="line">  <span class="keyword">val</span> text = env.socketTextStream(<span class="string">"node01"</span>, <span class="number">9000</span>)</span><br><span class="line"></span><br><span class="line">  <span class="comment">//3.转换数据格式，text-&gt;CarWc</span></span><br><span class="line">  <span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">CarWc</span>(<span class="params">sensorId: <span class="type">Int</span>, carCnt: <span class="type">Int</span></span>)</span></span><br><span class="line"><span class="class">  <span class="title">val</span> <span class="title">ds1</span></span>: <span class="type">DataStream</span>[<span class="type">CarWc</span>] = text.map &#123;</span><br><span class="line">    line =&gt; &#123;</span><br><span class="line">      <span class="keyword">val</span> tokens = line.split(<span class="string">","</span>)</span><br><span class="line">      <span class="type">CarWc</span>(tokens(<span class="number">0</span>).trim.toInt, tokens(<span class="number">1</span>).trim.toInt)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//4.执行统计操作，每个sensorId一个tumbling窗口，窗口的大小为5秒</span></span><br><span class="line">  <span class="comment">//也就是说，每5秒钟统计一次，在这过去的5秒钟内，各个路口通过红绿灯汽车的数量。</span></span><br><span class="line">  <span class="keyword">val</span> ds2: <span class="type">DataStream</span>[<span class="type">CarWc</span>] = ds1</span><br><span class="line">    .keyBy(<span class="string">"sensorId"</span>)</span><br><span class="line">    .timeWindow(<span class="type">Time</span>.seconds(<span class="number">5</span>))</span><br><span class="line">    .sum(<span class="string">"carCnt"</span>)</span><br><span class="line"></span><br><span class="line">  <span class="comment">//5.显示统计结果</span></span><br><span class="line">  ds2.print()</span><br><span class="line"></span><br><span class="line">  <span class="comment">//6.触发流计算</span></span><br><span class="line">  env.execute(<span class="keyword">this</span>.getClass.getName)</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="sliding-time-window-有重叠数据"><a href="#sliding-time-window-有重叠数据" class="headerlink" title="sliding-time-window (有重叠数据)"></a>sliding-time-window (有重叠数据)</h5><p><img src="/images/flink/1552238935817.png" alt="1552238935817"></p>
+<p>编码:</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> env = <span class="type">StreamExecutionEnvironment</span>.getExecutionEnvironment</span><br><span class="line"></span><br><span class="line"><span class="comment">//2.定义数据流来源</span></span><br><span class="line"><span class="keyword">val</span> text = env.socketTextStream(<span class="string">"localhost"</span>, <span class="number">9999</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">//3.转换数据格式，text-&gt;CarWc</span></span><br><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">CarWc</span>(<span class="params">sensorId: <span class="type">Int</span>, carCnt: <span class="type">Int</span></span>)</span></span><br><span class="line"><span class="class"><span class="title">val</span> <span class="title">ds1</span></span>: <span class="type">DataStream</span>[<span class="type">CarWc</span>] = text.map &#123;</span><br><span class="line">  line =&gt; &#123;</span><br><span class="line">    <span class="keyword">val</span> tokens = line.split(<span class="string">","</span>)</span><br><span class="line">    <span class="type">CarWc</span>(tokens(<span class="number">0</span>).trim.toInt, tokens(<span class="number">1</span>).trim.toInt)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//4.执行统计操作，每个sensorId一个sliding窗口，窗口时间10秒,滑动时间5秒</span></span><br><span class="line"><span class="comment">//也就是说，每5秒钟统计一次，在这过去的10秒钟内，各个路口通过红绿灯汽车的数量。</span></span><br><span class="line"><span class="keyword">val</span> ds2: <span class="type">DataStream</span>[<span class="type">CarWc</span>] = ds1</span><br><span class="line">  .keyBy(<span class="string">"sensorId"</span>)</span><br><span class="line">  .timeWindow(<span class="type">Time</span>.seconds(<span class="number">10</span>), <span class="type">Time</span>.seconds(<span class="number">5</span>))</span><br><span class="line">  .sum(<span class="string">"carCnt"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">//5.显示统计结果</span></span><br><span class="line">ds2.print()</span><br><span class="line"></span><br><span class="line"><span class="comment">//6.触发流计算</span></span><br><span class="line">env.execute(<span class="keyword">this</span>.getClass.getName)</span><br></pre></td></tr></table></figure>
+<h5 id="tumbling-count-window-无重叠数据"><a href="#tumbling-count-window-无重叠数据" class="headerlink" title="tumbling-count-window (无重叠数据)"></a>tumbling-count-window (无重叠数据)</h5><blockquote>
+<p>按照个数进行统计，比如：</p>
+<p>每个路口分别统计，收到关于它的5条消息时统计在最近5条消息中，各自路口通过的汽车数量</p>
+</blockquote>
+<p>代码:</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> env = <span class="type">StreamExecutionEnvironment</span>.getExecutionEnvironment</span><br><span class="line"></span><br><span class="line"><span class="comment">//2.定义数据流来源</span></span><br><span class="line"><span class="keyword">val</span> text = env.socketTextStream(<span class="string">"localhost"</span>, <span class="number">9999</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">//3.转换数据格式，text-&gt;CarWc</span></span><br><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">CarWc</span>(<span class="params">sensorId: <span class="type">Int</span>, carCnt: <span class="type">Int</span></span>)</span></span><br><span class="line"><span class="class"><span class="title">val</span> <span class="title">ds1</span></span>: <span class="type">DataStream</span>[<span class="type">CarWc</span>] = text.map &#123;</span><br><span class="line">  (f) =&gt; &#123;</span><br><span class="line">    <span class="keyword">val</span> tokens = f.split(<span class="string">","</span>)</span><br><span class="line">    <span class="type">CarWc</span>(tokens(<span class="number">0</span>).trim.toInt, tokens(<span class="number">1</span>).trim.toInt)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//4.执行统计操作，每个sensorId一个tumbling窗口，窗口的大小为5</span></span><br><span class="line"><span class="comment">//按照key进行收集，对应的key出现的次数达到5次作为一个结果</span></span><br><span class="line"><span class="keyword">val</span> ds2: <span class="type">DataStream</span>[<span class="type">CarWc</span>] = ds1</span><br><span class="line">  .keyBy(<span class="string">"sensorId"</span>)</span><br><span class="line">  .countWindow(<span class="number">5</span>)</span><br><span class="line">  .sum(<span class="string">"carCnt"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">//5.显示统计结果</span></span><br><span class="line">ds2.print()</span><br><span class="line"></span><br><span class="line"><span class="comment">//6.触发流计算</span></span><br><span class="line">env.execute(<span class="keyword">this</span>.getClass.getName)</span><br></pre></td></tr></table></figure>
+<h5 id="sliding-count-window-有重叠数据"><a href="#sliding-count-window-有重叠数据" class="headerlink" title="sliding-count-window (有重叠数据)"></a>sliding-count-window (有重叠数据)</h5><blockquote>
+<p>同样也是窗口长度和滑动窗口的操作：窗口长度是5，滑动长度是3</p>
+</blockquote>
+<p>编码:</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> env = <span class="type">StreamExecutionEnvironment</span>.getExecutionEnvironment</span><br><span class="line"></span><br><span class="line"><span class="comment">//2.定义数据流来源</span></span><br><span class="line"><span class="keyword">val</span> text = env.socketTextStream(<span class="string">"localhost"</span>, <span class="number">9999</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">//3.转换数据格式，text-&gt;CarWc</span></span><br><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">CarWc</span>(<span class="params">sensorId: <span class="type">Int</span>, carCnt: <span class="type">Int</span></span>)</span></span><br><span class="line"><span class="class"><span class="title">val</span> <span class="title">ds1</span></span>: <span class="type">DataStream</span>[<span class="type">CarWc</span>] = text.map &#123;</span><br><span class="line">  (f) =&gt; &#123;</span><br><span class="line">    <span class="keyword">val</span> tokens = f.split(<span class="string">","</span>)</span><br><span class="line">    <span class="type">CarWc</span>(tokens(<span class="number">0</span>).trim.toInt, tokens(<span class="number">1</span>).trim.toInt)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//4.执行统计操作，每个sensorId一个sliding窗口，窗口大小3条数据,窗口滑动为3条数据</span></span><br><span class="line"><span class="comment">//也就是说，每个路口分别统计，收到关于它的3条消息时统计在最近5条消息中，各自路口通过的汽车数量</span></span><br><span class="line"><span class="keyword">val</span> ds2: <span class="type">DataStream</span>[<span class="type">CarWc</span>] = ds1</span><br><span class="line">  .keyBy(<span class="string">"sensorId"</span>)</span><br><span class="line">  .countWindow(<span class="number">5</span>, <span class="number">3</span>)</span><br><span class="line">  .sum(<span class="string">"carCnt"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">//5.显示统计结果</span></span><br><span class="line">ds2.print()</span><br><span class="line"></span><br><span class="line"><span class="comment">//6.触发流计算</span></span><br><span class="line">env.execute(<span class="keyword">this</span>.getClass.getName)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>问题:</p>
+<p>Flink中的窗口分为两类，一类是按时间来分，一类是按照事件的种类来分。对吗？</p>
+</blockquote>
+<blockquote>
+<ol>
+<li>如果窗口滑动时间 &gt; 窗口时间，会出现数据丢失</li>
+<li>如果窗口滑动时间 &lt; 窗口时间，会出现数据重复计算,比较适合实时排行榜</li>
+<li>如果窗口滑动时间 = 窗口时间，数据不会被重复计算</li>
+</ol>
+</blockquote>
+<h3 id="水印"><a href="#水印" class="headerlink" title="水印"></a>水印</h3><h4 id="Flink的时间划分方式"><a href="#Flink的时间划分方式" class="headerlink" title="Flink的时间划分方式"></a>Flink的时间划分方式</h4><ul>
+<li>事件时间：事件时间是每条事件在它产生的时候记录的时间，该时间记录在事件中，在处理的时候可以被提取出来。小时的时间窗处理将会包含事件时间在该小时内的所有事件，而忽略事件到达的时间和到达的顺序</li>
+<li>摄入时间：摄入时间是事件进入flink的时间，在source operator中，每个事件拿到当前时间作为时间戳，后续的时间窗口基于该时间。</li>
+<li>处理时间：当前机器处理该条事件的时间</li>
+</ul>
+<p><img src="/images/flink/1552239345226.png" alt="1552239345226"></p>
+<blockquote>
+<p>问题:</p>
+<p>ProcessingTime是指的进入到Flink数据流处理系统的时间，对吗？</p>
+</blockquote>
+<h4 id="如何处理水印"><a href="#如何处理水印" class="headerlink" title="如何处理水印"></a>如何处理水印</h4><blockquote>
+<p>需求：</p>
+<p>以EventTime划分窗口，计算3秒钟内出价最高的产品</p>
+</blockquote>
+<figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1527911155000</span>,boos1,pc<span class="number">1,100.0</span></span><br><span class="line"><span class="number">1527911156000</span>,boos2,pc<span class="number">1,200.0</span></span><br><span class="line"><span class="number">1527911157000</span>,boos1,pc<span class="number">1,300.0</span></span><br><span class="line"><span class="number">1527911158000</span>,boos2,pc<span class="number">1,500.0</span></span><br><span class="line"><span class="number">1527911159000</span>,boos1,pc<span class="number">1,600.0</span></span><br><span class="line"><span class="number">1527911160000</span>,boos1,pc<span class="number">1,700.0</span></span><br><span class="line"><span class="number">1527911161000</span>,boos2,pc<span class="number">2,700.0</span></span><br><span class="line"><span class="number">1527911162000</span>,boos2,pc<span class="number">2,900.0</span></span><br><span class="line"><span class="number">1527911163000</span>,boos2,pc<span class="number">2,1000.0</span></span><br><span class="line"><span class="number">1527911164000</span>,boos2,pc<span class="number">2,1100.0</span></span><br><span class="line"><span class="number">1527911165000</span>,boos1,pc<span class="number">2,1100.0</span></span><br><span class="line"><span class="number">1527911166000</span>,boos2,pc<span class="number">2,1300.0</span></span><br><span class="line"><span class="number">1527911167000</span>,boos2,pc<span class="number">2,1400.0</span></span><br><span class="line"><span class="number">1527911168000</span>,boos2,pc<span class="number">2,1600.0</span></span><br><span class="line"><span class="number">1527911170000</span>,boos1,pc<span class="number">2,1300.0</span></span><br><span class="line"><span class="number">1527911171000</span>,boos2,pc<span class="number">2,1700.0</span></span><br><span class="line"><span class="number">1527911172000</span>,boos2,pc<span class="number">2,1800.0</span></span><br><span class="line"><span class="number">1527911173000</span>,boos1,pc<span class="number">2,1500.0</span></span><br></pre></td></tr></table></figure>
+<p>代码:</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]) &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//1.创建执行环境，并设置为使用EventTime</span></span><br><span class="line">    <span class="keyword">val</span> env = <span class="type">StreamExecutionEnvironment</span>.getExecutionEnvironment</span><br><span class="line">    <span class="comment">//置为使用EventTime</span></span><br><span class="line">    env.setStreamTimeCharacteristic(<span class="type">TimeCharacteristic</span>.<span class="type">EventTime</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">//2.创建数据流，并进行数据转化</span></span><br><span class="line">    <span class="keyword">val</span> source = env.socketTextStream(<span class="string">"localhost"</span>, <span class="number">9999</span>)</span><br><span class="line">    <span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">SalePrice</span>(<span class="params">time: <span class="type">Long</span>, boosName: <span class="type">String</span>, productName: <span class="type">String</span>, price: <span class="type">Double</span></span>)</span></span><br><span class="line"><span class="class">    <span class="title">val</span> <span class="title">dst1</span></span>: <span class="type">DataStream</span>[<span class="type">SalePrice</span>] = source.map(value =&gt; &#123;</span><br><span class="line">      <span class="keyword">val</span> columns = value.split(<span class="string">","</span>)</span><br><span class="line">      <span class="type">SalePrice</span>(columns(<span class="number">0</span>).toLong, columns(<span class="number">1</span>), columns(<span class="number">2</span>), columns(<span class="number">3</span>).toDouble)</span><br><span class="line">    &#125;)</span><br><span class="line"></span><br><span class="line">    <span class="comment">//3.使用EventTime进行求最值操作</span></span><br><span class="line">    <span class="keyword">val</span> dst2: <span class="type">DataStream</span>[<span class="type">SalePrice</span>] = dst1</span><br><span class="line">      <span class="comment">//提取消息中的时间戳属性</span></span><br><span class="line">      .assignAscendingTimestamps(_.time)</span><br><span class="line">      .keyBy(_.productName)</span><br><span class="line">      .timeWindow(<span class="type">Time</span>.seconds(<span class="number">3</span>))<span class="comment">//设置window方法一</span></span><br><span class="line">      .max(<span class="string">"price"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">//4.显示结果</span></span><br><span class="line">    dst2.print()</span><br><span class="line"></span><br><span class="line">    <span class="comment">//5.触发流计算</span></span><br><span class="line">    env.execute()</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>当前代码理论上看没有任何问题，在实际使用的时候就会出现很多问题,甚至接收不到数据或者接收到的数据是不准确的；这是因为对于flink最初设计的时候，就考虑到了网络延迟，网络乱序等问题，所以提出了一个抽象概念水印（WaterMark）</p>
+</blockquote>
+<p><img src="/images/flink/1552239660524.png" alt="1552239660524"></p>
+<p>水印分成两种形式：</p>
+<p><img src="/images/flink/1552239700782.png" alt="1552239700782"></p>
+<p><img src="/images/flink/1552239709601.png" alt="1552239709601"></p>
+<p>代码中就需要添加水印操作:</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="comment">//创建执行环境，并设置为使用EventTime</span></span><br><span class="line">    <span class="keyword">val</span> env = <span class="type">StreamExecutionEnvironment</span>.getExecutionEnvironment</span><br><span class="line">    env.setParallelism(<span class="number">1</span>)<span class="comment">//注意控制并发数</span></span><br><span class="line">    <span class="comment">//置为使用EventTime</span></span><br><span class="line">    env.setStreamTimeCharacteristic(<span class="type">TimeCharacteristic</span>.<span class="type">EventTime</span>)</span><br><span class="line">    <span class="keyword">val</span> source = env.socketTextStream(<span class="string">"node01"</span>, <span class="number">9999</span>)</span><br><span class="line">    <span class="keyword">val</span> dst1: <span class="type">DataStream</span>[<span class="type">SalePrice</span>] = source.map(value =&gt; &#123;</span><br><span class="line">      <span class="keyword">val</span> columns = value.split(<span class="string">","</span>)</span><br><span class="line">      <span class="type">SalePrice</span>(columns(<span class="number">0</span>).toLong, columns(<span class="number">1</span>), columns(<span class="number">2</span>), columns(<span class="number">3</span>).toDouble)</span><br><span class="line">    &#125;)</span><br><span class="line">    <span class="comment">//todo 水印时间  assignTimestampsAndWatermarks</span></span><br><span class="line">    <span class="keyword">val</span> timestamps_data = dst1.assignTimestampsAndWatermarks(<span class="keyword">new</span> <span class="type">AssignerWithPeriodicWatermarks</span>[<span class="type">SalePrice</span>]&#123;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">var</span> currentMaxTimestamp:<span class="type">Long</span> = <span class="number">0</span></span><br><span class="line">      <span class="keyword">val</span> maxOutOfOrderness = <span class="number">2000</span>L <span class="comment">//最大允许的乱序时间是2s</span></span><br><span class="line">      <span class="keyword">var</span> wm : <span class="type">Watermark</span> = <span class="literal">null</span></span><br><span class="line">      <span class="keyword">val</span> format = <span class="keyword">new</span> <span class="type">SimpleDateFormat</span>(<span class="string">"yyyy-MM-dd HH:mm:ss.SSS"</span>)</span><br><span class="line">      <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">getCurrentWatermark</span></span>: <span class="type">Watermark</span> = &#123;</span><br><span class="line">        wm = <span class="keyword">new</span> <span class="type">Watermark</span>(currentMaxTimestamp - maxOutOfOrderness)</span><br><span class="line">        wm</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">extractTimestamp</span></span>(element: <span class="type">SalePrice</span>, previousElementTimestamp: <span class="type">Long</span>): <span class="type">Long</span> = &#123;</span><br><span class="line">        <span class="keyword">val</span> timestamp = element.time</span><br><span class="line">        currentMaxTimestamp = <span class="type">Math</span>.max(timestamp, currentMaxTimestamp)</span><br><span class="line">        currentMaxTimestamp</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">    <span class="keyword">val</span> data: <span class="type">KeyedStream</span>[<span class="type">SalePrice</span>, <span class="type">String</span>] = timestamps_data.keyBy(line =&gt; line.productName)</span><br><span class="line">    <span class="keyword">val</span> window_data: <span class="type">WindowedStream</span>[<span class="type">SalePrice</span>, <span class="type">String</span>, <span class="type">TimeWindow</span>] = data.timeWindow(<span class="type">Time</span>.seconds(<span class="number">3</span>))</span><br><span class="line">    <span class="keyword">val</span> apply: <span class="type">DataStream</span>[<span class="type">SalePrice</span>] = window_data.apply(<span class="keyword">new</span> <span class="type">MyWindowFunc</span>)</span><br><span class="line">    apply.print()</span><br><span class="line">    env.execute()</span><br><span class="line"></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">SalePrice</span>(<span class="params">time: <span class="type">Long</span>, boosName: <span class="type">String</span>, productName: <span class="type">String</span>, price: <span class="type">Double</span></span>)</span></span><br><span class="line"><span class="class"><span class="title">class</span> <span class="title">MyWindowFunc</span> <span class="keyword">extends</span> <span class="title">WindowFunction</span>[<span class="type">SalePrice</span> , <span class="type">SalePrice</span> , <span class="type">String</span>, <span class="type">TimeWindow</span>]</span>&#123;</span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">apply</span></span>(key: <span class="type">String</span>, window: <span class="type">TimeWindow</span>, input: <span class="type">Iterable</span>[<span class="type">SalePrice</span>], out: <span class="type">Collector</span>[<span class="type">SalePrice</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> seq = input.toArray</span><br><span class="line">    <span class="keyword">val</span> take: <span class="type">Array</span>[<span class="type">SalePrice</span>] = seq.sortBy(line =&gt; line.price).reverse.take(<span class="number">1</span>)</span><br><span class="line">    <span class="keyword">for</span>(info &lt;- take)&#123;</span><br><span class="line">      out.collect(info)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="容错"><a href="#容错" class="headerlink" title="容错"></a>容错</h2><p>批处理系统比较容易实现容错机制，由于文件可以重复访问，当某个任务失败后，重启该任务即可。但是在流处理系统中，由于数据源是无限的数据流，一个流处理任务甚至可能会执行几个月，将所有数据缓存或是持久化，留待以后重复访问基本上是不可行的。</p>
+<p>Checkpoint是Flink实现容错机制最核心的功能，它能够根据配置周期性地基于Stream中各个Operator的状态来生成Snapshot，从而将这些状态数据定期持久化存储下来，当Flink程序一旦意外崩溃时，重新运行程序时可以有选择地从这些Snapshot进行恢复，从而修正因为故障带来的程序数据状态中断。</p>
+<h3 id="Checkpoint"><a href="#Checkpoint" class="headerlink" title="Checkpoint"></a>Checkpoint</h3><p><img src="/images/flink/1552240900014.png" alt="1552240900014"></p>
+<p>Checkpoint流程</p>
+<ol>
+<li>CheckpointCoordinator周期性的向该流应用的所有source算子发送barrier。 </li>
+<li>当某个source算子收到一个barrier时，会向自身所有下游算子广播该barrier，同时将自己的当前状态制作成快照(<strong>异步</strong>)，并保存到指定的持久化存储中，最后向CheckpointCoordinator报告自己快照制作情况</li>
+<li>下游算子收到barrier之后，会向自身所有下游算子广播该barrier，同时将自身的相关状态制作成快照(<strong>异步</strong>)，并保存到指定的持久化存储中，最后向CheckpointCoordinator报告自身快照情况</li>
+<li>每个算子按照步骤3不断制作快照并向下游广播，直到最后barrier传递到sink算子，快照制作完成。 </li>
+<li>当CheckpointCoordinator收到所有算子的报告之后，认为该周期的快照制作成功; 否则，如果在规定的时间内没有收到所有算子的报告，则认为本周期快照制作失败 </li>
+</ol>
+<h4 id="单流的barrier"><a href="#单流的barrier" class="headerlink" title="单流的barrier"></a>单流的barrier</h4><ol>
+<li>屏障作为数据流的一部分随着记录被注入到数据流中。屏障永远不会赶超通常的流记录，它会严格遵循顺序。</li>
+<li>屏障将数据流中的记录隔离成一系列的记录集合，并将一些集合中的数据加入到当前的快照中，而另一些数据加入到下一个快照中。</li>
+<li>每一个屏障携带着快照的ID，快照记录着ID并且将其放在快照数据的前面。</li>
+<li>屏障不会中断流处理，因此非常轻量级。</li>
+</ol>
+<p><img src="/images/flink/1552241036506.png" alt="1552241036506"></p>
+<h4 id="并行barrier"><a href="#并行barrier" class="headerlink" title="并行barrier"></a>并行barrier</h4><ol>
+<li>不止一个输入流的时的operator，需要在快照屏障上对齐(align)输入流，才会发射出去。 </li>
+<li>可以看到1,2,3会一直放在Input buffer，直到另一个输入流的快照到达Operator。</li>
+</ol>
+<p><img src="/images/flink/1552241154668.png" alt="1552241154668"></p>
+<blockquote>
+<p>问题:</p>
+<p>Flink中Barrier的对齐指的是Flink处理数据流的时候，会加入barrier，某一个operator接收到一个barriern，会等到接收到所有数据流的barrier，才继续往下处理。这样可以实现数据Exatly Once语义。对吗？</p>
+<p>一个Operator处理完数据流后，会将数据流中的barrier删除，这样可以减少处理的数据量，提高运行效率。对吗？</p>
+</blockquote>
+<h3 id="持久化存储"><a href="#持久化存储" class="headerlink" title="持久化存储"></a>持久化存储</h3><h4 id="MemoryStateBackend"><a href="#MemoryStateBackend" class="headerlink" title="MemoryStateBackend"></a>MemoryStateBackend</h4><p>state数据保存在java堆内存中，执行checkpoint的时候，会把state的快照数据保存到jobmanager的内存中 基于内存的state backend在生产环境下不建议使用。</p>
+<h4 id="FsStateBackend"><a href="#FsStateBackend" class="headerlink" title="FsStateBackend"></a>FsStateBackend</h4><p>state数据保存在taskmanager的内存中，执行checkpoint的时候，会把state的快照数据保存到配置的文件系统中，可以使用hdfs等分布式文件系统。</p>
+<h4 id="RocksDBStateBackend"><a href="#RocksDBStateBackend" class="headerlink" title="RocksDBStateBackend"></a>RocksDBStateBackend</h4><p>基于RocksDB + FS</p>
+<p>RocksDB跟上面的都略有不同，它会在本地文件系统中维护状态，state会直接写入本地rocksdb中。同时RocksDB需要配置一个远端的filesystem。</p>
+<p>代码:</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> env = <span class="type">StreamExecutionEnvironment</span>.getExecutionEnvironment</span><br><span class="line"><span class="comment">// start a checkpoint every 1000 ms</span></span><br><span class="line"><span class="comment">//开启Flink的Checkpoint</span></span><br><span class="line">env.enableCheckpointing(<span class="number">5000</span>)</span><br><span class="line"><span class="comment">// advanced options:</span></span><br><span class="line"><span class="comment">// 设置checkpoint的执行模式，最多执行一次或者至少执行一次</span></span><br><span class="line">env.getCheckpointConfig.setCheckpointingMode(<span class="type">CheckpointingMode</span>.<span class="type">EXACTLY_ONCE</span>)</span><br><span class="line"><span class="comment">// 设置checkpoint的超时时间</span></span><br><span class="line">env.getCheckpointConfig.setCheckpointTimeout(<span class="number">60000</span>)</span><br><span class="line"><span class="comment">// 如果在只做快照过程中出现错误，是否让整体任务失败：true是  false不是</span></span><br><span class="line">env.getCheckpointConfig.setFailTasksOnCheckpointingErrors(<span class="literal">false</span>)</span><br><span class="line"><span class="comment">//设置同一时间有多少 个checkpoint可以同时执行 </span></span><br><span class="line">env.getCheckpointConfig.setMaxConcurrentCheckpoints(<span class="number">1</span>)</span><br><span class="line"><span class="comment">//设置checkpoint路径</span></span><br><span class="line">    env.setStateBackend(<span class="keyword">new</span> <span class="type">FsStateBackend</span>(<span class="string">"hdfs://node01:8020/flink_checkpoint0000000"</span>))</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+      <div>
+        <div id="reward-container">
+  <div>Thank you for your accept. mua！</div>
+  <button id="reward-button" disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/reward/wechatpay.jpg" alt="丨HF丨 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/reward/alipay.jpg" alt="丨HF丨 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        
+
+
+
+
+  
+
+
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>丨HF丨</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    
+    <a href="https://manzhong.github.io/2020/01/29/Flink.html" title="Flink">https://manzhong.github.io/2020/01/29/Flink.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+    <div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:16px;">-------------本文结束<i class="fa fa-heart"></i>感谢您的阅读-------------</div>
+    
+</div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/BigData/" rel="tag"><i class="fa fa-tag"></i> BigData</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/02/Redis.html" rel="next" title="Redis">
+                <i class="fa fa-chevron-left"></i> Redis
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/03/15/基于python的数据分析.html" rel="prev" title="基于python的数据分析">
+                基于python的数据分析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC81MDA2Mi8yNjU1Mw=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/hexo.jpg" alt="丨HF丨">
+            
+              <p class="site-author-name" itemprop="name">丨HF丨</p>
+              <div class="site-description motion-element" itemprop="description">第二名就是头号输家!!!</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">54</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/ipyker" title="GitHub &rarr; https://github.com/ipyker" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:pyker@qq.com" title="E-Mail &rarr; mailto:pyker@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://weibo.com/viszhang" title="Weibo &rarr; https://weibo.com/viszhang" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="tencent://message/?uin=123435796&Site=&menu=yes" title="QQ &rarr; tencent://message/?uin=123435796&Site=&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i>QQ</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-book"></i>
+                推荐阅读
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://www.54tianzhisheng.cn/tags/Flink/" title="http://www.54tianzhisheng.cn/tags/Flink/" rel="noopener" target="_blank">Flink</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://nginxconfig.io/" title="https://nginxconfig.io/" rel="noopener" target="_blank">Nginxconfig</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://linux.51yip.com/" title="http://linux.51yip.com/" rel="noopener" target="_blank">Linux命令手册</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://echarts.baidu.com/index.html" title="https://echarts.baidu.com/index.html" rel="noopener" target="_blank">echarts可视化库</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+        </div>
+      </div>
+
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" style=" text-align:center;">&copy; 2017 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HF</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"> 站点字数合计:</i>
+    </span>
+    
+    <span title="站点总字数">961k</span>
+  
+  
+  <span class="post-meta-divider">|</span>
+  <a href="http://www.beian.miit.gov.cn" rel="noopener" target="_blank">粤ICP备19028706号 </a>
+
+</div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+
+<div class="run_time" style=" text-align:center;">
+  <span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+  <script>
+    var now = new Date(); 
+    function createtime() { 
+        var grt= new Date("07/23/2017 10:00:00");//此处修改你的建站时间或者网站上线时间 
+        now.setTime(now.getTime()+250); 
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days); 
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours); 
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum); 
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;} 
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum); 
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;} 
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 "; 
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒"; 
+    } 
+    setInterval("createtime()",250);
+  </script>
+</div>
+        
+<div class="busuanzi-count" style=" text-align:center;">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      我的第 <span class="busuanzi-value" id="busuanzi_value_site_uv"></span> 位朋友，
+    </span>
+  
+
+
+
+  
+    <span class="site-pv">
+      历经 <span class="busuanzi-value" id="busuanzi_value_site_pv"></span> 次回眸才与你相遇
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+  
+    
+    
+      
+    
+  
+  <script color="255,0,255" opacity="0.7" zindex="-1" count="140" src="//cdn.jsdelivr.net/gh/theme-next/theme-next-canvas-nest@1.0.0/canvas-nest.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.1"></script>
+
+  <script src="/js/motion.js?v=7.1.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/schemes/muse.js?v=7.1.1"></script>
+
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.1"></script>
+<script src="/js/post-details.js?v=7.1.1"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.1"></script>
+
+
+  
+
+  
+
+  
+  
+  
+
+  
+
+  
+  
+  
+
+
+  
+
+
+  
+    <script>
+  window.livereOptions = {
+    refer: '2020/01/29/Flink.html'
+  };
+  (function(d, s) {
+    var j, e = d.getElementsByTagName(s)[0];
+    if (typeof LivereTower === 'function') { return; }
+    j = d.createElement(s);
+    j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+    j.async = true;
+    e.parentNode.insertBefore(j, e);
+  })(document, 'script');
+</script>
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <script src="/lib/bookmark/bookmark.min.js?v=1.0"></script>
+  <script>
+  
+    bookmark.scrollToMark('auto', "#更多");
+  
+  </script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

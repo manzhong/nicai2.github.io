@@ -1,0 +1,3212 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="true">
+
+
+
+  
+  
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.1.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":true,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: true,
+    fastclick: true,
+    lazyload: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"shrinkIn","post_header":"slideLeftIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideDownIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="1 SparkSql的内置函数•    1 !•    2 %•    3 &amp;amp;•    4 *•    5 +•    6 -•    7 /•    8 &amp;lt;•    9 &amp;lt;=•    10 &amp;lt;=&amp;gt;•    11 =•    12 ==•    13 &amp;gt;•    14 &amp;gt;=•    15 ^•    16 abs•    17 acos•    18 a">
+<meta name="keywords" content="SparkSql">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SparkSql的内置函数">
+<meta property="og:url" content="https://manzhong.github.io/2020/05/02/SparkSql的内置函数.html">
+<meta property="og:site_name" content="春雨里洗过的太阳">
+<meta property="og:description" content="1 SparkSql的内置函数•    1 !•    2 %•    3 &amp;amp;•    4 *•    5 +•    6 -•    7 /•    8 &amp;lt;•    9 &amp;lt;=•    10 &amp;lt;=&amp;gt;•    11 =•    12 ==•    13 &amp;gt;•    14 &amp;gt;=•    15 ^•    16 abs•    17 acos•    18 a">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-05-02T14:56:08.910Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SparkSql的内置函数">
+<meta name="twitter:description" content="1 SparkSql的内置函数•    1 !•    2 %•    3 &amp;amp;•    4 *•    5 +•    6 -•    7 /•    8 &amp;lt;•    9 &amp;lt;=•    10 &amp;lt;=&amp;gt;•    11 =•    12 ==•    13 &amp;gt;•    14 &amp;gt;=•    15 ^•    16 abs•    17 acos•    18 a">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="春雨里洗过的太阳" type="application/atom+xml">
+
+
+
+  
+  
+  <link rel="canonical" href="https://manzhong.github.io/2020/05/02/SparkSql的内置函数">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>SparkSql的内置函数 | 春雨里洗过的太阳</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+ 
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">春雨里洗过的太阳</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-bookmark"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-互动">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/guestbook/" rel="section"><i class="menu-item-icon fa fa-fw fa-comments"></i> <br>互动</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://manzhong.github.io/2020/05/02/SparkSql的内置函数.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="丨HF丨">
+      <meta itemprop="description" content="第二名就是头号输家!!!">
+      <meta itemprop="image" content="/images/hexo.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="春雨里洗过的太阳">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">SparkSql的内置函数
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2020-05-02 22:16:12 / 修改时间：22:56:08" itemprop="dateCreated datePublished" datetime="2020-05-02T22:16:12+08:00">2020-05-02</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">51k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">46 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="1-SparkSql的内置函数"><a href="#1-SparkSql的内置函数" class="headerlink" title="1 SparkSql的内置函数"></a>1 SparkSql的内置函数</h1><p>•    1 !<br>•    2 %<br>•    3 &amp;<br>•    4 *<br>•    5 +<br>•    6 -<br>•    7 /<br>•    8 &lt;<br>•    9 &lt;=<br>•    10 &lt;=&gt;<br>•    11 =<br>•    12 ==<br>•    13 &gt;<br>•    14 &gt;=<br>•    15 ^<br>•    16 abs<br>•    17 acos<br>•    18 add_months<br>•    19 and<br>•    20 approx_count_distinct<br>•    21 approx_percentile<br>•    22 array<br>•    23 array_contains<br>•    24 ascii<br>•    25 asin<br>•    26 assert_true<br>•    27 atan<br>•    28 atan2<br>•    29 avg<br>•    30 base64<br>•    31 bigint<br>•    32 bin<br>•    33 binary<br>•    34 bit_length<br>•    35 boolean<br>•    36 bround<br>•    37 cast<br>•    38 cbrt<br>•    39 ceil<br>•    40 ceiling<br>•    41 char<br>•    42 char_length<br>•    43 character_length<br>•    44 chr<br>•    45 coalesce<br>•    46 collect_list<br>•    47 collect_set<br>•    48 concat<br>•    49 concat_ws<br>•    50 conv<br>•    51 corr<br>•    52 cos<br>•    53 cosh<br>•    54 cot<br>•    55 count<br>•    56 count_min_sketch<br>•    57 covar_pop<br>•    58 covar_samp<br>•    59 crc32<br>•    60 cube<br>•    61 cume_dist<br>•    62 current_database<br>•    63 current_date<br>•    64 current_timestamp<br>•    65 date<br>•    66 date_add<br>•    67 date_format<br>•    68 date_sub<br>•    69 date_trunc<br>•    70 datediff<br>•    71 day<br>•    72 dayofmonth<br>•    73 dayofweek<br>•    74 dayofyear<br>•    75 decimal<br>•    76 decode<br>•    77 degrees<br>•    78 dense_rank<br>•    79 double<br>•    80 e<br>•    81 elt<br>•    82 encode<br>•    83 exp<br>•    84 explode<br>•    85 explode_outer<br>•    86 expm1<br>•    87 factorial<br>•    88 find_in_set<br>•    89 first<br>•    90 first_value<br>•    91 float<br>•    92 floor<br>•    93 format_number<br>•    94 format_string<br>•    95 from_json<br>•    96 from_unixtime<br>•    97 from_utc_timestamp<br>•    98 get_json_object<br>•    99 greatest<br>•    100 grouping<br>•    101 grouping_id<br>•    102 hash<br>•    103 hex<br>•    104 hour<br>•    105 hypot<br>•    106 if<br>•    107 ifnull<br>•    108 in<br>•    109 initcap<br>•    110 inline<br>•    111 inline_outer<br>•    112 input_file_block_length<br>•    113 input_file_block_start<br>•    114 input_file_name<br>•    115 instr<br>•    116 int<br>•    117 isnan<br>•    118 isnotnull<br>•    119 isnull<br>•    120 java_method<br>•    121 json_tuple<br>•    122 kurtosis<br>•    123 lag<br>•    124 last<br>•    125 last_day<br>•    126 last_value<br>•    127 lcase<br>•    128 lead<br>•    129 least<br>•    130 left<br>•    131 length<br>•    132 levenshtein<br>•    133 like<br>•    134 ln<br>•    135 locate<br>•    136 log<br>•    137 log10<br>•    138 log1p<br>•    139 log2<br>•    140 lower<br>•    141 lpad<br>•    142 ltrim<br>•    143 map<br>•    144 map_keys<br>•    145 map_values<br>•    146 max<br>•    147 md5<br>•    148 mean<br>•    149 min<br>•    150 minute<br>•    151 mod<br>•    152 monotonically_increasing_id<br>•    153 month<br>•    154 months_between<br>•    155 named_struct<br>•    156 nanvl<br>•    157 negative<br>•    158 next_day<br>•    159 not<br>•    160 now<br>•    161 ntile<br>•    162 nullif<br>•    163 nvl<br>•    164 nvl2<br>•    165 octet_length<br>•    166 or<br>•    167 parse_url<br>•    168 percent_rank<br>•    169 percentile<br>•    170 percentile_approx<br>•    171 pi<br>•    172 pmod<br>•    173 posexplode<br>•    174 posexplode_outer<br>•    175 position<br>•    176 positive<br>•    177 pow<br>•    178 power<br>•    179 printf<br>•    180 quarter<br>•    181 radians<br>•    182 rand<br>•    183 randn<br>•    184 rank<br>•    185 reflect<br>•    186 regexp_extract<br>•    187 regexp_replace<br>•    188 repeat<br>•    189 replace<br>•    190 reverse<br>•    191 right<br>•    192 rint<br>•    193 rlike<br>•    194 rollup<br>•    195 round<br>•    196 row_number<br>•    197 rpad<br>•    198 rtrim<br>•    199 second<br>•    200 sentences<br>•    201 sha<br>•    202 sha1<br>•    203 sha2<br>•    204 shiftleft<br>•    205 shiftright<br>•    206 shiftrightunsigned<br>•    207 sign<br>•    208 signum<br>•    209 sin<br>•    210 sinh<br>•    211 size<br>•    212 skewness<br>•    213 smallint<br>•    214 sort_array<br>•    215 soundex<br>•    216 space<br>•    217 spark_partition_id<br>•    218 split<br>•    219 sqrt<br>•    220 stack<br>•    221 std<br>•    222 stddev<br>•    223 stddev_pop<br>•    224 stddev_samp<br>•    225 str_to_map<br>•    226 string<br>•    227 struct<br>•    228 substr<br>•    229 substring<br>•    230 substring_index<br>•    231 sum<br>•    232 tan<br>•    233 tanh<br>•    234 timestamp<br>•    235 tinyint<br>•    236 to_date<br>•    237 to_json<br>•    238 to_timestamp<br>•    239 to_unix_timestamp<br>•    240 to_utc_timestamp<br>•    241 translate<br>•    242 trim<br>•    243 trunc<br>•    244 ucase<br>•    245 unbase64<br>•    246 unhex<br>•    247 unix_timestamp<br>•    248 upper<br>•    249 uuid<br>•    250 var_pop<br>•    251 var_samp<br>•    252 variance<br>•    253 weekofyear<br>•    254 when<br>•    255 window<br>•    256 xpath<br>•    257 xpath_boolean<br>•    258 xpath_double<br>•    259 xpath_float<br>•    260 xpath_int<br>•    261 xpath_long<br>•    262 xpath_number<br>•    263 xpath_short<br>•    264 xpath_string<br>•    265 year<br>•    266 |<br>•    267 ~</p>
+<p>!<br>! expr ：逻辑非。</p>
+<p>%<br>expr1 % expr2 - 返回 expr1/expr2 的余数.</p>
+<p>例子：</p>
+<blockquote>
+<p>SELECT 2 % 1.8;</p>
+</blockquote>
+<p> 0.2</p>
+<blockquote>
+<p>SELECT MOD(2, 1.8);</p>
+</blockquote>
+<p> 0.2</p>
+<p>&amp;<br>expr1 &amp; expr2 - 返回 expr1 和 expr2 的按位AND的结果。</p>
+<p>例子：</p>
+<blockquote>
+<p>SELECT 3 &amp; 5;</p>
+</blockquote>
+<p> 1</p>
+<p><em><br>expr1 </em> expr2 - 返回 expr1*expr2.</p>
+<p>例子：</p>
+<blockquote>
+<p>SELECT 2 * 3;</p>
+</blockquote>
+<p> 6</p>
+<p>+<br>expr1 + expr2 - 返回 expr1+expr2.</p>
+<p>例子：</p>
+<blockquote>
+<p>SELECT 1 + 2;</p>
+</blockquote>
+<p> 3</p>
+<p>-<br>expr1 - expr2 - 返回 expr1-expr2.</p>
+<p>例子：</p>
+<blockquote>
+<p>SELECT 2 - 1;</p>
+</blockquote>
+<p> 1</p>
+<p>/<br>expr1 / expr2 - 返回 expr1/expr2，返回结果总是浮点数。</p>
+<p>例子：</p>
+<blockquote>
+<p>SELECT 3 / 2;</p>
+</blockquote>
+<p> 1.5</p>
+<blockquote>
+<p>SELECT 2L / 2L;</p>
+</blockquote>
+<p> 1.0</p>
+<p>&lt;<br>expr1 &lt; expr2 - 如果 expr1 小于 expr2 则返回 true.</p>
+<p>参数:<br>expr1, expr2 - 比较的两个参数类型必须一致，或者可以转换成一样的类型，而且这个类型支持排序。比如 map 类型就是不支持比较的，所以这个操作符不支持 map 类型的参数。</p>
+<p>例子：</p>
+<blockquote>
+<p>SELECT 1 &lt; 2;</p>
+</blockquote>
+<p> true</p>
+<blockquote>
+<p>SELECT 1.1 &lt; ‘1’;</p>
+</blockquote>
+<p> false</p>
+<blockquote>
+<p>SELECT to_date(‘2009-07-30 04:17:52’) &lt; to_date(‘2009-07-30 04:17:52’);</p>
+</blockquote>
+<p> false</p>
+<blockquote>
+<p>SELECT to_date(‘2009-07-30 04:17:52’) &lt; to_date(‘2009-08-01 04:17:52’);</p>
+</blockquote>
+<p> true</p>
+<blockquote>
+<p>SELECT 1 &lt; NULL;</p>
+</blockquote>
+<p> NULL</p>
+<p>&lt;=<br>expr1 &lt;= expr2 - 如果 expr1 小于等于 expr2。</p>
+<p>例子：<br>expr1, expr2 - 比较的两个参数类型必须一致，或者可以转换成一样的类型，而且这个类型支持排序。比如 map 类型就是不支持比较的，所以这个操作符不支持 map 类型的参数。</p>
+<p>例子：</p>
+<blockquote>
+<p>SELECT 2 &lt;= 2;</p>
+</blockquote>
+<p> true</p>
+<blockquote>
+<p>SELECT 1.0 &lt;= ‘1’;</p>
+</blockquote>
+<p> true</p>
+<blockquote>
+<p>SELECT to_date(‘2009-07-30 04:17:52’) &lt;= to_date(‘2009-07-30 04:17:52’);</p>
+</blockquote>
+<p> true</p>
+<blockquote>
+<p>SELECT to_date(‘2009-07-30 04:17:52’) &lt;= to_date(‘2009-08-01 04:17:52’);</p>
+</blockquote>
+<p> true</p>
+<blockquote>
+<p>SELECT 1 &lt;= NULL;</p>
+</blockquote>
+<p> NULL</p>
+<p>&lt;=&gt;<br>expr1 &lt;=&gt; expr2 - 返回的结果和 EQUAL(=) 一样。如果操作符两边都是 null，该操作符返回 true；仅一边为null则返回false。</p>
+<p>参数:<br>expr1, expr2 - 比较的两个参数类型必须一致，或者可以转换成一样的类型，而且这个类型支持排序。比如 map 类型就是不支持比较的，所以这个操作符不支持 map 类型的参数。<br>例子：</p>
+<blockquote>
+<p>SELECT 2 &lt;=&gt; 2;</p>
+</blockquote>
+<p> true</p>
+<blockquote>
+<p>SELECT 1 &lt;=&gt; ‘1’;</p>
+</blockquote>
+<p> true</p>
+<blockquote>
+<p>SELECT true &lt;=&gt; NULL;</p>
+</blockquote>
+<p> false</p>
+<blockquote>
+<p>SELECT NULL &lt;=&gt; NULL;</p>
+</blockquote>
+<p> true</p>
+<p>=<br>expr1 = expr2 - 如果 expr1 等于 expr2 则返回true，否则返回false。</p>
+<p>参数:<br>expr1, expr2 - 比较的两个参数类型必须一致，或者可以转换成一样的类型，而且这个类型支持排序。比如 map 类型就是不支持比较的，所以这个操作符不支持 map 类型的参数。<br>例子：</p>
+<blockquote>
+<p>SELECT 2 = 2;</p>
+</blockquote>
+<p> true</p>
+<blockquote>
+<p>SELECT 1 = ‘1’;</p>
+</blockquote>
+<p> true</p>
+<blockquote>
+<p>SELECT true = NULL;</p>
+</blockquote>
+<p> NULL</p>
+<blockquote>
+<p>SELECT NULL = NULL;</p>
+</blockquote>
+<p> NULL</p>
+<p>==<br>expr1 == expr2 - 如果 expr1 等于 expr2 则返回true，否则返回false。</p>
+<p>参数:<br>expr1, expr2 - 比较的两个参数类型必须一致，或者可以转换成一样的类型，而且这个类型支持排序。比如 map 类型就是不支持比较的，所以这个操作符不支持 map 类型的参数。<br>例子：</p>
+<blockquote>
+<p>SELECT 2 == 2;</p>
+</blockquote>
+<p> true</p>
+<blockquote>
+<p>SELECT 1 == ‘1’;</p>
+</blockquote>
+<p> true</p>
+<blockquote>
+<p>SELECT true == NULL;</p>
+</blockquote>
+<p> NULL</p>
+<blockquote>
+<p>SELECT NULL == NULL;</p>
+</blockquote>
+<p> NULL</p>
+<blockquote>
+<p>expr1 &gt; expr2 - 如果 expr1 大于 expr2 则返回 true。</p>
+</blockquote>
+<p>参数:<br>expr1, expr2 - 比较的两个参数类型必须一致，或者可以转换成一样的类型，而且这个类型支持排序。比如 map 类型就是不支持比较的，所以这个操作符不支持 map 类型的参数。<br>例子：</p>
+<blockquote>
+<p>SELECT 2 &gt; 1;</p>
+</blockquote>
+<p> true</p>
+<blockquote>
+<p>SELECT 2 &gt; ‘1.1’;</p>
+</blockquote>
+<p> true</p>
+<blockquote>
+<p>SELECT to_date(‘2009-07-30 04:17:52’) &gt; to_date(‘2009-07-30 04:17:52’);</p>
+</blockquote>
+<p> false</p>
+<blockquote>
+<p>SELECT to_date(‘2009-07-30 04:17:52’) &gt; to_date(‘2009-08-01 04:17:52’);</p>
+</blockquote>
+<p> false</p>
+<blockquote>
+<p>SELECT 1 &gt; NULL;</p>
+</blockquote>
+<p> NULL</p>
+<blockquote>
+<p>=<br>expr1 &gt;= expr2 - 如果 expr1 大于等于 expr2 则返回 true。</p>
+</blockquote>
+<p>参数:<br>expr1, expr2 - 比较的两个参数类型必须一致，或者可以转换成一样的类型，而且这个类型支持排序。比如 map 类型就是不支持比较的，所以这个操作符不支持 map 类型的参数。<br>例子：</p>
+<blockquote>
+<p>SELECT 2 &gt;= 1;</p>
+</blockquote>
+<p> true</p>
+<blockquote>
+<p>SELECT 2.0 &gt;= ‘2.1’;</p>
+</blockquote>
+<p> false</p>
+<blockquote>
+<p>SELECT to_date(‘2009-07-30 04:17:52’) &gt;= to_date(‘2009-07-30 04:17:52’);</p>
+</blockquote>
+<p> true</p>
+<blockquote>
+<p>SELECT to_date(‘2009-07-30 04:17:52’) &gt;= to_date(‘2009-08-01 04:17:52’);</p>
+</blockquote>
+<p> false</p>
+<blockquote>
+<p>SELECT 1 &gt;= NULL;</p>
+</blockquote>
+<p> NULL</p>
+<p>^<br>expr1 ^ expr2 - 返回 expr1 和 expr2 的按位异或的结果。</p>
+<p>例子：</p>
+<blockquote>
+<p>SELECT 3 ^ 5;</p>
+</blockquote>
+<p> 2</p>
+<p>abs<br>abs(expr) - 返回数值的绝对值。<br>例子：</p>
+<blockquote>
+<p>SELECT abs(-1);</p>
+</blockquote>
+<p> 1</p>
+<p>acos<br>acos(expr) - 如果 -1 &lt;= expr &lt;= 1，则返回 expr 的反余弦，否则返回 NaN。<br>例子：</p>
+<blockquote>
+<p>SELECT acos(1);</p>
+</blockquote>
+<p> 0.0</p>
+<blockquote>
+<p>SELECT acos(2);</p>
+</blockquote>
+<p> NaN</p>
+<p>add_months<br>add_months(start_date, num_months)</p>
+<p>例子：</p>
+<blockquote>
+<p>SELECT add_months(‘2016-08-31’, 1);</p>
+</blockquote>
+<p> 2016-09-30</p>
+<p>Since: 1.5.0</p>
+<p>and<br>expr1 and expr2 - 逻辑 AND.</p>
+<p>approx_count_distinct<br>approx_count_distinct(expr[, relativeSD]) - 通过 HyperLogLog ++ 返回估计的基数. relativeSD 定义允许的最大估计误差。</p>
+<p>approx_percentile<br>approx_percentile(col, percentage [, accuracy]) - 返回给定百分比处数值列 col 的近似百分位数值。百分比的值必须是 0.0 到 1.0 之间。</p>
+<p>例子:</p>
+<blockquote>
+<p>SELECT approx_percentile(10.0, array(0.5, 0.4, 0.1), 100);</p>
+</blockquote>
+<p> [10.0,10.0,10.0]</p>
+<blockquote>
+<p>SELECT approx_percentile(10.0, 0.5, 100);</p>
+</blockquote>
+<p> 10.0</p>
+<p>array<br>array(expr, …) - 返回给定值组成的数组。</p>
+<p>例子:</p>
+<blockquote>
+<p>SELECT array(1, 2, 3);</p>
+</blockquote>
+<p> [1,2,3]</p>
+<p>array_contains<br>array_contains(array, value) - 如果数组包含了 value，则返回 true。</p>
+<p>例子:</p>
+<blockquote>
+<p>SELECT array_contains(array(1, 2, 3), 2);</p>
+</blockquote>
+<p> true</p>
+<p>ascii<br>ascii(str) - 返回 str 的第一个字符的 ascii 数值。</p>
+<p>例子:</p>
+<blockquote>
+<p>SELECT ascii(‘222’);</p>
+</blockquote>
+<p> 50</p>
+<blockquote>
+<p>SELECT ascii(2);</p>
+</blockquote>
+<p> 50</p>
+<p>asin<br>asin(expr) - 如果 -1 &lt;= expr &lt;= 1，则返回 expr 的反正弦，否则返回 NaN。</p>
+<p>例子:</p>
+<blockquote>
+<p>SELECT asin(0);</p>
+</blockquote>
+<p> 0.0</p>
+<blockquote>
+<p>SELECT asin(2);</p>
+</blockquote>
+<p> NaN</p>
+<p>assert_true<br>assert_true(expr) - 如果 expr 表达式的返回值不是 true 则抛出异常。</p>
+<p>例子:</p>
+<blockquote>
+<p>SELECT assert_true(0 &lt; 1);</p>
+</blockquote>
+<p> NULL</p>
+<p>atan<br>atan(expr) - 返回 expr 的反正切。</p>
+<p>例子:</p>
+<blockquote>
+<p>SELECT atan(0);</p>
+</blockquote>
+<p> 0.0</p>
+<p>atan2<br>atan2(expr1, expr2) - 返回平面的正 x 轴与由坐标（expr1，expr2）点之间的弧度角度。</p>
+<p>例子:</p>
+<blockquote>
+<p>SELECT atan2(0, 0);</p>
+</blockquote>
+<p> 0.0</p>
+<p>avg<br>avg(expr) - 返回 expr 表达式的平均值。</p>
+<p>base64<br>base64(bin) - 将参数从二进制文件转换为 base64 的字符串。</p>
+<p>例子:</p>
+<blockquote>
+<p>SELECT base64(‘Spark SQL’);</p>
+</blockquote>
+<p> U3BhcmsgU1FM</p>
+<p>bigint<br>bigint(expr) - 将值 expr 转换为 bigint 数据类型。</p>
+<p>bin<br>bin(expr) - 返回 long 类型的参数 expr 的二进制字符串表示形式。</p>
+<p>例子:</p>
+<blockquote>
+<p>SELECT bin(13);</p>
+</blockquote>
+<p> 1101</p>
+<blockquote>
+<p>SELECT bin(-13);</p>
+</blockquote>
+<p> 1111111111111111111111111111111111111111111111111111111111110011</p>
+<blockquote>
+<p>SELECT bin(13.3);</p>
+</blockquote>
+<p> 1101</p>
+<p>binary<br>binary(expr) - 将值 expr 转换为 binary 数据类型。</p>
+<p>bit_length<br>bit_length(expr) - 返回字符串数据的位长度或二进制数据的位数。</p>
+<p>例子:</p>
+<blockquote>
+<p>SELECT bit_length(‘Spark SQL’);</p>
+</blockquote>
+<p> 72</p>
+<p>boolean<br>boolean(expr) - 将值 expr 转换为 boolean 数据类型。</p>
+<p>bround<br>bround(expr, d) - 使用 HALF_EVEN 舍入模式返回 expr 四舍五入至 d 位小数点的数据。</p>
+<p>例子:</p>
+<blockquote>
+<p>SELECT bround(2.5, 0);</p>
+</blockquote>
+<p> 2.0</p>
+<p>cast<br>cast(expr AS type) - 将 expr 转换成 type 类型的数据。</p>
+<p>例子:</p>
+<blockquote>
+<p>SELECT cast(‘10’ as int);</p>
+</blockquote>
+<p> 10</p>
+<p>cbrt<br>cbrt(expr) - 返回 expr 的立方根。</p>
+<p>例子:</p>
+<blockquote>
+<p>SELECT cbrt(27.0);</p>
+</blockquote>
+<p> 3.0</p>
+<p>ceil<br>ceil(expr) - 返回不小于 expr 的最小整数。</p>
+<p>例子:</p>
+<blockquote>
+<p>SELECT ceil(-0.1);</p>
+</blockquote>
+<p> 0</p>
+<blockquote>
+<p>SELECT ceil(5);</p>
+</blockquote>
+<p> 5</p>
+<p>ceiling<br>ceiling(expr) - 返回不小于 expr 的最小整数。</p>
+<p>例子:</p>
+<blockquote>
+<p>SELECT ceiling(-0.1);</p>
+</blockquote>
+<p> 0</p>
+<blockquote>
+<p>SELECT ceiling(5);</p>
+</blockquote>
+<p> 5</p>
+<p>char<br>char(expr) - 返回二进制等效于 expr 的 ASCII 字符。 如果 n 大于256，则结果等于 chr(n%256)</p>
+<p>例子:</p>
+<blockquote>
+<p>SELECT char(65);</p>
+</blockquote>
+<p> A</p>
+<p>char_length<br>char_length(expr) - 返回字符串数据的字符长度或二进制数据的字节数。 字符串数据的长度包括尾随空格，二进制数据的长度包括二进制零。</p>
+<p>例子:</p>
+<blockquote>
+<p>SELECT char_length(‘Spark SQL ‘);</p>
+</blockquote>
+<p> 10</p>
+<blockquote>
+<p>SELECT CHAR_LENGTH(‘Spark SQL ‘);</p>
+</blockquote>
+<p> 10</p>
+<blockquote>
+<p>SELECT CHARACTER_LENGTH(‘Spark SQL ‘);</p>
+</blockquote>
+<p> 10</p>
+<p>character_length<br>character_length(expr) - 返回字符串数据的字符长度或二进制数据的字节数。 字符串数据的长度包括尾随空格，二进制数据的长度包括二进制零。</p>
+<p>例子:</p>
+<blockquote>
+<p>SELECT character_length(‘Spark SQL ‘);</p>
+</blockquote>
+<p> 10</p>
+<blockquote>
+<p>SELECT CHAR_LENGTH(‘Spark SQL ‘);</p>
+</blockquote>
+<p> 10</p>
+<blockquote>
+<p>SELECT CHARACTER_LENGTH(‘Spark SQL ‘);</p>
+</blockquote>
+<p> 10</p>
+<p>chr<br>chr(expr) - 返回二进制等效于 expr 的 ASCII 字符。 如果 n 大于256，则结果等于 chr(n%256)</p>
+<p>例子:</p>
+<blockquote>
+<p>SELECT chr(65);</p>
+</blockquote>
+<p> A</p>
+<p>coalesce<br>coalesce(expr1, expr2, …) - 返回第一个非空参数（如果存在）。 否则，返回 null。</p>
+<p>例子:</p>
+<blockquote>
+<p>SELECT coalesce(NULL, 1, NULL);</p>
+</blockquote>
+<p> 1</p>
+<p>collect_list<br>collect_list(expr) - 收集并返回非唯一元素列表。</p>
+<p>collect_set<br>collect_set(expr) - 收集并返回唯一元素列表。</p>
+<p>concat<br>concat(str1, str2, …, strN) - 返回由 str1, str2, …, strN 组成的字符串。</p>
+<p>例子:</p>
+<blockquote>
+<p>SELECT concat(‘Spark’, ‘SQL’);</p>
+</blockquote>
+<p> SparkSQL</p>
+<p>concat_ws<br>concat_ws(sep, [str | array(str)]+) - 返回由 sep 分隔组成的字符串连接。</p>
+<p>例子:</p>
+<blockquote>
+<p>SELECT concat_ws(‘ ‘, ‘Spark’, ‘SQL’);</p>
+</blockquote>
+<p>  Spark SQL</p>
+<p>conv<br>conv(num, from_base, to_base) - 将 num 从 from_base 进制转换为 to_base 进制。</p>
+<p>例子:</p>
+<blockquote>
+<p>SELECT conv(‘100’, 2, 10);</p>
+</blockquote>
+<p> 4</p>
+<blockquote>
+<p>SELECT conv(-10, 16, -10);</p>
+</blockquote>
+<p> -16</p>
+<p>corr<br>corr(expr1, expr2) - Returns Pearson coefficient of correlation between a set of number pairs.</p>
+<p>cos<br>cos(expr) - 返回 expr 的余弦。</p>
+<p>例子:</p>
+<blockquote>
+<p>SELECT cos(0);</p>
+</blockquote>
+<p> 1.0</p>
+<p>cosh<br>cosh(expr) - 返回 expr 的双曲余弦。</p>
+<p>例子:</p>
+<blockquote>
+<p>SELECT cosh(0);</p>
+</blockquote>
+<p> 1.0</p>
+<p>cot<br>cot(expr) - 返回 expr 的余切值。</p>
+<p>例子:</p>
+<blockquote>
+<p>SELECT cot(1);</p>
+</blockquote>
+<p> 0.6420926159343306</p>
+<p>count<br>count(*) - Returns the total number of retrieved rows, including rows containing null.</p>
+<p>count(expr) - Returns the number of rows for which the supplied expression is non-null.</p>
+<p>count(DISTINCT expr[, expr…]) - Returns the number of rows for which the supplied expression(s) are unique and non-null.</p>
+<p>count_min_sketch<br>count_min_sketch(col, eps, confidence, seed) - Returns a count-min sketch of a column with the given esp,<br>confidence and seed. The result is an array of bytes, which can be deserialized to a<br>CountMinSketch before usage. Count-min sketch is a probabilistic data structure used for<br>cardinality estimation using sub-linear space.</p>
+<p>covar_pop<br>covar_pop(expr1, expr2) - Returns the population covariance of a set of number pairs.</p>
+<p>covar_samp<br>covar_samp(expr1, expr2) - Returns the sample covariance of a set of number pairs.</p>
+<p>crc32<br>crc32(expr) - Returns a cyclic redundancy check value of the expr as a bigint.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT crc32(‘Spark’);</p>
+</blockquote>
+<p> 1557323817</p>
+<p>cube<br>cume_dist<br>cume_dist() - Computes the position of a value relative to all values in the partition.</p>
+<p>current_database<br>current_database() - Returns the current database.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT current_database();</p>
+</blockquote>
+<p> default</p>
+<p>current_date<br>current_date() - Returns the current date at the start of query evaluation.</p>
+<p>Since: 1.5.0</p>
+<p>current_timestamp<br>current_timestamp() - Returns the current timestamp at the start of query evaluation.</p>
+<p>Since: 1.5.0</p>
+<p>date<br>date(expr) - Casts the value expr to the target data type date.</p>
+<p>date_add<br>date_add(start_date, num_days) - Returns the date that is num_days after start_date.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT date_add(‘2016-07-30’, 1);</p>
+</blockquote>
+<p> 2016-07-31</p>
+<p>Since: 1.5.0</p>
+<p>date_format<br>date_format(timestamp, fmt) - Converts timestamp to a value of string in the format specified by the date format fmt.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT date_format(‘2016-04-08’, ‘y’);</p>
+</blockquote>
+<p> 2016</p>
+<p>Since: 1.5.0</p>
+<p>date_sub<br>date_sub(start_date, num_days) - Returns the date that is num_days before start_date.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT date_sub(‘2016-07-30’, 1);</p>
+</blockquote>
+<p> 2016-07-29</p>
+<p>Since: 1.5.0</p>
+<p>date_trunc<br>date_trunc(fmt, ts) - Returns timestamp ts truncated to the unit specified by the format model fmt.<br>fmt should be one of [“YEAR”, “YYYY”, “YY”, “MON”, “MONTH”, “MM”, “DAY”, “DD”, “HOUR”, “MINUTE”, “SECOND”, “WEEK”, “QUARTER”]</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT date_trunc(‘YEAR’, ‘2015-03-05T09:32:05.359’);</p>
+</blockquote>
+<p> 2015-01-01 00:00:00</p>
+<blockquote>
+<p>SELECT date_trunc(‘MM’, ‘2015-03-05T09:32:05.359’);</p>
+</blockquote>
+<p> 2015-03-01 00:00:00</p>
+<blockquote>
+<p>SELECT date_trunc(‘DD’, ‘2015-03-05T09:32:05.359’);</p>
+</blockquote>
+<p> 2015-03-05 00:00:00</p>
+<blockquote>
+<p>SELECT date_trunc(‘HOUR’, ‘2015-03-05T09:32:05.359’);</p>
+</blockquote>
+<p> 2015-03-05 09:00:00</p>
+<p>Since: 2.3.0</p>
+<p>datediff<br>datediff(endDate, startDate) - Returns the number of days from startDate to endDate.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT datediff(‘2009-07-31’, ‘2009-07-30’);</p>
+</blockquote>
+<p> 1</p>
+<blockquote>
+<p>SELECT datediff(‘2009-07-30’, ‘2009-07-31’);</p>
+</blockquote>
+<p> -1</p>
+<p>Since: 1.5.0</p>
+<p>day<br>day(date) - Returns the day of month of the date/timestamp.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT day(‘2009-07-30’);</p>
+</blockquote>
+<p> 30</p>
+<p>Since: 1.5.0</p>
+<p>dayofmonth<br>dayofmonth(date) - Returns the day of month of the date/timestamp.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT dayofmonth(‘2009-07-30’);</p>
+</blockquote>
+<p> 30</p>
+<p>Since: 1.5.0</p>
+<p>dayofweek<br>dayofweek(date) - Returns the day of the week for date/timestamp (1 = Sunday, 2 = Monday, …, 7 = Saturday).</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT dayofweek(‘2009-07-30’);</p>
+</blockquote>
+<p> 5</p>
+<p>Since: 2.3.0</p>
+<p>dayofyear<br>dayofyear(date) - Returns the day of year of the date/timestamp.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT dayofyear(‘2016-04-09’);</p>
+</blockquote>
+<p> 100</p>
+<p>Since: 1.5.0</p>
+<p>decimal<br>decimal(expr) - Casts the value expr to the target data type decimal.</p>
+<p>decode<br>decode(bin, charset) - Decodes the first argument using the second argument character set.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT decode(encode(‘abc’, ‘utf-8’), ‘utf-8’);</p>
+</blockquote>
+<p> abc</p>
+<p>degrees<br>degrees(expr) - Converts radians to degrees.</p>
+<p>Arguments:</p>
+<p>expr - angle in radians<br>Examples:</p>
+<blockquote>
+<p>SELECT degrees(3.141592653589793);</p>
+</blockquote>
+<p> 180.0</p>
+<p>dense_rank<br>dense_rank() - Computes the rank of a value in a group of values. The result is one plus the<br>previously assigned rank value. Unlike the function rank, dense_rank will not produce gaps<br>in the ranking sequence.</p>
+<p>double<br>double(expr) - Casts the value expr to the target data type double.</p>
+<p>e<br>e() - Returns Euler’s number, e.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT e();</p>
+</blockquote>
+<p> 2.718281828459045</p>
+<p>elt<br>elt(n, input1, input2, …) - Returns the n-th input, e.g., returns input2 when n is 2.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT elt(1, ‘scala’, ‘java’);</p>
+</blockquote>
+<p> scala</p>
+<p>encode<br>encode(str, charset) - Encodes the first argument using the second argument character set.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT encode(‘abc’, ‘utf-8’);</p>
+</blockquote>
+<p> abc</p>
+<p>exp<br>exp(expr) - Returns e to the power of expr.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT exp(0);</p>
+</blockquote>
+<p> 1.0</p>
+<p>explode<br>explode(expr) - Separates the elements of array expr into multiple rows, or the elements of map expr into multiple rows and columns.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT explode(array(10, 20));</p>
+</blockquote>
+<p> 10</p>
+<p> 20</p>
+<p>explode_outer<br>explode_outer(expr) - Separates the elements of array expr into multiple rows, or the elements of map exprinto multiple rows and columns.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT explode_outer(array(10, 20));</p>
+</blockquote>
+<p> 10</p>
+<p> 20</p>
+<p>expm1<br>expm1(expr) - Returns exp(expr) - 1.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT expm1(0);</p>
+</blockquote>
+<p> 0.0</p>
+<p>factorial<br>factorial(expr) - Returns the factorial of expr. expr is [0..20]. Otherwise, null.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT factorial(5);</p>
+</blockquote>
+<p> 120</p>
+<p>find_in_set<br>find_in_set(str, str_array) - Returns the index (1-based) of the given string (str) in the comma-delimited list (str_array).<br>Returns 0, if the string was not found or if the given string (str) contains a comma.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT find_in_set(‘ab’,’abc,b,ab,c,def’);</p>
+</blockquote>
+<p> 3</p>
+<p>first<br>first(expr[, isIgnoreNull]) - Returns the first value of expr for a group of rows.<br>If isIgnoreNull is true, returns only non-null values.</p>
+<p>first_value<br>first_value(expr[, isIgnoreNull]) - Returns the first value of expr for a group of rows.<br>If isIgnoreNull is true, returns only non-null values.</p>
+<p>float<br>float(expr) - Casts the value expr to the target data type float.</p>
+<p>floor<br>floor(expr) - Returns the largest integer not greater than expr.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT floor(-0.1);</p>
+</blockquote>
+<p> -1</p>
+<blockquote>
+<p>SELECT floor(5);</p>
+</blockquote>
+<p> 5</p>
+<p>format_number<br>format_number(expr1, expr2) - Formats the number expr1 like ‘#,###,###.##’, rounded to expr2<br>decimal places. If expr2 is 0, the result has no decimal point or fractional part.<br>This is supposed to function like MySQL’s FORMAT.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT format_number(12332.123456, 4);</p>
+</blockquote>
+<p> 12,332.1235</p>
+<p>format_string<br>format_string(strfmt, obj, …) - Returns a formatted string from printf-style format strings.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT format_string(“Hello World %d %s”, 100, “days”);</p>
+</blockquote>
+<p> Hello World 100 days</p>
+<p>from_json<br>from_json(jsonStr, schema[, options]) - Returns a struct value with the given jsonStr and schema.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT from_json(‘{“a”:1, “b”:0.8}’, ‘a INT, b DOUBLE’);</p>
+</blockquote>
+<p> {“a”:1, “b”:0.8}</p>
+<blockquote>
+<p>SELECT from_json(‘{“time”:”26/08/2015”}’, ‘time Timestamp’, map(‘timestampFormat’, ‘dd/MM/yyyy’));</p>
+</blockquote>
+<p> {“time”:”2015-08-26 00:00:00.0”}</p>
+<p>Since: 2.2.0</p>
+<p>from_unixtime<br>from_unixtime(unix_time, format) - Returns unix_time in the specified format.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT from_unixtime(0, ‘yyyy-MM-dd HH:mm:ss’);</p>
+</blockquote>
+<p> 1970-01-01 00:00:00</p>
+<p>Since: 1.5.0</p>
+<p>from_utc_timestamp<br>from_utc_timestamp(timestamp, timezone) - Given a timestamp like ‘2017-07-14 02:40:00.0’, interprets it as a time in UTC, and renders that time as a timestamp in the given time zone. For example, ‘GMT+1’ would yield ‘2017-07-14 03:40:00.0’.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT from_utc_timestamp(‘2016-08-31’, ‘Asia/Seoul’);</p>
+</blockquote>
+<p> 2016-08-31 09:00:00</p>
+<p>Since: 1.5.0</p>
+<p>get_json_object<br>get_json_object(json_txt, path) - Extracts a json object from path.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT get_json_object(‘{“a”:”b”}’, ‘$.a’);</p>
+</blockquote>
+<p> b</p>
+<p>greatest<br>greatest(expr, …) - Returns the greatest value of all parameters, skipping null values.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT greatest(10, 9, 2, 4, 3);</p>
+</blockquote>
+<p> 10</p>
+<p>grouping<br>grouping_id<br>hash<br>hash(expr1, expr2, …) - Returns a hash value of the arguments.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT hash(‘Spark’, array(123), 2);</p>
+</blockquote>
+<p> -1321691492</p>
+<p>hex<br>hex(expr) - Converts expr to hexadecimal.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT hex(17);</p>
+</blockquote>
+<p> 11</p>
+<blockquote>
+<p>SELECT hex(‘Spark SQL’);</p>
+</blockquote>
+<p> 537061726B2053514C</p>
+<p>hour<br>hour(timestamp) - Returns the hour component of the string/timestamp.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT hour(‘2009-07-30 12:58:59’);</p>
+</blockquote>
+<p> 12</p>
+<p>Since: 1.5.0</p>
+<p>hypot<br>hypot(expr1, expr2) - Returns sqrt(expr12 + expr22).</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT hypot(3, 4);</p>
+</blockquote>
+<p> 5.0</p>
+<p>if<br>if(expr1, expr2, expr3) - If expr1 evaluates to true, then returns expr2; otherwise returns expr3.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT if(1 &lt; 2, ‘a’, ‘b’);</p>
+</blockquote>
+<p> a</p>
+<p>ifnull<br>ifnull(expr1, expr2) - Returns expr2 if expr1 is null, or expr1 otherwise.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT ifnull(NULL, array(‘2’));</p>
+</blockquote>
+<p> [“2”]</p>
+<p>in<br>expr1 in(expr2, expr3, …) - Returns true if expr equals to any valN.</p>
+<p>Arguments:</p>
+<p>expr1, expr2, expr3, … - the arguments must be same type.<br>Examples:</p>
+<blockquote>
+<p>SELECT 1 in(1, 2, 3);</p>
+</blockquote>
+<p> true</p>
+<blockquote>
+<p>SELECT 1 in(2, 3, 4);</p>
+</blockquote>
+<p> false</p>
+<blockquote>
+<p>SELECT named_struct(‘a’, 1, ‘b’, 2) in(named_struct(‘a’, 1, ‘b’, 1), named_struct(‘a’, 1, ‘b’, 3));</p>
+</blockquote>
+<p> false</p>
+<blockquote>
+<p>SELECT named_struct(‘a’, 1, ‘b’, 2) in(named_struct(‘a’, 1, ‘b’, 2), named_struct(‘a’, 1, ‘b’, 3));</p>
+</blockquote>
+<p> true</p>
+<p>initcap<br>initcap(str) - Returns str with the first letter of each word in uppercase.<br>All other letters are in lowercase. Words are delimited by white space.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT initcap(‘sPark sql’);</p>
+</blockquote>
+<p> Spark Sql</p>
+<p>inline<br>inline(expr) - Explodes an array of structs into a table.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT inline(array(struct(1, ‘a’), struct(2, ‘b’)));</p>
+</blockquote>
+<p> 1  a</p>
+<p> 2  b</p>
+<p>inline_outer<br>inline_outer(expr) - Explodes an array of structs into a table.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT inline_outer(array(struct(1, ‘a’), struct(2, ‘b’)));</p>
+</blockquote>
+<p> 1  a</p>
+<p> 2  b</p>
+<p>input_file_block_length<br>input_file_block_length() - Returns the length of the block being read, or -1 if not available.</p>
+<p>input_file_block_start<br>input_file_block_start() - Returns the start offset of the block being read, or -1 if not available.</p>
+<p>input_file_name<br>input_file_name() - Returns the name of the file being read, or empty string if not available.</p>
+<p>instr<br>instr(str, substr) - Returns the (1-based) index of the first occurrence of substr in str.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT instr(‘SparkSQL’, ‘SQL’);</p>
+</blockquote>
+<p> 6</p>
+<p>int<br>int(expr) - Casts the value expr to the target data type int.</p>
+<p>isnan<br>isnan(expr) - Returns true if expr is NaN, or false otherwise.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT isnan(cast(‘NaN’ as double));</p>
+</blockquote>
+<p> true</p>
+<p>isnotnull<br>isnotnull(expr) - Returns true if expr is not null, or false otherwise.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT isnotnull(1);</p>
+</blockquote>
+<p> true</p>
+<p>isnull<br>isnull(expr) - Returns true if expr is null, or false otherwise.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT isnull(1);</p>
+</blockquote>
+<p> false</p>
+<p>java_method<br>java_method(class, method[, arg1[, arg2 ..]]) - Calls a method with reflection.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT java_method(‘java.util.UUID’, ‘randomUUID’);</p>
+</blockquote>
+<p> c33fb387-8500-4bfa-81d2-6e0e3e930df2</p>
+<blockquote>
+<p>SELECT java_method(‘java.util.UUID’, ‘fromString’, ‘a5cf6c42-0c85-418f-af6c-3e4e5b1328f2’);</p>
+</blockquote>
+<p> a5cf6c42-0c85-418f-af6c-3e4e5b1328f2</p>
+<p>json_tuple<br>json_tuple(jsonStr, p1, p2, …, pn) - Returns a tuple like the function get_json_object, but it takes multiple names. All the input parameters and output column types are string.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT json_tuple(‘{“a”:1, “b”:2}’, ‘a’, ‘b’);</p>
+</blockquote>
+<p> 1  2</p>
+<p>kurtosis<br>kurtosis(expr) - Returns the kurtosis value calculated from values of a group.</p>
+<p>lag<br>lag(input[, offset[, default]]) - Returns the value of input at the offsetth row<br>before the current row in the window. The default value of offset is 1 and the default<br>value of default is null. If the value of input at the offsetth row is null,<br>null is returned. If there is no such offset row (e.g., when the offset is 1, the first<br>row of the window does not have any previous row), default is returned.</p>
+<p>last<br>last(expr[, isIgnoreNull]) - Returns the last value of expr for a group of rows.<br>If isIgnoreNull is true, returns only non-null values.</p>
+<p>last_day<br>last_day(date) - Returns the last day of the month which the date belongs to.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT last_day(‘2009-01-12’);</p>
+</blockquote>
+<p> 2009-01-31</p>
+<p>Since: 1.5.0</p>
+<p>last_value<br>last_value(expr[, isIgnoreNull]) - Returns the last value of expr for a group of rows.<br>If isIgnoreNull is true, returns only non-null values.</p>
+<p>lcase<br>lcase(str) - Returns str with all characters changed to lowercase.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT lcase(‘SparkSql’);</p>
+</blockquote>
+<p> sparksql</p>
+<p>lead<br>lead(input[, offset[, default]]) - Returns the value of input at the offsetth row<br>after the current row in the window. The default value of offset is 1 and the default<br>value of default is null. If the value of input at the offsetth row is null,<br>null is returned. If there is no such an offset row (e.g., when the offset is 1, the last<br>row of the window does not have any subsequent row), default is returned.</p>
+<p>least<br>least(expr, …) - Returns the least value of all parameters, skipping null values.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT least(10, 9, 2, 4, 3);</p>
+</blockquote>
+<p> 2</p>
+<p>left<br>left(str, len) - Returns the leftmost len(len can be string type) characters from the string str,if len is less or equal than 0 the result is an empty string.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT left(‘Spark SQL’, 3);</p>
+</blockquote>
+<p> Spa</p>
+<p>length<br>length(expr) - Returns the character length of string data or number of bytes of binary data. The length of string data includes the trailing spaces. The length of binary data includes binary zeros.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT length(‘Spark SQL ‘);</p>
+</blockquote>
+<p> 10</p>
+<blockquote>
+<p>SELECT CHAR_LENGTH(‘Spark SQL ‘);</p>
+</blockquote>
+<p> 10</p>
+<blockquote>
+<p>SELECT CHARACTER_LENGTH(‘Spark SQL ‘);</p>
+</blockquote>
+<p> 10</p>
+<p>levenshtein<br>levenshtein(str1, str2) - Returns the Levenshtein distance between the two given strings.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT levenshtein(‘kitten’, ‘sitting’);</p>
+</blockquote>
+<p> 3</p>
+<p>like<br>str like pattern - Returns true if str matches pattern, null if any arguments are null, false otherwise.</p>
+<p>Arguments:</p>
+<p>str - a string expression<br>pattern - a string expression. The pattern is a string which is matched literally, with<br>exception to the following special symbols:</p>
+<p>_ matches any one character in the input (similar to . in posix regular expressions)</p>
+<p>% matches zero or more characters in the input (similar to .* in posix regular<br>expressions)</p>
+<p>The escape character is ‘\’. If an escape character precedes a special symbol or another<br>escape character, the following character is matched literally. It is invalid to escape<br>any other character.</p>
+<p>Since Spark 2.0, string literals are unescaped in our SQL parser. For example, in order<br>to match “\abc”, the pattern should be “\abc”.</p>
+<p>When SQL config ‘spark.sql.parser.escapedStringLiterals’ is enabled, it fallbacks<br>to Spark 1.6 behavior regarding string literal parsing. For example, if the config is<br>enabled, the pattern to match “\abc” should be “\abc”.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT ‘%SystemDrive%\Users\John’ like ‘\%SystemDrive\%\Users%’</p>
+</blockquote>
+<p>true</p>
+<p>Note:</p>
+<p>Use RLIKE to match with standard regular expressions.</p>
+<p>ln<br>ln(expr) - Returns the natural logarithm (base e) of expr.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT ln(1);</p>
+</blockquote>
+<p> 0.0</p>
+<p>locate<br>locate(substr, str[, pos]) - Returns the position of the first occurrence of substr in str after position pos.<br>The given pos and return value are 1-based.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT locate(‘bar’, ‘foobarbar’);</p>
+</blockquote>
+<p> 4</p>
+<blockquote>
+<p>SELECT locate(‘bar’, ‘foobarbar’, 5);</p>
+</blockquote>
+<p> 7</p>
+<blockquote>
+<p>SELECT POSITION(‘bar’ IN ‘foobarbar’);</p>
+</blockquote>
+<p> 4</p>
+<p>log<br>log(base, expr) - Returns the logarithm of expr with base.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT log(10, 100);</p>
+</blockquote>
+<p> 2.0</p>
+<p>log10<br>log10(expr) - Returns the logarithm of expr with base 10.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT log10(10);</p>
+</blockquote>
+<p> 1.0</p>
+<p>log1p<br>log1p(expr) - Returns log(1 + expr).</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT log1p(0);</p>
+</blockquote>
+<p> 0.0</p>
+<p>log2<br>log2(expr) - Returns the logarithm of expr with base 2.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT log2(2);</p>
+</blockquote>
+<p> 1.0</p>
+<p>lower<br>lower(str) - Returns str with all characters changed to lowercase.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT lower(‘SparkSql’);</p>
+</blockquote>
+<p> sparksql</p>
+<p>lpad<br>lpad(str, len, pad) - Returns str, left-padded with pad to a length of len.<br>If str is longer than len, the return value is shortened to len characters.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT lpad(‘hi’, 5, ‘??’);</p>
+</blockquote>
+<p> ???hi</p>
+<blockquote>
+<p>SELECT lpad(‘hi’, 1, ‘??’);</p>
+</blockquote>
+<p> h</p>
+<p>ltrim<br>ltrim(str) - Removes the leading space characters from str.</p>
+<p>ltrim(trimStr, str) - Removes the leading string contains the characters from the trim string</p>
+<p>Arguments:</p>
+<p>str - a string expression<br>trimStr - the trim string characters to trim, the default value is a single space<br>Examples:</p>
+<blockquote>
+<p>SELECT ltrim(‘    SparkSQL   ‘);</p>
+</blockquote>
+<p> SparkSQL</p>
+<blockquote>
+<p>SELECT ltrim(‘Sp’, ‘SSparkSQLS’);</p>
+</blockquote>
+<p> arkSQLS</p>
+<p>map<br>map(key0, value0, key1, value1, …) - Creates a map with the given key/value pairs.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT map(1.0, ‘2’, 3.0, ‘4’);</p>
+</blockquote>
+<p> {1.0:”2”,3.0:”4”}</p>
+<p>map_keys<br>map_keys(map) - Returns an unordered array containing the keys of the map.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT map_keys(map(1, ‘a’, 2, ‘b’));</p>
+</blockquote>
+<p> [1,2]</p>
+<p>map_values<br>map_values(map) - Returns an unordered array containing the values of the map.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT map_values(map(1, ‘a’, 2, ‘b’));</p>
+</blockquote>
+<p> [“a”,”b”]</p>
+<p>max<br>max(expr) - Returns the maximum value of expr.</p>
+<p>md5<br>md5(expr) - Returns an MD5 128-bit checksum as a hex string of expr.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT md5(‘Spark’);</p>
+</blockquote>
+<p> 8cde774d6f7333752ed72cacddb05126</p>
+<p>mean<br>mean(expr) - Returns the mean calculated from values of a group.</p>
+<p>min<br>min(expr) - Returns the minimum value of expr.</p>
+<p>minute<br>minute(timestamp) - Returns the minute component of the string/timestamp.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT minute(‘2009-07-30 12:58:59’);</p>
+</blockquote>
+<p> 58</p>
+<p>Since: 1.5.0</p>
+<p>mod<br>expr1 mod expr2 - Returns the remainder after expr1/expr2.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT 2 mod 1.8;</p>
+</blockquote>
+<p> 0.2</p>
+<blockquote>
+<p>SELECT MOD(2, 1.8);</p>
+</blockquote>
+<p> 0.2</p>
+<p>monotonically_increasing_id<br>monotonically_increasing_id() - Returns monotonically increasing 64-bit integers. The generated ID is guaranteed<br>to be monotonically increasing and unique, but not consecutive. The current implementation<br>puts the partition ID in the upper 31 bits, and the lower 33 bits represent the record number<br>within each partition. The assumption is that the data frame has less than 1 billion<br>partitions, and each partition has less than 8 billion records.</p>
+<p>month<br>month(date) - Returns the month component of the date/timestamp.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT month(‘2016-07-30’);</p>
+</blockquote>
+<p> 7</p>
+<p>Since: 1.5.0</p>
+<p>months_between<br>months_between(timestamp1, timestamp2) - Returns number of months between timestamp1 and timestamp2.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT months_between(‘1997-02-28 10:30:00’, ‘1996-10-30’);</p>
+</blockquote>
+<p> 3.94959677</p>
+<p>Since: 1.5.0</p>
+<p>named_struct<br>named_struct(name1, val1, name2, val2, …) - Creates a struct with the given field names and values.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT named_struct(“a”, 1, “b”, 2, “c”, 3);</p>
+</blockquote>
+<p> {“a”:1,”b”:2,”c”:3}</p>
+<p>nanvl<br>nanvl(expr1, expr2) - Returns expr1 if it’s not NaN, or expr2 otherwise.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT nanvl(cast(‘NaN’ as double), 123);</p>
+</blockquote>
+<p> 123.0</p>
+<p>negative<br>negative(expr) - Returns the negated value of expr.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT negative(1);</p>
+</blockquote>
+<p> -1</p>
+<p>next_day<br>next_day(start_date, day_of_week) - Returns the first date which is later than start_date and named as indicated.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT next_day(‘2015-01-14’, ‘TU’);</p>
+</blockquote>
+<p> 2015-01-20</p>
+<p>Since: 1.5.0</p>
+<p>not<br>not expr - Logical not.</p>
+<p>now<br>now() - Returns the current timestamp at the start of query evaluation.</p>
+<p>Since: 1.5.0</p>
+<p>ntile<br>ntile(n) - Divides the rows for each window partition into n buckets ranging<br>from 1 to at most n.</p>
+<p>nullif<br>nullif(expr1, expr2) - Returns null if expr1 equals to expr2, or expr1 otherwise.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT nullif(2, 2);</p>
+</blockquote>
+<p> NULL</p>
+<p>nvl<br>nvl(expr1, expr2) - Returns expr2 if expr1 is null, or expr1 otherwise.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT nvl(NULL, array(‘2’));</p>
+</blockquote>
+<p> [“2”]</p>
+<p>nvl2<br>nvl2(expr1, expr2, expr3) - Returns expr2 if expr1 is not null, or expr3 otherwise.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT nvl2(NULL, 2, 1);</p>
+</blockquote>
+<p> 1</p>
+<p>octet_length<br>octet_length(expr) - Returns the byte length of string data or number of bytes of binary data.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT octet_length(‘Spark SQL’);</p>
+</blockquote>
+<p> 9</p>
+<p>or<br>expr1 or expr2 - Logical OR.</p>
+<p>parse_url<br>parse_url(url, partToExtract[, key]) - Extracts a part from a URL.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT parse_url(‘<a href="http://spark.apache.org/path?query=1&#39;" target="_blank" rel="noopener">http://spark.apache.org/path?query=1&#39;</a>, ‘HOST’)</p>
+</blockquote>
+<p> spark.apache.org</p>
+<blockquote>
+<p>SELECT parse_url(‘<a href="http://spark.apache.org/path?query=1&#39;" target="_blank" rel="noopener">http://spark.apache.org/path?query=1&#39;</a>, ‘QUERY’)</p>
+</blockquote>
+<p> query=1</p>
+<blockquote>
+<p>SELECT parse_url(‘<a href="http://spark.apache.org/path?query=1&#39;" target="_blank" rel="noopener">http://spark.apache.org/path?query=1&#39;</a>, ‘QUERY’, ‘query’)</p>
+</blockquote>
+<p> 1</p>
+<p>percent_rank<br>percent_rank() - Computes the percentage ranking of a value in a group of values.</p>
+<p>percentile<br>percentile(col, percentage [, frequency]) - Returns the exact percentile value of numeric column<br>col at the given percentage. The value of percentage must be between 0.0 and 1.0. The<br>value of frequency should be positive integral</p>
+<p>percentile(col, array(percentage1 [, percentage2]…) [, frequency]) - Returns the exact<br>percentile value array of numeric column col at the given percentage(s). Each value<br>of the percentage array must be between 0.0 and 1.0. The value of frequency should be<br>positive integral</p>
+<p>percentile_approx<br>percentile_approx(col, percentage [, accuracy]) - Returns the approximate percentile value of numeric<br>column col at the given percentage. The value of percentage must be between 0.0<br>and 1.0. The accuracy parameter (default: 10000) is a positive numeric literal which<br>controls approximation accuracy at the cost of memory. Higher value of accuracy yields<br>better accuracy, 1.0/accuracy is the relative error of the approximation.<br>When percentage is an array, each value of the percentage array must be between 0.0 and 1.0.<br>In this case, returns the approximate percentile array of column col at the given<br>percentage array.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT percentile_approx(10.0, array(0.5, 0.4, 0.1), 100);</p>
+</blockquote>
+<p> [10.0,10.0,10.0]</p>
+<blockquote>
+<p>SELECT percentile_approx(10.0, 0.5, 100);</p>
+</blockquote>
+<p> 10.0</p>
+<p>pi<br>pi() - Returns pi.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT pi();</p>
+</blockquote>
+<p> 3.141592653589793</p>
+<p>pmod<br>pmod(expr1, expr2) - Returns the positive value of expr1 mod expr2.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT pmod(10, 3);</p>
+</blockquote>
+<p> 1</p>
+<blockquote>
+<p>SELECT pmod(-10, 3);</p>
+</blockquote>
+<p> 2</p>
+<p>posexplode<br>posexplode(expr) - Separates the elements of array expr into multiple rows with positions, or the elements of map expr into multiple rows and columns with positions.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT posexplode(array(10,20));</p>
+</blockquote>
+<p> 0  10</p>
+<p> 1  20</p>
+<p>posexplode_outer<br>posexplode_outer(expr) - Separates the elements of array expr into multiple rows with positions, or the elements of map expr into multiple rows and columns with positions.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT posexplode_outer(array(10,20));</p>
+</blockquote>
+<p> 0  10</p>
+<p> 1  20</p>
+<p>position<br>position(substr, str[, pos]) - Returns the position of the first occurrence of substr in str after position pos.<br>The given pos and return value are 1-based.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT position(‘bar’, ‘foobarbar’);</p>
+</blockquote>
+<p> 4</p>
+<blockquote>
+<p>SELECT position(‘bar’, ‘foobarbar’, 5);</p>
+</blockquote>
+<p> 7</p>
+<blockquote>
+<p>SELECT POSITION(‘bar’ IN ‘foobarbar’);</p>
+</blockquote>
+<p> 4</p>
+<p>positive<br>positive(expr) - Returns the value of expr.</p>
+<p>pow<br>pow(expr1, expr2) - Raises expr1 to the power of expr2.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT pow(2, 3);</p>
+</blockquote>
+<p> 8.0</p>
+<p>power<br>power(expr1, expr2) - Raises expr1 to the power of expr2.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT power(2, 3);</p>
+</blockquote>
+<p> 8.0</p>
+<p>printf<br>printf(strfmt, obj, …) - Returns a formatted string from printf-style format strings.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT printf(“Hello World %d %s”, 100, “days”);</p>
+</blockquote>
+<p> Hello World 100 days</p>
+<p>quarter<br>quarter(date) - Returns the quarter of the year for date, in the range 1 to 4.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT quarter(‘2016-08-31’);</p>
+</blockquote>
+<p> 3</p>
+<p>Since: 1.5.0</p>
+<p>radians<br>radians(expr) - Converts degrees to radians.</p>
+<p>Arguments:</p>
+<p>expr - angle in degrees<br>Examples:</p>
+<blockquote>
+<p>SELECT radians(180);</p>
+</blockquote>
+<p> 3.141592653589793</p>
+<p>rand<br>rand([seed]) - Returns a random value with independent and identically distributed (i.i.d.) uniformly distributed values in [0, 1).</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT rand();</p>
+</blockquote>
+<p> 0.9629742951434543</p>
+<blockquote>
+<p>SELECT rand(0);</p>
+</blockquote>
+<p> 0.8446490682263027</p>
+<blockquote>
+<p>SELECT rand(null);</p>
+</blockquote>
+<p> 0.8446490682263027</p>
+<p>randn<br>randn([seed]) - Returns a random value with independent and identically distributed (i.i.d.) values drawn from the standard normal distribution.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT randn();</p>
+</blockquote>
+<p> -0.3254147983080288</p>
+<blockquote>
+<p>SELECT randn(0);</p>
+</blockquote>
+<p> 1.1164209726833079</p>
+<blockquote>
+<p>SELECT randn(null);</p>
+</blockquote>
+<p> 1.1164209726833079</p>
+<p>rank<br>rank() - Computes the rank of a value in a group of values. The result is one plus the number<br>of rows preceding or equal to the current row in the ordering of the partition. The values<br>will produce gaps in the sequence.</p>
+<p>reflect<br>reflect(class, method[, arg1[, arg2 ..]]) - Calls a method with reflection.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT reflect(‘java.util.UUID’, ‘randomUUID’);</p>
+</blockquote>
+<p> c33fb387-8500-4bfa-81d2-6e0e3e930df2</p>
+<blockquote>
+<p>SELECT reflect(‘java.util.UUID’, ‘fromString’, ‘a5cf6c42-0c85-418f-af6c-3e4e5b1328f2’);</p>
+</blockquote>
+<p> a5cf6c42-0c85-418f-af6c-3e4e5b1328f2</p>
+<p>regexp_extract<br>regexp_extract(str, regexp[, idx]) - Extracts a group that matches regexp.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT regexp_extract(‘100-200’, ‘(\d+)-(\d+)’, 1);</p>
+</blockquote>
+<p> 100</p>
+<p>regexp_replace<br>regexp_replace(str, regexp, rep) - Replaces all substrings of str that match regexp with rep.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT regexp_replace(‘100-200’, ‘(\d+)’, ‘num’);</p>
+</blockquote>
+<p> num-num</p>
+<p>repeat<br>repeat(str, n) - Returns the string which repeats the given string value n times.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT repeat(‘123’, 2);</p>
+</blockquote>
+<p> 123123</p>
+<p>replace<br>replace(str, search[, replace]) - Replaces all occurrences of search with replace.</p>
+<p>Arguments:</p>
+<p>str - a string expression<br>search - a string expression. If search is not found in str, str is returned unchanged.<br>replace - a string expression. If replace is not specified or is an empty string, nothing replaces<br>the string that is removed from str.<br>Examples:</p>
+<blockquote>
+<p>SELECT replace(‘ABCabc’, ‘abc’, ‘DEF’);</p>
+</blockquote>
+<p> ABCDEF</p>
+<p>reverse<br>reverse(str) - Returns the reversed given string.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT reverse(‘Spark SQL’);</p>
+</blockquote>
+<p> LQS krapS</p>
+<p>right<br>right(str, len) - Returns the rightmost len(len can be string type) characters from the string str,if len is less or equal than 0 the result is an empty string.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT right(‘Spark SQL’, 3);</p>
+</blockquote>
+<p> SQL</p>
+<p>rint<br>rint(expr) - Returns the double value that is closest in value to the argument and is equal to a mathematical integer.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT rint(12.3456);</p>
+</blockquote>
+<p> 12.0</p>
+<p>rlike<br>str rlike regexp - Returns true if str matches regexp, or false otherwise.</p>
+<p>Arguments:</p>
+<p>str - a string expression<br>regexp - a string expression. The pattern string should be a Java regular expression.</p>
+<p>Since Spark 2.0, string literals (including regex patterns) are unescaped in our SQL<br>parser. For example, to match “\abc”, a regular expression for regexp can be<br>“^\abc$”.</p>
+<p>There is a SQL config ‘spark.sql.parser.escapedStringLiterals’ that can be used to<br>fallback to the Spark 1.6 behavior regarding string literal parsing. For example,<br>if the config is enabled, the regexp that can match “\abc” is “^\abc$”.</p>
+<p>Examples:</p>
+<p>When spark.sql.parser.escapedStringLiterals is disabled (default).</p>
+<blockquote>
+<p>SELECT ‘%SystemDrive%\Users\John’ rlike ‘%SystemDrive%\Users.*’</p>
+</blockquote>
+<p>true</p>
+<p>When spark.sql.parser.escapedStringLiterals is enabled.</p>
+<blockquote>
+<p>SELECT ‘%SystemDrive%\Users\John’ rlike ‘%SystemDrive%\Users.*’</p>
+</blockquote>
+<p>true</p>
+<p>Note:</p>
+<p>Use LIKE to match with simple string pattern.</p>
+<p>rollup<br>round<br>round(expr, d) - Returns expr rounded to d decimal places using HALF_UP rounding mode.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT round(2.5, 0);</p>
+</blockquote>
+<p> 3.0</p>
+<p>row_number<br>row_number() - Assigns a unique, sequential number to each row, starting with one,<br>according to the ordering of rows within the window partition.</p>
+<p>rpad<br>rpad(str, len, pad) - Returns str, right-padded with pad to a length of len.<br>If str is longer than len, the return value is shortened to len characters.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT rpad(‘hi’, 5, ‘??’);</p>
+</blockquote>
+<p> hi???</p>
+<blockquote>
+<p>SELECT rpad(‘hi’, 1, ‘??’);</p>
+</blockquote>
+<p> h</p>
+<p>rtrim<br>rtrim(str) - Removes the trailing space characters from str.</p>
+<p>rtrim(trimStr, str) - Removes the trailing string which contains the characters from the trim string from the str</p>
+<p>Arguments:</p>
+<p>str - a string expression<br>trimStr - the trim string characters to trim, the default value is a single space<br>Examples:</p>
+<blockquote>
+<p>SELECT rtrim(‘    SparkSQL   ‘);</p>
+</blockquote>
+<p> SparkSQL</p>
+<blockquote>
+<p>SELECT rtrim(‘LQSa’, ‘SSparkSQLS’);</p>
+</blockquote>
+<p> SSpark</p>
+<p>second<br>second(timestamp) - Returns the second component of the string/timestamp.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT second(‘2009-07-30 12:58:59’);</p>
+</blockquote>
+<p> 59</p>
+<p>Since: 1.5.0</p>
+<p>sentences<br>sentences(str[, lang, country]) - Splits str into an array of array of words.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT sentences(‘Hi there! Good morning.’);</p>
+</blockquote>
+<p> [[“Hi”,”there”],[“Good”,”morning”]]</p>
+<p>sha<br>sha(expr) - Returns a sha1 hash value as a hex string of the expr.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT sha(‘Spark’);</p>
+</blockquote>
+<p> 85f5955f4b27a9a4c2aab6ffe5d7189fc298b92c</p>
+<p>sha1<br>sha1(expr) - Returns a sha1 hash value as a hex string of the expr.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT sha1(‘Spark’);</p>
+</blockquote>
+<p> 85f5955f4b27a9a4c2aab6ffe5d7189fc298b92c</p>
+<p>sha2<br>sha2(expr, bitLength) - Returns a checksum of SHA-2 family as a hex string of expr.<br>SHA-224, SHA-256, SHA-384, and SHA-512 are supported. Bit length of 0 is equivalent to 256.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT sha2(‘Spark’, 256);</p>
+</blockquote>
+<p> 529bc3b07127ecb7e53a4dcf1991d9152c24537d919178022b2c42657f79a26b</p>
+<p>shiftleft<br>shiftleft(base, expr) - Bitwise left shift.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT shiftleft(2, 1);</p>
+</blockquote>
+<p> 4</p>
+<p>shiftright<br>shiftright(base, expr) - Bitwise (signed) right shift.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT shiftright(4, 1);</p>
+</blockquote>
+<p> 2</p>
+<p>shiftrightunsigned<br>shiftrightunsigned(base, expr) - Bitwise unsigned right shift.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT shiftrightunsigned(4, 1);</p>
+</blockquote>
+<p> 2</p>
+<p>sign<br>sign(expr) - Returns -1.0, 0.0 or 1.0 as expr is negative, 0 or positive.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT sign(40);</p>
+</blockquote>
+<p> 1.0</p>
+<p>signum<br>signum(expr) - Returns -1.0, 0.0 or 1.0 as expr is negative, 0 or positive.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT signum(40);</p>
+</blockquote>
+<p> 1.0</p>
+<p>sin<br>sin(expr) - Returns the sine of expr, as if computed by java.lang.Math.sin.</p>
+<p>Arguments:</p>
+<p>expr - angle in radians<br>Examples:</p>
+<blockquote>
+<p>SELECT sin(0);</p>
+</blockquote>
+<p> 0.0</p>
+<p>sinh<br>sinh(expr) - Returns hyperbolic sine of expr, as if computed by java.lang.Math.sinh.</p>
+<p>Arguments:</p>
+<p>expr - hyperbolic angle<br>Examples:</p>
+<blockquote>
+<p>SELECT sinh(0);</p>
+</blockquote>
+<p> 0.0</p>
+<p>size<br>size(expr) - Returns the size of an array or a map. Returns -1 if null.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT size(array(‘b’, ‘d’, ‘c’, ‘a’));</p>
+</blockquote>
+<p> 4</p>
+<p>skewness<br>skewness(expr) - Returns the skewness value calculated from values of a group.</p>
+<p>smallint<br>smallint(expr) - Casts the value expr to the target data type smallint.</p>
+<p>sort_array<br>sort_array(array[, ascendingOrder]) - Sorts the input array in ascending or descending order according to the natural ordering of the array elements.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT sort_array(array(‘b’, ‘d’, ‘c’, ‘a’), true);</p>
+</blockquote>
+<p> [“a”,”b”,”c”,”d”]</p>
+<p>soundex<br>soundex(str) - Returns Soundex code of the string.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT soundex(‘Miller’);</p>
+</blockquote>
+<p> M460</p>
+<p>space<br>space(n) - Returns a string consisting of n spaces.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT concat(space(2), ‘1’);</p>
+</blockquote>
+<p>   1</p>
+<p>spark_partition_id<br>spark_partition_id() - Returns the current partition id.</p>
+<p>split<br>split(str, regex) - Splits str around occurrences that match regex.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT split(‘oneAtwoBthreeC’, ‘[ABC]’);</p>
+</blockquote>
+<p> [“one”,”two”,”three”,””]</p>
+<p>sqrt<br>sqrt(expr) - Returns the square root of expr.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT sqrt(4);</p>
+</blockquote>
+<p> 2.0</p>
+<p>stack<br>stack(n, expr1, …, exprk) - Separates expr1, …, exprk into n rows.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT stack(2, 1, 2, 3);</p>
+</blockquote>
+<p> 1  2</p>
+<p> 3  NULL</p>
+<p>std<br>std(expr) - Returns the sample standard deviation calculated from values of a group.</p>
+<p>stddev<br>stddev(expr) - Returns the sample standard deviation calculated from values of a group.</p>
+<p>stddev_pop<br>stddev_pop(expr) - Returns the population standard deviation calculated from values of a group.</p>
+<p>stddev_samp<br>stddev_samp(expr) - Returns the sample standard deviation calculated from values of a group.</p>
+<p>str_to_map<br>str_to_map(text[, pairDelim[, keyValueDelim]]) - Creates a map after splitting the text into key/value pairs using delimiters. Default delimiters are ‘,’ for pairDelim and ‘:’ for keyValueDelim.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT str_to_map(‘a:1,b:2,c:3’, ‘,’, ‘:’);</p>
+</blockquote>
+<p> map(“a”:”1”,”b”:”2”,”c”:”3”)</p>
+<blockquote>
+<p>SELECT str_to_map(‘a’);</p>
+</blockquote>
+<p> map(“a”:null)</p>
+<p>string<br>string(expr) - Casts the value expr to the target data type string.</p>
+<p>struct<br>struct(col1, col2, col3, …) - Creates a struct with the given field values.</p>
+<p>substr<br>substr(str, pos[, len]) - Returns the substring of str that starts at pos and is of length len, or the slice of byte array that starts at pos and is of length len.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT substr(‘Spark SQL’, 5);</p>
+</blockquote>
+<p> k SQL</p>
+<blockquote>
+<p>SELECT substr(‘Spark SQL’, -3);</p>
+</blockquote>
+<p> SQL</p>
+<blockquote>
+<p>SELECT substr(‘Spark SQL’, 5, 1);</p>
+</blockquote>
+<p> k</p>
+<p>substring<br>substring(str, pos[, len]) - Returns the substring of str that starts at pos and is of length len, or the slice of byte array that starts at pos and is of length len.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT substring(‘Spark SQL’, 5);</p>
+</blockquote>
+<p> k SQL</p>
+<blockquote>
+<p>SELECT substring(‘Spark SQL’, -3);</p>
+</blockquote>
+<p> SQL</p>
+<blockquote>
+<p>SELECT substring(‘Spark SQL’, 5, 1);</p>
+</blockquote>
+<p> k</p>
+<p>substring_index<br>substring_index(str, delim, count) - Returns the substring from str before count occurrences of the delimiter delim.<br>If count is positive, everything to the left of the final delimiter (counting from the<br>left) is returned. If count is negative, everything to the right of the final delimiter<br>(counting from the right) is returned. The function substring_index performs a case-sensitive match<br>when searching for delim.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT substring_index(‘<a href="http://www.apache.org&#39;" target="_blank" rel="noopener">www.apache.org&#39;</a>, ‘.’, 2);</p>
+</blockquote>
+<p> <a href="http://www.apache" target="_blank" rel="noopener">www.apache</a></p>
+<p>sum<br>sum(expr) - Returns the sum calculated from values of a group.</p>
+<p>tan<br>tan(expr) - Returns the tangent of expr, as if computed by java.lang.Math.tan.</p>
+<p>Arguments:</p>
+<p>expr - angle in radians<br>Examples:</p>
+<blockquote>
+<p>SELECT tan(0);</p>
+</blockquote>
+<p> 0.0</p>
+<p>tanh<br>tanh(expr) - Returns the hyperbolic tangent of expr, as if computed by<br>java.lang.Math.tanh.</p>
+<p>Arguments:</p>
+<p>expr - hyperbolic angle<br>Examples:</p>
+<blockquote>
+<p>SELECT tanh(0);</p>
+</blockquote>
+<p> 0.0</p>
+<p>timestamp<br>timestamp(expr) - Casts the value expr to the target data type timestamp.</p>
+<p>tinyint<br>tinyint(expr) - Casts the value expr to the target data type tinyint.</p>
+<p>to_date<br>to_date(date_str[, fmt]) - Parses the date_str expression with the fmt expression to<br>a date. Returns null with invalid input. By default, it follows casting rules to a date if<br>the fmt is omitted.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT to_date(‘2009-07-30 04:17:52’);</p>
+</blockquote>
+<p> 2009-07-30</p>
+<blockquote>
+<p>SELECT to_date(‘2016-12-31’, ‘yyyy-MM-dd’);</p>
+</blockquote>
+<p> 2016-12-31</p>
+<p>Since: 1.5.0</p>
+<p>to_json<br>to_json(expr[, options]) - Returns a json string with a given struct value</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT to_json(named_struct(‘a’, 1, ‘b’, 2));</p>
+</blockquote>
+<p> {“a”:1,”b”:2}</p>
+<blockquote>
+<p>SELECT to_json(named_struct(‘time’, to_timestamp(‘2015-08-26’, ‘yyyy-MM-dd’)), map(‘timestampFormat’, ‘dd/MM/yyyy’));</p>
+</blockquote>
+<p> {“time”:”26/08/2015”}</p>
+<blockquote>
+<p>SELECT to_json(array(named_struct(‘a’, 1, ‘b’, 2));</p>
+</blockquote>
+<p> [{“a”:1,”b”:2}]</p>
+<blockquote>
+<p>SELECT to_json(map(‘a’, named_struct(‘b’, 1)));</p>
+</blockquote>
+<p> {“a”:{“b”:1}}</p>
+<blockquote>
+<p>SELECT to_json(map(named_struct(‘a’, 1),named_struct(‘b’, 2)));</p>
+</blockquote>
+<p> {“[1]”:{“b”:2}}</p>
+<blockquote>
+<p>SELECT to_json(map(‘a’, 1));</p>
+</blockquote>
+<p> {“a”:1}</p>
+<blockquote>
+<p>SELECT to_json(array((map(‘a’, 1))));</p>
+</blockquote>
+<p> [{“a”:1}]</p>
+<p>Since: 2.2.0</p>
+<p>to_timestamp<br>to_timestamp(timestamp[, fmt]) - Parses the timestamp expression with the fmt expression to<br>a timestamp. Returns null with invalid input. By default, it follows casting rules to<br>a timestamp if the fmt is omitted.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT to_timestamp(‘2016-12-31 00:12:00’);</p>
+</blockquote>
+<p> 2016-12-31 00:12:00</p>
+<blockquote>
+<p>SELECT to_timestamp(‘2016-12-31’, ‘yyyy-MM-dd’);</p>
+</blockquote>
+<p> 2016-12-31 00:00:00</p>
+<p>Since: 2.2.0</p>
+<p>to_unix_timestamp<br>to_unix_timestamp(expr[, pattern]) - Returns the UNIX timestamp of the given time.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT to_unix_timestamp(‘2016-04-08’, ‘yyyy-MM-dd’);</p>
+</blockquote>
+<p> 1460041200</p>
+<p>Since: 1.6.0</p>
+<p>to_utc_timestamp<br>to_utc_timestamp(timestamp, timezone) - Given a timestamp like ‘2017-07-14 02:40:00.0’, interprets it as a time in the given time zone, and renders that time as a timestamp in UTC. For example, ‘GMT+1’ would yield ‘2017-07-14 01:40:00.0’.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT to_utc_timestamp(‘2016-08-31’, ‘Asia/Seoul’);</p>
+</blockquote>
+<p> 2016-08-30 15:00:00</p>
+<p>Since: 1.5.0</p>
+<p>translate<br>translate(input, from, to) - Translates the input string by replacing the characters present in the from string with the corresponding characters in the to string.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT translate(‘AaBbCc’, ‘abc’, ‘123’);</p>
+</blockquote>
+<p> A1B2C3</p>
+<p>trim<br>trim(str) - Removes the leading and trailing space characters from str.</p>
+<p>trim(BOTH trimStr FROM str) - Remove the leading and trailing trimStr characters from str</p>
+<p>trim(LEADING trimStr FROM str) - Remove the leading trimStr characters from str</p>
+<p>trim(TRAILING trimStr FROM str) - Remove the trailing trimStr characters from str</p>
+<p>Arguments:</p>
+<p>str - a string expression<br>trimStr - the trim string characters to trim, the default value is a single space<br>BOTH, FROM - these are keywords to specify trimming string characters from both ends of<br>the string<br>LEADING, FROM - these are keywords to specify trimming string characters from the left<br>end of the string<br>TRAILING, FROM - these are keywords to specify trimming string characters from the right<br>end of the string<br>Examples:</p>
+<blockquote>
+<p>SELECT trim(‘    SparkSQL   ‘);</p>
+</blockquote>
+<p> SparkSQL</p>
+<blockquote>
+<p>SELECT trim(‘SL’, ‘SSparkSQLS’);</p>
+</blockquote>
+<p> parkSQ</p>
+<blockquote>
+<p>SELECT trim(BOTH ‘SL’ FROM ‘SSparkSQLS’);</p>
+</blockquote>
+<p> parkSQ</p>
+<blockquote>
+<p>SELECT trim(LEADING ‘SL’ FROM ‘SSparkSQLS’);</p>
+</blockquote>
+<p> parkSQLS</p>
+<blockquote>
+<p>SELECT trim(TRAILING ‘SL’ FROM ‘SSparkSQLS’);</p>
+</blockquote>
+<p> SSparkSQ</p>
+<p>trunc<br>trunc(date, fmt) - Returns date with the time portion of the day truncated to the unit specified by the format model fmt.<br>fmt should be one of [“year”, “yyyy”, “yy”, “mon”, “month”, “mm”]</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT trunc(‘2009-02-12’, ‘MM’);</p>
+</blockquote>
+<p> 2009-02-01</p>
+<blockquote>
+<p>SELECT trunc(‘2015-10-27’, ‘YEAR’);</p>
+</blockquote>
+<p> 2015-01-01</p>
+<p>Since: 1.5.0</p>
+<p>ucase<br>ucase(str) - Returns str with all characters changed to uppercase.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT ucase(‘SparkSql’);</p>
+</blockquote>
+<p> SPARKSQL</p>
+<p>unbase64<br>unbase64(str) - Converts the argument from a base 64 string str to a binary.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT unbase64(‘U3BhcmsgU1FM’);</p>
+</blockquote>
+<p> Spark SQL</p>
+<p>unhex<br>unhex(expr) - Converts hexadecimal expr to binary.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT decode(unhex(‘537061726B2053514C’), ‘UTF-8’);</p>
+</blockquote>
+<p> Spark SQL</p>
+<p>unix_timestamp<br>unix_timestamp([expr[, pattern]]) - Returns the UNIX timestamp of current or specified time.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT unix_timestamp();</p>
+</blockquote>
+<p> 1476884637</p>
+<blockquote>
+<p>SELECT unix_timestamp(‘2016-04-08’, ‘yyyy-MM-dd’);</p>
+</blockquote>
+<p> 1460041200</p>
+<p>Since: 1.5.0</p>
+<p>upper<br>upper(str) - Returns str with all characters changed to uppercase.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT upper(‘SparkSql’);</p>
+</blockquote>
+<p> SPARKSQL</p>
+<p>uuid<br>uuid() - Returns an universally unique identifier (UUID) string. The value is returned as a canonical UUID 36-character string.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT uuid();</p>
+</blockquote>
+<p> 46707d92-02f4-4817-8116-a4c3b23e6266</p>
+<p>var_pop<br>var_pop(expr) - Returns the population variance calculated from values of a group.</p>
+<p>var_samp<br>var_samp(expr) - Returns the sample variance calculated from values of a group.</p>
+<p>variance<br>variance(expr) - Returns the sample variance calculated from values of a group.</p>
+<p>weekofyear<br>weekofyear(date) - Returns the week of the year of the given date. A week is considered to start on a Monday and week 1 is the first week with &gt;3 days.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT weekofyear(‘2008-02-20’);</p>
+</blockquote>
+<p> 8</p>
+<p>Since: 1.5.0</p>
+<p>when<br>CASE WHEN expr1 THEN expr2 [WHEN expr3 THEN expr4]* [ELSE expr5] END - When expr1 = true, returns expr2; else when expr3 = true, returns expr4; else returns expr5.</p>
+<p>Arguments:</p>
+<p>expr1, expr3 - the branch condition expressions should all be boolean type.<br>expr2, expr4, expr5 - the branch value expressions and else value expression should all be<br>same type or coercible to a common type.<br>Examples:</p>
+<blockquote>
+<p>SELECT CASE WHEN 1 &gt; 0 THEN 1 WHEN 2 &gt; 0 THEN 2.0 ELSE 1.2 END;</p>
+</blockquote>
+<p> 1</p>
+<blockquote>
+<p>SELECT CASE WHEN 1 &lt; 0 THEN 1 WHEN 2 &gt; 0 THEN 2.0 ELSE 1.2 END;</p>
+</blockquote>
+<p> 2</p>
+<blockquote>
+<p>SELECT CASE WHEN 1 &lt; 0 THEN 1 WHEN 2 &lt; 0 THEN 2.0 END;</p>
+</blockquote>
+<p> NULL</p>
+<p>window<br>xpath<br>xpath(xml, xpath) - Returns a string array of values within the nodes of xml that match the XPath expression.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT xpath(‘<a><b>b1</b><b>b2</b><b>b3</b><c>c1</c><c>c2</c></a>‘,’a/b/text()’);</p>
+</blockquote>
+<p> [‘b1’,’b2’,’b3’]</p>
+<p>xpath_boolean<br>xpath_boolean(xml, xpath) - Returns true if the XPath expression evaluates to true, or if a matching node is found.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT xpath_boolean(‘<a><b>1</b></a>‘,’a/b’);</p>
+</blockquote>
+<p> true</p>
+<p>xpath_double<br>xpath_double(xml, xpath) - Returns a double value, the value zero if no match is found, or NaN if a match is found but the value is non-numeric.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT xpath_double(‘<a><b>1</b><b>2</b></a>‘, ‘sum(a/b)’);</p>
+</blockquote>
+<p> 3.0</p>
+<p>xpath_float<br>xpath_float(xml, xpath) - Returns a float value, the value zero if no match is found, or NaN if a match is found but the value is non-numeric.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT xpath_float(‘<a><b>1</b><b>2</b></a>‘, ‘sum(a/b)’);</p>
+</blockquote>
+<p> 3.0</p>
+<p>xpath_int<br>xpath_int(xml, xpath) - Returns an integer value, or the value zero if no match is found, or a match is found but the value is non-numeric.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT xpath_int(‘<a><b>1</b><b>2</b></a>‘, ‘sum(a/b)’);</p>
+</blockquote>
+<p> 3</p>
+<p>xpath_long<br>xpath_long(xml, xpath) - Returns a long integer value, or the value zero if no match is found, or a match is found but the value is non-numeric.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT xpath_long(‘<a><b>1</b><b>2</b></a>‘, ‘sum(a/b)’);</p>
+</blockquote>
+<p> 3</p>
+<p>xpath_number<br>xpath_number(xml, xpath) - Returns a double value, the value zero if no match is found, or NaN if a match is found but the value is non-numeric.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT xpath_number(‘<a><b>1</b><b>2</b></a>‘, ‘sum(a/b)’);</p>
+</blockquote>
+<p> 3.0</p>
+<p>xpath_short<br>xpath_short(xml, xpath) - Returns a short integer value, or the value zero if no match is found, or a match is found but the value is non-numeric.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT xpath_short(‘<a><b>1</b><b>2</b></a>‘, ‘sum(a/b)’);</p>
+</blockquote>
+<p> 3</p>
+<p>xpath_string<br>xpath_string(xml, xpath) - Returns the text contents of the first xml node that matches the XPath expression.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT xpath_string(‘<a><b>b</b><c>cc</c></a>‘,’a/c’);</p>
+</blockquote>
+<p> cc</p>
+<p>year<br>year(date) - Returns the year component of the date/timestamp.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT year(‘2016-07-30’);</p>
+</blockquote>
+<p> 2016</p>
+<p>Since: 1.5.0</p>
+<p>|<br>expr1 | expr2 - Returns the result of bitwise OR of expr1 and expr2.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT 3 | 5;</p>
+</blockquote>
+<p> 7</p>
+<p>~<br>~ expr - Returns the result of bitwise NOT of expr.</p>
+<p>Examples:</p>
+<blockquote>
+<p>SELECT ~ 0;</p>
+</blockquote>
+<p> -1</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+      <div>
+        <div id="reward-container">
+  <div>Thank you for your accept. mua！</div>
+  <button id="reward-button" disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/reward/wechatpay.jpg" alt="丨HF丨 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/reward/alipay.jpg" alt="丨HF丨 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        
+
+
+
+
+  
+
+
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>丨HF丨</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    
+    <a href="https://manzhong.github.io/2020/05/02/SparkSql的内置函数.html" title="SparkSql的内置函数">https://manzhong.github.io/2020/05/02/SparkSql的内置函数.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+    <div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:16px;">-------------本文结束<i class="fa fa-heart"></i>感谢您的阅读-------------</div>
+    
+</div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/SparkSql/" rel="tag"><i class="fa fa-tag"></i> SparkSql</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/04/12/SparkSql随笔.html" rel="next" title="SparkSql随笔">
+                <i class="fa fa-chevron-left"></i> SparkSql随笔
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/05/02/python.html" rel="prev" title="python">
+                python <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC81MDA2Mi8yNjU1Mw=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/hexo.jpg" alt="丨HF丨">
+            
+              <p class="site-author-name" itemprop="name">丨HF丨</p>
+              <div class="site-description motion-element" itemprop="description">第二名就是头号输家!!!</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">54</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/ipyker" title="GitHub &rarr; https://github.com/ipyker" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:pyker@qq.com" title="E-Mail &rarr; mailto:pyker@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://weibo.com/viszhang" title="Weibo &rarr; https://weibo.com/viszhang" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="tencent://message/?uin=123435796&Site=&menu=yes" title="QQ &rarr; tencent://message/?uin=123435796&Site=&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i>QQ</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-book"></i>
+                推荐阅读
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://www.54tianzhisheng.cn/tags/Flink/" title="http://www.54tianzhisheng.cn/tags/Flink/" rel="noopener" target="_blank">Flink</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://nginxconfig.io/" title="https://nginxconfig.io/" rel="noopener" target="_blank">Nginxconfig</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://linux.51yip.com/" title="http://linux.51yip.com/" rel="noopener" target="_blank">Linux命令手册</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://echarts.baidu.com/index.html" title="https://echarts.baidu.com/index.html" rel="noopener" target="_blank">echarts可视化库</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+        </div>
+      </div>
+
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" style=" text-align:center;">&copy; 2017 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HF</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"> 站点字数合计:</i>
+    </span>
+    
+    <span title="站点总字数">961k</span>
+  
+  
+  <span class="post-meta-divider">|</span>
+  <a href="http://www.beian.miit.gov.cn" rel="noopener" target="_blank">粤ICP备19028706号 </a>
+
+</div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+
+<div class="run_time" style=" text-align:center;">
+  <span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+  <script>
+    var now = new Date(); 
+    function createtime() { 
+        var grt= new Date("07/23/2017 10:00:00");//此处修改你的建站时间或者网站上线时间 
+        now.setTime(now.getTime()+250); 
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days); 
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours); 
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum); 
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;} 
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum); 
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;} 
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 "; 
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒"; 
+    } 
+    setInterval("createtime()",250);
+  </script>
+</div>
+        
+<div class="busuanzi-count" style=" text-align:center;">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      我的第 <span class="busuanzi-value" id="busuanzi_value_site_uv"></span> 位朋友，
+    </span>
+  
+
+
+
+  
+    <span class="site-pv">
+      历经 <span class="busuanzi-value" id="busuanzi_value_site_pv"></span> 次回眸才与你相遇
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+  
+    
+    
+      
+    
+  
+  <script color="255,0,255" opacity="0.7" zindex="-1" count="140" src="//cdn.jsdelivr.net/gh/theme-next/theme-next-canvas-nest@1.0.0/canvas-nest.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.1"></script>
+
+  <script src="/js/motion.js?v=7.1.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/schemes/muse.js?v=7.1.1"></script>
+
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.1"></script>
+<script src="/js/post-details.js?v=7.1.1"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.1"></script>
+
+
+  
+
+  
+
+  
+  
+  
+
+  
+
+  
+  
+  
+
+
+  
+
+
+  
+    <script>
+  window.livereOptions = {
+    refer: '2020/05/02/SparkSql的内置函数.html'
+  };
+  (function(d, s) {
+    var j, e = d.getElementsByTagName(s)[0];
+    if (typeof LivereTower === 'function') { return; }
+    j = d.createElement(s);
+    j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+    j.async = true;
+    e.parentNode.insertBefore(j, e);
+  })(document, 'script');
+</script>
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <script src="/lib/bookmark/bookmark.min.js?v=1.0"></script>
+  <script>
+  
+    bookmark.scrollToMark('auto', "#更多");
+  
+  </script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

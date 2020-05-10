@@ -1,0 +1,1762 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="true">
+
+
+
+  
+  
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.1.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":true,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: true,
+    fastclick: true,
+    lazyload: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"shrinkIn","post_header":"slideLeftIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideDownIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="KuDu一概述背景介绍在KUDU之前，大数据主要以两种方式存储；    （1）静态数据：    以 HDFS 引擎作为存储引擎，适用于高吞吐量的离线大数据分析场景。 这类存储的局限性是数据无法进行随机的读写。  （2）动态数据：    以 HBase、Cassandra 作为存储引擎，适用于大数据随机读写场景。 局限性是批量读取吞吐量远不如 HDFS，不适用于批量数据分析的场景。 从上面分析可知，">
+<meta name="keywords" content="BigData">
+<meta property="og:type" content="article">
+<meta property="og:title" content="kudu">
+<meta property="og:url" content="https://manzhong.github.io/2017/07/14/kudu.html">
+<meta property="og:site_name" content="春雨里洗过的太阳">
+<meta property="og:description" content="KuDu一概述背景介绍在KUDU之前，大数据主要以两种方式存储；    （1）静态数据：    以 HDFS 引擎作为存储引擎，适用于高吞吐量的离线大数据分析场景。 这类存储的局限性是数据无法进行随机的读写。  （2）动态数据：    以 HBase、Cassandra 作为存储引擎，适用于大数据随机读写场景。 局限性是批量读取吞吐量远不如 HDFS，不适用于批量数据分析的场景。 从上面分析可知，">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://manzhong.github.io/images/kudu/t.png">
+<meta property="og:image" content="https://manzhong.github.io/images/kudu/t2.png">
+<meta property="og:image" content="https://manzhong.github.io/images/kudu/dcs.png">
+<meta property="og:image" content="https://manzhong.github.io/images/kudu/dcs2.png">
+<meta property="og:image" content="https://manzhong.github.io/images/kudu/dcs3.png">
+<meta property="og:image" content="https://manzhong.github.io/images/kudu/f.png">
+<meta property="og:image" content="https://manzhong.github.io/images/kudu/w.png">
+<meta property="og:image" content="https://manzhong.github.io/images/kudu/r.png">
+<meta property="og:image" content="https://manzhong.github.io/images/kudu/updata.png">
+<meta property="og:updated_time" content="2020-03-15T14:47:50.606Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="kudu">
+<meta name="twitter:description" content="KuDu一概述背景介绍在KUDU之前，大数据主要以两种方式存储；    （1）静态数据：    以 HDFS 引擎作为存储引擎，适用于高吞吐量的离线大数据分析场景。 这类存储的局限性是数据无法进行随机的读写。  （2）动态数据：    以 HBase、Cassandra 作为存储引擎，适用于大数据随机读写场景。 局限性是批量读取吞吐量远不如 HDFS，不适用于批量数据分析的场景。 从上面分析可知，">
+<meta name="twitter:image" content="https://manzhong.github.io/images/kudu/t.png">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="春雨里洗过的太阳" type="application/atom+xml">
+
+
+
+  
+  
+  <link rel="canonical" href="https://manzhong.github.io/2017/07/14/kudu">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>kudu | 春雨里洗过的太阳</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+ 
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">春雨里洗过的太阳</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-bookmark"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-互动">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/guestbook/" rel="section"><i class="menu-item-icon fa fa-fw fa-comments"></i> <br>互动</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://manzhong.github.io/2017/07/14/kudu.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="丨HF丨">
+      <meta itemprop="description" content="第二名就是头号输家!!!">
+      <meta itemprop="image" content="/images/hexo.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="春雨里洗过的太阳">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">kudu
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2017-07-14 18:31:05" itemprop="dateCreated datePublished" datetime="2017-07-14T18:31:05+08:00">2017-07-14</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2020-03-15 22:47:50" itemprop="dateModified" datetime="2020-03-15T22:47:50+08:00">2020-03-15</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">34k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">31 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="KuDu"><a href="#KuDu" class="headerlink" title="KuDu"></a>KuDu</h1><h2 id="一概述"><a href="#一概述" class="headerlink" title="一概述"></a>一概述</h2><h3 id="背景介绍"><a href="#背景介绍" class="headerlink" title="背景介绍"></a>背景介绍</h3><p>在KUDU之前，大数据主要以两种方式存储；   </p>
+<p>（1）静态数据：</p>
+<p>   以 HDFS 引擎作为存储引擎，适用于高吞吐量的离线大数据分析场景。</p>
+<p>这类存储的局限性是数据无法进行随机的读写。 </p>
+<p>（2）动态数据：</p>
+<p>   以 HBase、Cassandra 作为存储引擎，适用于大数据随机读写场景。</p>
+<p>局限性是批量读取吞吐量远不如 HDFS，不适用于批量数据分析的场景。</p>
+<p>从上面分析可知，这两种数据在存储方式上完全不同，进而导致使用场景完全不同，但在真实的场景中，边界可能没有那么清晰，面对既需要随机读写，又需要批量分析的大数据场景，该如何选择呢？</p>
+<p>这个场景中，单种存储引擎无法满足业务需求，我们需要通过多种大数据工具组合来满足这一需求</p>
+<p><img src="/images/kudu/t.png" alt="img"></p>
+<p>如上图所示，数据实时写入 HBase，实时的数据更新也在 HBase 完成，为了应对 OLAP 需求，我们定时将 HBase 数据写成静态的文件（如：Parquet）导入到 OLAP 引擎（如：Impala、hive）。这一架构能满足既需要随机读写，又可以支持 OLAP 分析的场景，但他有如下缺点：</p>
+<p>(1)<strong>架构复杂</strong>。从架构上看，数据在HBase、消息队列、HDFS 间流转，涉及环节太多，运维成本很高。并且每个环节需要保证高可用，都需要维护多个副本，存储空间也有一定的浪费。最后数据在多个系统上，对数据安全策略、监控等都提出了挑战。</p>
+<p>(2)<strong>时效性低</strong>。数据从HBase导出成静态文件是周期性的，一般这个周期是一天（或一小时），在时效性上不是很高。</p>
+<p>(3)<strong>难以应对后续的更新</strong>。真实场景中，总会有数据是延迟到达的。如果这些数据之前已经从HBase导出到HDFS，新到的变更数据就难以处理了，一个方案是把原有数据应用上新的变更后重写一遍，但这代价又很高。</p>
+<p>为了解决上述架构的这些问题，KUDU应运而生。<strong>KUDU</strong>的定位是Fast Analytics on Fast Data，<strong>是一个既支持随机读写、又支持 OLAP 分析的大数据存储引擎</strong>。</p>
+<p>KUDU 是一个折中的产品，在 HDFS 和 HBase 这两个偏科生中平衡了随机读写和批量分析的性能。从 KUDU 的诞生可以说明一个观点：底层的技术发展很多时候都是上层的业务推动的，脱离业务的技术很可能是空中楼阁。</p>
+<p>kudu是什么</p>
+<ul>
+<li>是一个大数据存储引擎  用于大数据的存储，结合其他软件开展数据分析。</li>
+<li>汲取了hdfs中高吞吐数据的能力和hbase中高随机读写数据的能力  </li>
+<li>既满足有传统OLAP分析 又满足于随机读写访问数据</li>
+<li>kudu来自于cloudera 后来贡献给了apache</li>
+</ul>
+<p>kudu应用场景</p>
+<p>适用于那些既有随机访问，也有批量数据扫描的复合场景</p>
+<p>高计算量的场景</p>
+<p>使用了高性能的存储设备，包括使用更多的内存</p>
+<p>支持数据更新，避免数据反复迁移</p>
+<p>支持跨地域的实时数据备份和查询</p>
+<h2 id="二架构"><a href="#二架构" class="headerlink" title="二架构"></a>二架构</h2><ul>
+<li>kudu集群是主从架构<ul>
+<li>主角色 master ：管理集群  管理元数据</li>
+<li>从角色 tablet server：负责最终数据的存储 对外提供数据读写能力 里面存储的都是一个个tablet</li>
+</ul>
+</li>
+<li>kudu tablet<ul>
+<li>是kudu表中的数据水平分区  一个表可以划分成为多个tablet(类似于hbase  region)</li>
+<li>tablet中主键是不重复连续的  所有tablet加起来就是一个table的所有数据</li>
+<li>tablet在存储的时候 会进行冗余存放 设置多个副本 </li>
+<li>在一个tablet所有冗余中 任意时刻 一个是leader 其他的冗余都是follower</li>
+</ul>
+</li>
+</ul>
+<p>与HDFS和HBase相似，Kudu使用单个的Master节点，用来管理集群的元数据，并且使用任意数量的Tablet Server（类似HBase中的RegionServer角色）节点用来存储实际数据。可以部署多个Master节点来提高容错性。</p>
+<p><img src="/images/kudu/t2.png" alt="img"></p>
+<h2 id="1．-Table"><a href="#1．-Table" class="headerlink" title="1． Table"></a>1． Table</h2><p>表（Table）是数据库中用来存储数据的对象，是有结构的数据集合。kudu中的表具有schema（纲要）和全局有序的primary key（主键）。kudu中一个table会被水平分成多个被称之为tablet的片段。</p>
+<h2 id="2．-Tablet"><a href="#2．-Tablet" class="headerlink" title="2． Tablet"></a>2． Tablet</h2><p>一个 tablet 是一张 table连续的片段，tablet是kudu表的水平分区，类似于HBase的region。每个tablet存储着一定连续range的数据（key），且tablet两两间的range不会重叠。一张表的所有tablet包含了这张表的所有key空间。</p>
+<p>tablet 会冗余存储。放置到多个 tablet server上，并且在任何给定的时间点，其中一个副本被认为是leader tablet,其余的被认之为follower tablet。每个tablet都可以进行数据的读请求，但只有Leader tablet负责写数据请求。</p>
+<h2 id="3．-Tablet-Server"><a href="#3．-Tablet-Server" class="headerlink" title="3． Tablet Server"></a>3． Tablet Server</h2><p>tablet server集群中的小弟，负责数据存储，并提供数据读写服务</p>
+<p>一个 tablet server 存储了table表的tablet，向kudu client 提供读取数据服务。对于给定的 tablet，一个tablet server 充当 leader，其他 tablet server 充当该 tablet 的 follower 副本。</p>
+<p>只有 leader服务写请求，然而 leader 或 followers 为每个服务提供读请求 。一个 tablet server 可以服务多个 tablets ，并且一个 tablet 可以被多个 tablet servers 服务着。</p>
+<h2 id="4．-Master-Server"><a href="#4．-Master-Server" class="headerlink" title="4． Master Server"></a>4． Master Server</h2><p>集群中的老大，负责集群管理、元数据管理等功能。</p>
+<h2 id="三-kudu安装"><a href="#三-kudu安装" class="headerlink" title="三 kudu安装"></a>三 kudu安装</h2><p>1节点规划</p>
+<table>
+<thead>
+<tr>
+<th><strong>节点</strong></th>
+<th><strong>kudu-master</strong></th>
+<th><strong>kudu-tserver</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>node01</td>
+<td>是</td>
+<td>是</td>
+</tr>
+<tr>
+<td>node02</td>
+<td>是</td>
+<td>是</td>
+</tr>
+<tr>
+<td>node03</td>
+<td>是</td>
+<td>是</td>
+</tr>
+</tbody>
+</table>
+<p>本次配置node01 和node02 不配置 kudu-master</p>
+<p>2本地yum源配置</p>
+<p>配过了在 node03上</p>
+<p>3 安装KUDU</p>
+<table>
+<thead>
+<tr>
+<th><strong>服务器</strong></th>
+<th><strong>安装命令</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>node01</td>
+<td>yum   install -y kudu kudu-tserver kudu-client0 kudu-client-devel</td>
+</tr>
+<tr>
+<td>node02</td>
+<td>yum   install -y kudu kudu-tserver kudu-client0 kudu-client-devel</td>
+</tr>
+<tr>
+<td>node03</td>
+<td>yum   install -y kudu kudu-master kudu-tserver kudu-client0 kudu-client-devel</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">yum <span class="keyword">install</span> kudu <span class="comment"># Kudu的基本包</span></span><br><span class="line">yum <span class="keyword">install</span> kudu-<span class="keyword">master</span> <span class="comment"># KuduMaster </span></span><br><span class="line">yum <span class="keyword">install</span> kudu-tserver <span class="comment"># KuduTserver </span></span><br><span class="line">yum <span class="keyword">install</span> kudu-client0 <span class="comment">#Kudu C ++客户端共享库</span></span><br><span class="line">yum <span class="keyword">install</span> kudu-<span class="keyword">client</span>-devel <span class="comment"># Kudu C ++客户端共享库 SDK</span></span><br></pre></td></tr></table></figure>
+<p>4 kudu节点配置</p>
+<p>安装完成之后。 需要在所有节点的/etc/kudu/conf目录下有两个文件：master.gflagfile和tserver.gflagfile。</p>
+<h3 id="1-1．-修改master-gflagfile"><a href="#1-1．-修改master-gflagfile" class="headerlink" title="1.1． 修改master.gflagfile"></a>1.1． 修改master.gflagfile</h3><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># cat /etc/kudu/conf/master.gflagfile</span></span><br><span class="line"><span class="comment"># Do not modify these two lines. If you wish to change these variables,</span></span><br><span class="line"><span class="comment"># modify them in /etc/default/kudu-master.</span></span><br><span class="line"><span class="attribute">--fromenv</span>=rpc_bind_addresses</span><br><span class="line"><span class="attribute">--fromenv</span>=log_dir</span><br><span class="line"><span class="attribute">--fs_wal_dir</span>=/export/servers/kudu/master</span><br><span class="line"><span class="attribute">--fs_data_dirs</span>=/export/servers/kudu/master</span><br><span class="line"><span class="attribute">--master_addresses</span>=node03:7051     若为集node01:7051,node02:7051,node03:7051 若为单节点 则这句注释掉</span><br><span class="line">若为单节点 且没注释掉 则启动报错</span><br></pre></td></tr></table></figure>
+<h3 id="1-2-修改tserver-gflagfile"><a href="#1-2-修改tserver-gflagfile" class="headerlink" title="1.2 修改tserver.gflagfile"></a>1.2 修改tserver.gflagfile</h3><figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Do not modify these two lines. If you wish to change these variables,</span></span><br><span class="line"><span class="comment"># modify them in /etc/default/kudu-tserver.</span></span><br><span class="line"><span class="attr">--fromenv</span>=rpc_bind_addresses</span><br><span class="line"><span class="attr">--fromenv</span>=log_dir</span><br><span class="line"><span class="attr">--fs_wal_dir</span>=/export/servers/kudu/tserver</span><br><span class="line"><span class="attr">--fs_data_dirs</span>=/export/servers/kudu/tserver</span><br><span class="line"><span class="attr">--tserver_master_addrs</span>=node03:<span class="number">7051</span>  若为集node01:<span class="number">7051</span>,node02:<span class="number">7051</span>,node03:<span class="number">7051</span></span><br></pre></td></tr></table></figure>
+<h3 id="1-3修改-etc-default-kudu-master"><a href="#1-3修改-etc-default-kudu-master" class="headerlink" title="1.3修改 /etc/default/kudu-master"></a>1.3修改 /etc/default/kudu-master</h3><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="builtin-name">export</span> <span class="attribute">FLAGS_log_dir</span>=/var/log/kudu</span><br><span class="line"><span class="comment">#每台机器的master地址要与主机名一致,这里是在node03上</span></span><br><span class="line"><span class="builtin-name">export</span> <span class="attribute">FLAGS_rpc_bind_addresses</span>=node03:7051</span><br></pre></td></tr></table></figure>
+<h3 id="1-4修改-etc-default-kudu-tserver"><a href="#1-4修改-etc-default-kudu-tserver" class="headerlink" title="1.4修改 /etc/default/kudu-tserver"></a>1.4修改 /etc/default/kudu-tserver</h3><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="builtin-name">export</span> <span class="attribute">FLAGS_log_dir</span>=/var/log/kudu</span><br><span class="line"><span class="comment">#每台机器的tserver地址要与主机名一致，这里是在node03上</span></span><br><span class="line"><span class="builtin-name">export</span> <span class="attribute">FLAGS_rpc_bind_addresses</span>=node03:7050</span><br></pre></td></tr></table></figure>
+<p>kudu默认用户就是KUDU，所以需要将/export/servers/kudu权限修改成kudu：</p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> /<span class="keyword">export</span>/servers/kudu</span><br><span class="line">chown -R kudu:kudu /<span class="keyword">export</span>/servers/kudu</span><br></pre></td></tr></table></figure>
+<p>(如果使用的是普通的用户，那么最好配置sudo权限)/etc/sudoers文件中添加：</p>
+<p><strong>kudu集群的启动与关闭</strong></p>
+<p>1 ntp服务的安装</p>
+<p>启动的时候要注意时间同步</p>
+<p>安装ntp服务</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum -y <span class="keyword">install</span> ntp</span><br></pre></td></tr></table></figure>
+<p>设置开机启动</p>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">service ntpd <span class="built_in">start</span> </span><br><span class="line">chkconfig ntpd <span class="keyword">on</span></span><br></pre></td></tr></table></figure>
+<p>可以在每台服务器执行</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="regexp">/etc/i</span>nit.d<span class="regexp">/ntpd restart</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">启动</span><br><span class="line">service kudu-master start</span><br><span class="line">service kudu-tserver start</span><br><span class="line">关闭</span><br><span class="line">service kudu-master stop</span><br><span class="line">service kudu-tserver stop</span><br></pre></td></tr></table></figure>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">kudu的web管理界面。<span class="string">http:</span><span class="comment">//master主机名:8051</span></span><br><span class="line"></span><br><span class="line">可以查看每个机器上master相关信息。<span class="string">http:</span><span class="comment">//node03:8051/masters    一定为8051 不为7051</span></span><br><span class="line"></span><br><span class="line">tserver 的web地址  <span class="string">http:</span><span class="comment">//node03:8051/tablet-servers</span></span><br></pre></td></tr></table></figure>
+<p>安装属于事项</p>
+<h3 id="1-1给普通用户授予sudo出错"><a href="#1-1给普通用户授予sudo出错" class="headerlink" title="1.1给普通用户授予sudo出错"></a>1.1给普通用户授予sudo出错</h3><figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">sudo:</span> <span class="meta-keyword">/etc/</span>sudoers is world writable</span><br><span class="line">解决方式：``pkexec chmod <span class="number">555</span> <span class="meta-keyword">/etc/</span>sudoers</span><br></pre></td></tr></table></figure>
+<h3 id="1-2-启动kudu的时候报错"><a href="#1-2-启动kudu的时候报错" class="headerlink" title="1.2 启动kudu的时候报错"></a>1.2 启动kudu的时候报错</h3><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Failed <span class="keyword">to</span> start Kudu Master Server. Return value: 1 [FAILED]</span><br><span class="line">去日志文件中查看：</span><br><span class="line">Service unavailable: Cannot initialize clock: Errorreading clock.<span class="built_in"> Clock </span>considered</span><br><span class="line">unsynchronized</span><br><span class="line">解决：</span><br><span class="line">第一步：首先检查是否有安装ntp：如果没有安装则使用以下命令安装：</span><br><span class="line">yum -y install ntp</span><br><span class="line">第二步：设置随机启动：</span><br><span class="line">service ntpd start</span><br><span class="line">chkconfig ntpd on</span><br></pre></td></tr></table></figure>
+<h3 id="1-3-启动过程中报错"><a href="#1-3-启动过程中报错" class="headerlink" title="1.3 启动过程中报错"></a>1.3 启动过程中报错</h3><figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Invalid argument: Unable <span class="keyword">to</span> initialize catalog manager: Failed <span class="keyword">to</span> initialize sys</span><br><span class="line">tables</span><br><span class="line">async: <span class="keyword">on</span>-disk master <span class="built_in">list</span></span><br><span class="line">解决：</span><br><span class="line">（<span class="number">1</span>）：停掉master和tserver</span><br><span class="line">（<span class="number">2</span>）：删除掉之前所有的/export/servers/kudu/master/*和/export/servers/kudu/tserver/*</span><br></pre></td></tr></table></figure>
+<h3 id="1-4-启动过程中报错"><a href="#1-4-启动过程中报错" class="headerlink" title="1.4 启动过程中报错"></a>1.4 启动过程中报错</h3><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">error: Could <span class="keyword">not</span> create new FS layout: unable <span class="keyword">to</span> create file<span class="built_in"> system </span>roots: unable <span class="keyword">to</span></span><br><span class="line">write<span class="built_in"> instance </span>metadata: Call <span class="keyword">to</span> mkstemp() failed on name template</span><br><span class="line">/export/servers/kudu/master/instance.kudutmp.XXXXXX: Permission denied (<span class="builtin-name">error</span> 13)</span><br><span class="line">这是因为kudu默认使用kudu权限进行执行，可能遇到文件夹的权限不一致情况，更改文件夹权限即可</span><br></pre></td></tr></table></figure>
+<h2 id="四-Java操作kudu"><a href="#四-Java操作kudu" class="headerlink" title="四 Java操作kudu"></a>四 Java操作kudu</h2><p>###1 创建maven工程 导入依赖</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependencies</span>&gt;</span>  </span><br><span class="line">   <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.kudu<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>kudu-client<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.6.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>junit<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>junit<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">version</span>&gt;</span>4.12<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="2-初始化方法"><a href="#2-初始化方法" class="headerlink" title="2 初始化方法"></a>2 初始化方法</h3><figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestKudu</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//声明全局变量 KuduClient后期通过它来操作kudu表</span></span><br><span class="line">    <span class="keyword">private</span> KuduClient kuduClient;</span><br><span class="line">    <span class="comment">//指定kuduMaster地址</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">String</span> kuduMaster;</span><br><span class="line">    <span class="comment">//指定表名</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">String</span> tableName;</span><br><span class="line"></span><br><span class="line">    @Before</span><br><span class="line">    <span class="keyword">public</span> void init()&#123;</span><br><span class="line">        <span class="comment">//初始化操作</span></span><br><span class="line">        kuduMaster=<span class="string">"node03:7051"</span>;</span><br><span class="line">        <span class="comment">//指定表名</span></span><br><span class="line">        tableName=<span class="string">"student"</span>;</span><br><span class="line">        KuduClient.KuduClientBuilder kuduClientBuilder = <span class="keyword">new</span> <span class="type">KuduClient</span>.KuduClientBuilder(kuduMaster);</span><br><span class="line">		<span class="comment">//设置客户端与kudu集群socket超时时间</span></span><br><span class="line">        kuduClientBuilder.defaultSocketReadTimeoutMs(<span class="number">10000</span>);</span><br><span class="line">        kuduClient=kuduClientBuilder.build();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="3-创建表"><a href="#3-创建表" class="headerlink" title="3 创建表"></a>3 创建表</h3><figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 创建表</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">@Test</span><br><span class="line"><span class="keyword">public</span> void createTable() throws KuduException &#123;</span><br><span class="line">    <span class="comment">//判断表是否存在，不存在就构建</span></span><br><span class="line">    <span class="keyword">if</span>(!kuduClient.tableExists(tableName))&#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//构建创建表的schema信息-----就是表的字段和类型</span></span><br><span class="line">        ArrayList&lt;ColumnSchema&gt; columnSchemas = <span class="keyword">new</span> <span class="type">ArrayList</span>&lt;ColumnSchema&gt;();</span><br><span class="line">        columnSchemas.add(<span class="keyword">new</span> <span class="type">ColumnSchema</span>.ColumnSchemaBuilder(<span class="string">"id"</span>, Type.INT32).key(<span class="literal">true</span>).build());</span><br><span class="line">        columnSchemas.add(<span class="keyword">new</span> <span class="type">ColumnSchema</span>.ColumnSchemaBuilder(<span class="string">"name"</span>, Type.STRING).build());</span><br><span class="line">        columnSchemas.add(<span class="keyword">new</span> <span class="type">ColumnSchema</span>.ColumnSchemaBuilder(<span class="string">"age"</span>, Type.INT32).build());</span><br><span class="line">        columnSchemas.add(<span class="keyword">new</span> <span class="type">ColumnSchema</span>.ColumnSchemaBuilder(<span class="string">"sex"</span>, Type.INT32).build());</span><br><span class="line">        Schema schema = <span class="keyword">new</span> <span class="type">Schema</span>(columnSchemas);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//指定创建表的相关属性</span></span><br><span class="line">        CreateTableOptions options = <span class="keyword">new</span> <span class="type">CreateTableOptions</span>();</span><br><span class="line">        ArrayList&lt;<span class="keyword">String</span>&gt; partitionList = <span class="keyword">new</span> <span class="type">ArrayList</span>&lt;<span class="keyword">String</span>&gt;();</span><br><span class="line">        <span class="comment">//指定kudu表的分区字段是什么</span></span><br><span class="line">        partitionList.add(<span class="string">"id"</span>);    <span class="comment">//  按照 id.hashcode % 分区数 = 分区号</span></span><br><span class="line">        options.addHashPartitions(partitionList,<span class="number">6</span>);</span><br><span class="line"></span><br><span class="line">        kuduClient.createTable(tableName,schema,options);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="4-插入数据"><a href="#4-插入数据" class="headerlink" title="4 插入数据"></a>4 插入数据</h3><figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment">   * 向表加载数据</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  <span class="meta">@Test</span></span><br><span class="line">  <span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">insertTable</span><span class="params">()</span> <span class="keyword">throws</span> KuduException </span>&#123;</span><br><span class="line">      <span class="comment">//向表加载数据需要一个kuduSession对象</span></span><br><span class="line">      KuduSession kuduSession = kuduClient.newSession();</span><br><span class="line">      <span class="comment">//设置提交数据为自动flush</span></span><br><span class="line">      kuduSession.setFlushMode(SessionConfiguration.FlushMode.AUTO_FLUSH_SYNC);</span><br><span class="line"></span><br><span class="line">      <span class="comment">//需要使用kuduTable来构建Operation的子类实例对象  就是打开本次操作的表名</span></span><br><span class="line">      KuduTable kuduTable = kuduClient.openTable(tableName);</span><br><span class="line"><span class="comment">//此处需要kudutable 来构建operation的子类实例对象  此处 为insert</span></span><br><span class="line">      <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">1</span>;i&lt;=<span class="number">10</span>;i++)&#123;</span><br><span class="line">          Insert insert = kuduTable.newInsert();</span><br><span class="line">          PartialRow row = insert.getRow();</span><br><span class="line">          row.addInt(<span class="string">"id"</span>,i);</span><br><span class="line">          row.addString(<span class="string">"name"</span>,<span class="string">"zhangsan-"</span>+i);</span><br><span class="line">          row.addInt(<span class="string">"age"</span>,<span class="number">20</span>+i);</span><br><span class="line">          row.addInt(<span class="string">"sex"</span>,i%<span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">          kuduSession.apply(insert);<span class="comment">//最后实现执行数据的加载操作</span></span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="5-查询数据"><a href="#5-查询数据" class="headerlink" title="5 查询数据"></a>5 查询数据</h3><figure class="highlight processing"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 查询表的数据结果</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    @Test</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> queryData() <span class="keyword">throws</span> KuduException &#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//构建一个查询的扫描器 在扫描器中指定 表名</span></span><br><span class="line">        KuduScanner.KuduScannerBuilder kuduScannerBuilder = kuduClient.newScannerBuilder(kuduClient.openTable(tableName));</span><br><span class="line">        <span class="comment">//创建集合 用于存储扫描的字段信息</span></span><br><span class="line">        ArrayList&lt;<span class="keyword">String</span>&gt; columnsList = <span class="keyword">new</span> ArrayList&lt;<span class="keyword">String</span>&gt;();</span><br><span class="line">        columnsList.<span class="built_in">add</span>(<span class="string">"id"</span>);</span><br><span class="line">        columnsList.<span class="built_in">add</span>(<span class="string">"name"</span>);</span><br><span class="line">        columnsList.<span class="built_in">add</span>(<span class="string">"age"</span>);</span><br><span class="line">        columnsList.<span class="built_in">add</span>(<span class="string">"sex"</span>);</span><br><span class="line">        kuduScannerBuilder.setProjectedColumnNames(columnsList);</span><br><span class="line">        <span class="comment">// 调用build方法执行扫描,返回结果集</span></span><br><span class="line">        KuduScanner kuduScanner = kuduScannerBuilder.build();</span><br><span class="line">        <span class="comment">//遍历</span></span><br><span class="line">        <span class="keyword">while</span> (kuduScanner.hasMoreRows())&#123;</span><br><span class="line">            RowResultIterator rowResults = kuduScanner.nextRows();</span><br><span class="line"></span><br><span class="line">             <span class="keyword">while</span> (rowResults.hasNext())&#123;</span><br><span class="line">                 RowResult row = rowResults.next(); <span class="comment">//拿到的是一行数据</span></span><br><span class="line">                 <span class="built_in">int</span> id = row.getInt(<span class="string">"id"</span>);</span><br><span class="line">                 <span class="keyword">String</span> name = row.getString(<span class="string">"name"</span>);</span><br><span class="line">                 <span class="built_in">int</span> age = row.getInt(<span class="string">"age"</span>);</span><br><span class="line">                 <span class="built_in">int</span> sex = row.getInt(<span class="string">"sex"</span>);</span><br><span class="line"></span><br><span class="line">                 System.out.<span class="built_in">println</span>(<span class="string">"id="</span>+id+<span class="string">"  name="</span>+name+<span class="string">"  age="</span>+age+<span class="string">"  sex="</span>+sex);</span><br><span class="line">             &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="6-修改数据"><a href="#6-修改数据" class="headerlink" title="6 修改数据"></a>6 修改数据</h3><figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 修改表的数据</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    @Test</span><br><span class="line">    <span class="keyword">public</span> void updateData() throws KuduException &#123;</span><br><span class="line">        <span class="comment">//修改表的数据需要一个kuduSession对象</span></span><br><span class="line">        KuduSession kuduSession = kuduClient.<span class="keyword">new</span><span class="type">Session</span>();</span><br><span class="line">        <span class="comment">//设置提交数据为自动flush</span></span><br><span class="line">        kuduSession.setFlushMode(SessionConfiguration.FlushMode.AUTO_FLUSH_SYNC);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//需要使用kuduTable来构建Operation的子类实例对象</span></span><br><span class="line">        KuduTable kuduTable = kuduClient.openTable(tableName);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//Update update = kuduTable.newUpdate(); //如果id不存在 ,就什么也不操作</span></span><br><span class="line">        Upsert upsert = kuduTable.<span class="keyword">new</span><span class="type">Upsert</span>(); <span class="comment">//如果id存在就表示修改，不存在就新增</span></span><br><span class="line">        PartialRow row = upsert.getRow();</span><br><span class="line">        row.addInt(<span class="string">"id"</span>,<span class="number">100</span>);</span><br><span class="line">        row.addString(<span class="string">"name"</span>,<span class="string">"zhangsan-100"</span>);</span><br><span class="line">        row.addInt(<span class="string">"age"</span>,<span class="number">100</span>);</span><br><span class="line">        row.addInt(<span class="string">"sex"</span>,<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">        kuduSession.apply(upsert);<span class="comment">//最后实现执行数据的修改操作</span></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="7删除数据"><a href="#7删除数据" class="headerlink" title="7删除数据"></a>7删除数据</h3><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 删除数据</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    @Test</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> deleteData() <span class="keyword">throws</span> KuduException &#123;</span><br><span class="line">        <span class="comment">//删除表的数据需要一个kuduSession对象</span></span><br><span class="line">        KuduSession kuduSession = kuduClient.newSession();</span><br><span class="line">        kuduSession.setFlushMode(SessionConfiguration.FlushMode.AUTO_FLUSH_SYNC);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//需要使用kuduTable来构建Operation的子类实例对象</span></span><br><span class="line">        KuduTable kuduTable = kuduClient.openTable(tableName);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">Delete</span> <span class="keyword">delete</span> = kuduTable.newDelete();</span><br><span class="line">        PartialRow row = <span class="keyword">delete</span>.getRow();</span><br><span class="line">        row.addInt(<span class="string">"id"</span>,<span class="number">100</span>);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        kuduSession.apply(<span class="keyword">delete</span>);<span class="comment">//最后实现执行数据的删除操作</span></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="8-删除表"><a href="#8-删除表" class="headerlink" title="8 删除表"></a>8 删除表</h3><figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">dropTable</span><span class="params">()</span> <span class="keyword">throws</span> KuduException </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(kuduClient.tableExists(tableName))&#123;</span><br><span class="line">        kuduClient.deleteTable(tableName);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="9-kudu的分区方式"><a href="#9-kudu的分区方式" class="headerlink" title="9 kudu的分区方式"></a>9 kudu的分区方式</h3><p>为了提供可扩展性，Kudu 表被划分为称为 tablet 的单元，并分布在许多 tablet servers 上。行总是属于单个tablet 。将行分配给 tablet 的方法由在表创建期间设置的表的分区决定。 kudu提供了3种分区方式。</p>
+<h4 id="1-范围分区Range-Partitioning"><a href="#1-范围分区Range-Partitioning" class="headerlink" title="1 范围分区Range Partitioning"></a>1 范围分区Range Partitioning</h4><p>范围分区可以根据存入数据的数据量，均衡的存储到各个机器上，防止机器出现负载不均衡现象.</p>
+<figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">  * 测试分区：</span></span><br><span class="line"><span class="comment">  * RangePartition</span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line"> @Test</span><br><span class="line"> <span class="keyword">public</span> void testRangePartition() throws KuduException &#123;</span><br><span class="line">     <span class="comment">//设置表的schema</span></span><br><span class="line">     LinkedList&lt;ColumnSchema&gt; columnSchemas = <span class="keyword">new</span> <span class="type">LinkedList</span>&lt;ColumnSchema&gt;();</span><br><span class="line">     columnSchemas.add(<span class="keyword">new</span> <span class="type">Column</span>(<span class="string">"id"</span>, Type.INT32,<span class="literal">true</span>));</span><br><span class="line">     columnSchemas.add(<span class="keyword">new</span> <span class="type">Column</span>(<span class="string">"WorkId"</span>, Type.INT32,<span class="literal">false</span>));</span><br><span class="line">     columnSchemas.add(<span class="keyword">new</span> <span class="type">Column</span>(<span class="string">"Name"</span>, Type.STRING,<span class="literal">false</span>));</span><br><span class="line">     columnSchemas.add(<span class="keyword">new</span> <span class="type">Column</span>(<span class="string">"Gender"</span>, Type.STRING,<span class="literal">false</span>));</span><br><span class="line">     columnSchemas.add(<span class="keyword">new</span> <span class="type">Column</span>(<span class="string">"Photo"</span>, Type.STRING,<span class="literal">false</span>));</span><br><span class="line"></span><br><span class="line">     <span class="comment">//创建schema</span></span><br><span class="line">     Schema schema = <span class="keyword">new</span> <span class="type">Schema</span>(columnSchemas);</span><br><span class="line"></span><br><span class="line">     <span class="comment">//创建表时提供的所有选项</span></span><br><span class="line">     CreateTableOptions tableOptions = <span class="keyword">new</span> <span class="type">CreateTableOptions</span>();</span><br><span class="line">     <span class="comment">//设置副本数</span></span><br><span class="line">     <span class="comment">//tableOptions.setNumReplicas(1);</span></span><br><span class="line">     <span class="comment">//设置范围分区的规则</span></span><br><span class="line">     LinkedList&lt;<span class="keyword">String</span>&gt; parcols = <span class="keyword">new</span> <span class="type">LinkedList</span>&lt;<span class="keyword">String</span>&gt;();</span><br><span class="line">     parcols.add(<span class="string">"id"</span>);</span><br><span class="line">     <span class="comment">//设置按照那个字段进行range分区</span></span><br><span class="line">     tableOptions.setRangePartitionColumns(parcols);</span><br><span class="line"></span><br><span class="line">     <span class="comment">/**</span></span><br><span class="line"><span class="comment">      * range</span></span><br><span class="line"><span class="comment">      *  0 &lt; value &lt; 10</span></span><br><span class="line"><span class="comment">      * 10 &lt;= value &lt; 20</span></span><br><span class="line"><span class="comment">      * 20 &lt;= value &lt; 30</span></span><br><span class="line"><span class="comment">      * ........</span></span><br><span class="line"><span class="comment">      * 80 &lt;= value &lt; 90</span></span><br><span class="line"><span class="comment">      * */</span></span><br><span class="line">     int count=<span class="number">0</span>;</span><br><span class="line">     <span class="keyword">for</span>(int i =<span class="number">0</span>;i&lt;<span class="number">10</span>;i++)&#123;</span><br><span class="line">         <span class="comment">//范围开始</span></span><br><span class="line">         PartialRow lower = schema.<span class="keyword">new</span><span class="type">PartialRow</span>();</span><br><span class="line">         lower.addInt(<span class="string">"id"</span>,count);</span><br><span class="line"></span><br><span class="line">         <span class="comment">//范围结束</span></span><br><span class="line">         PartialRow upper = schema.<span class="keyword">new</span><span class="type">PartialRow</span>();</span><br><span class="line">         count +=<span class="number">10</span>;</span><br><span class="line">         upper.addInt(<span class="string">"id"</span>,count);</span><br><span class="line"></span><br><span class="line">         <span class="comment">//设置每一个分区的范围</span></span><br><span class="line">         tableOptions.addRangePartition(lower,upper);</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line">     <span class="keyword">try</span> &#123;</span><br><span class="line">         kuduClient.createTable(<span class="string">"t-range-partition"</span>,schema,tableOptions);</span><br><span class="line">     &#125; <span class="keyword">catch</span> (KuduException e) &#123;</span><br><span class="line">         e.printStackTrace();</span><br><span class="line">     &#125;</span><br><span class="line">      kuduClient.close();</span><br><span class="line"></span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-哈希分区Hash-Partitioning-为kudu的默认分区"><a href="#2-哈希分区Hash-Partitioning-为kudu的默认分区" class="headerlink" title="2 哈希分区Hash Partitioning 为kudu的默认分区"></a>2 哈希分区Hash Partitioning 为kudu的默认分区</h4><p>哈希分区通过哈希值将行分配到许多 buckets (存储桶 )之一； 哈希分区是一种有效的策略，当不需要对表进行有序访问时。哈希分区对于在 tablet 之间随机散布这些功能是有效的，这有助于减轻热点和 tablet 大小不均匀。</p>
+<figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 测试分区：</span></span><br><span class="line"><span class="comment">     * hash分区</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    @Test</span><br><span class="line">    <span class="keyword">public</span> void testHashPartition() throws KuduException &#123;</span><br><span class="line">        <span class="comment">//设置表的schema</span></span><br><span class="line">        LinkedList&lt;ColumnSchema&gt; columnSchemas = <span class="keyword">new</span> <span class="type">LinkedList</span>&lt;ColumnSchema&gt;();</span><br><span class="line">        columnSchemas.add(<span class="keyword">new</span> <span class="type">Column</span>(<span class="string">"id"</span>, Type.INT32,<span class="literal">true</span>));</span><br><span class="line">        columnSchemas.add(<span class="keyword">new</span> <span class="type">Column</span>(<span class="string">"WorkId"</span>, Type.INT32,<span class="literal">false</span>));</span><br><span class="line">        columnSchemas.add(<span class="keyword">new</span> <span class="type">Column</span>(<span class="string">"Name"</span>, Type.STRING,<span class="literal">false</span>));</span><br><span class="line">        columnSchemas.add(<span class="keyword">new</span> <span class="type">Column</span>(<span class="string">"Gender"</span>, Type.STRING,<span class="literal">false</span>));</span><br><span class="line">        columnSchemas.add(<span class="keyword">new</span> <span class="type">Column</span>(<span class="string">"Photo"</span>, Type.STRING,<span class="literal">false</span>));</span><br><span class="line"></span><br><span class="line">        <span class="comment">//创建schema</span></span><br><span class="line">        Schema schema = <span class="keyword">new</span> <span class="type">Schema</span>(columnSchemas);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//创建表时提供的所有选项</span></span><br><span class="line">        CreateTableOptions tableOptions = <span class="keyword">new</span> <span class="type">CreateTableOptions</span>();</span><br><span class="line">        <span class="comment">//设置副本数</span></span><br><span class="line">        tableOptions.setNumReplicas(<span class="number">1</span>);</span><br><span class="line">        <span class="comment">//设置范围分区的规则</span></span><br><span class="line">        LinkedList&lt;<span class="keyword">String</span>&gt; parcols = <span class="keyword">new</span> <span class="type">LinkedList</span>&lt;<span class="keyword">String</span>&gt;();</span><br><span class="line">        parcols.add(<span class="string">"id"</span>);</span><br><span class="line">        <span class="comment">//设置按照那个字段进行range分区</span></span><br><span class="line">        tableOptions.addHashPartitions(parcols,<span class="number">6</span>);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            kuduClient.createTable(<span class="string">"t-hash-partition"</span>,schema,tableOptions);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (KuduException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        kuduClient.close();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h4 id="3-多级分区Multilevel-Partitioning"><a href="#3-多级分区Multilevel-Partitioning" class="headerlink" title="3 多级分区Multilevel Partitioning"></a>3 多级分区Multilevel Partitioning</h4><p>Kudu 允许一个表在单个表上组合多级分区。 当正确使用时，多级分区可以保留各个分区类型的优点，同时减少每个分区的缺点</p>
+<p>如 范围分区  为5个  hash分区为3个   则多级分区为15个  (即在范围分区里面有进行了hash分区)</p>
+<figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 测试分区：</span></span><br><span class="line"><span class="comment">     * 多级分区</span></span><br><span class="line"><span class="comment">     * Multilevel Partition</span></span><br><span class="line"><span class="comment">     * 混合使用hash分区和range分区</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * 哈希分区有利于提高写入数据的吞吐量，而范围分区可以避免tablet无限增长问题，</span></span><br><span class="line"><span class="comment">     * hash分区和range分区结合，可以极大的提升kudu的性能</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    @Test</span><br><span class="line">    <span class="keyword">public</span> void testMultilevelPartition() throws KuduException &#123;</span><br><span class="line">        <span class="comment">//设置表的schema</span></span><br><span class="line">        LinkedList&lt;ColumnSchema&gt; columnSchemas = <span class="keyword">new</span> <span class="type">LinkedList</span>&lt;ColumnSchema&gt;();</span><br><span class="line">        columnSchemas.add(<span class="keyword">new</span> <span class="type">Column</span>(<span class="string">"id"</span>, Type.INT32,<span class="literal">true</span>));</span><br><span class="line">        columnSchemas.add(<span class="keyword">new</span> <span class="type">Column</span>(<span class="string">"WorkId"</span>, Type.INT32,<span class="literal">false</span>));</span><br><span class="line">        columnSchemas.add(<span class="keyword">new</span> <span class="type">Column</span>(<span class="string">"Name"</span>, Type.STRING,<span class="literal">false</span>));</span><br><span class="line">        columnSchemas.add(<span class="keyword">new</span> <span class="type">Column</span>(<span class="string">"Gender"</span>, Type.STRING,<span class="literal">false</span>));</span><br><span class="line">        columnSchemas.add(<span class="keyword">new</span> <span class="type">Column</span>(<span class="string">"Photo"</span>, Type.STRING,<span class="literal">false</span>));</span><br><span class="line"></span><br><span class="line">        <span class="comment">//创建schema</span></span><br><span class="line">        Schema schema = <span class="keyword">new</span> <span class="type">Schema</span>(columnSchemas);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">//创建表时提供的所有选项</span></span><br><span class="line">        CreateTableOptions tableOptions = <span class="keyword">new</span> <span class="type">CreateTableOptions</span>();</span><br><span class="line">        <span class="comment">//设置副本数</span></span><br><span class="line">        <span class="comment">//tableOptions.setNumReplicas(1);</span></span><br><span class="line">        <span class="comment">//设置范围分区的规则</span></span><br><span class="line">        LinkedList&lt;<span class="keyword">String</span>&gt; parcols = <span class="keyword">new</span> <span class="type">LinkedList</span>&lt;<span class="keyword">String</span>&gt;();</span><br><span class="line">        parcols.add(<span class="string">"id"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//hash分区</span></span><br><span class="line">        tableOptions.addHashPartitions(parcols,<span class="number">5</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//range分区</span></span><br><span class="line">        int count=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span>(int i=<span class="number">0</span>;i&lt;<span class="number">10</span>;i++)&#123;</span><br><span class="line">        <span class="comment">//指定上界</span></span><br><span class="line">            PartialRow lower = schema.<span class="keyword">new</span><span class="type">PartialRow</span>();</span><br><span class="line">            lower.addInt(<span class="string">"id"</span>,count);</span><br><span class="line">            count+=<span class="number">10</span>;</span><br><span class="line">			<span class="comment">//指定下界</span></span><br><span class="line">            PartialRow upper = schema.<span class="keyword">new</span><span class="type">PartialRow</span>();</span><br><span class="line">            upper.addInt(<span class="string">"id"</span>,count);</span><br><span class="line">            tableOptions.addRangePartition(lower,upper);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            kuduClient.createTable(<span class="string">"t-multilevel-partition"</span>,schema,tableOptions);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (KuduException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        kuduClient.close();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="五-kudu集成impala"><a href="#五-kudu集成impala" class="headerlink" title="五 kudu集成impala"></a>五 kudu集成impala</h2><h3 id="1-impala的配置修改"><a href="#1-impala的配置修改" class="headerlink" title="1 impala的配置修改"></a>1 impala的配置修改</h3><p>可选项 若配置以后写的时候指定 master地址即可</p>
+<p>在每一个服务器的impala的配置文件中添加如下配置。</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim <span class="regexp">/etc/</span><span class="keyword">default</span><span class="regexp">/impala</span></span><br></pre></td></tr></table></figure>
+<p>在IMPALA_SERVER_ARGS下添加：</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-<span class="attr">kudu_master_hosts=</span><span class="keyword">node</span>-1:<span class="title">7051</span>,<span class="keyword">node</span>-2:<span class="title">7051</span>,<span class="keyword">node</span>-3:<span class="title">7051</span></span><br></pre></td></tr></table></figure>
+<h3 id="2-创建kudu表"><a href="#2-创建kudu表" class="headerlink" title="2 创建kudu表"></a>2 创建kudu表</h3><p>需要先启动hdfs、hive、kudu、impala。使用impala的shell控制台。</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">impala-<span class="keyword">shell</span><span class="bash"></span></span><br></pre></td></tr></table></figure>
+<p>内部表:impala中删除,kudu里也会删除  </p>
+<p>外部表: impala中删除,kudu中不会删除.</p>
+<p>2.1 内部表</p>
+<p>内部表由Impala管理，当您从Impala中删除时，数据和表确实被删除。当您使用Impala创建新表时，它通常是内部表。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> my_first_table</span><br><span class="line">(</span><br><span class="line"><span class="keyword">id</span> <span class="built_in">BIGINT</span>,</span><br><span class="line"><span class="keyword">name</span> <span class="keyword">STRING</span>,</span><br><span class="line">PRIMARY <span class="keyword">KEY</span>(<span class="keyword">id</span>)</span><br><span class="line">)</span><br><span class="line"><span class="keyword">PARTITION</span> <span class="keyword">BY</span> <span class="keyword">HASH</span> <span class="keyword">PARTITIONS</span> <span class="number">16</span> </span><br><span class="line"><span class="keyword">STORED</span> <span class="keyword">AS</span> KUDU</span><br><span class="line">TBLPROPERTIES (</span><br><span class="line"><span class="string">'kudu.master_addresses'</span> = <span class="string">'node1:7051,node2:7051,node3:7051'</span>,  //这种就是没有配置以上的 指定地址</span><br><span class="line"><span class="string">'kudu.table_name'</span> = <span class="string">'my_first_table'</span></span><br><span class="line">);</span><br><span class="line">    </span><br><span class="line">在 <span class="keyword">CREATE</span> <span class="keyword">TABLE</span> 语句中，必须首先列出构成主键的列。</span><br></pre></td></tr></table></figure>
+<p>2.2 外部表</p>
+<p>外部表（创建者CREATE EXTERNAL TABLE）不受Impala管理，并且删除此表不会将表从其源位置（此处为Kudu）丢弃。相反，它只会去除Impala和Kudu之间的映射。这是Kudu提供的用于将现有表映射到Impala的语法。</p>
+<p>首先使用java创建kudu表：</p>
+<figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CreateTable</span> </span>&#123;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">static</span> ColumnSchema <span class="keyword">new</span><span class="type">Column</span>(<span class="keyword">String</span> name, Type type, boolean iskey) &#123;</span><br><span class="line">                ColumnSchema.ColumnSchemaBuilder column = <span class="keyword">new</span><span class="type"></span></span><br><span class="line"><span class="type"></span>                    ColumnSchema.ColumnSchemaBuilder(name, type);</span><br><span class="line">                column.key(iskey);</span><br><span class="line">                <span class="keyword">return</span> column.build();</span><br><span class="line">        &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> void main(<span class="keyword">String</span>[] args) throws KuduException &#123;</span><br><span class="line">        <span class="comment">// master地址</span></span><br><span class="line">        final <span class="keyword">String</span> masteraddr = <span class="string">"node1,node2,node3"</span>;</span><br><span class="line">        <span class="comment">// 创建kudu的数据库链接</span></span><br><span class="line">        KuduClient client = <span class="keyword">new</span><span class="type"></span></span><br><span class="line"><span class="type"></span>     KuduClient.KuduClientBuilder(masteraddr).defaultSocketReadTimeoutMs(<span class="number">6000</span>).build();</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 设置表的schema</span></span><br><span class="line">        List&lt;ColumnSchema&gt; columns = <span class="keyword">new</span> <span class="type">LinkedList</span>&lt;ColumnSchema&gt;();</span><br><span class="line">        columns.add(<span class="keyword">new</span><span class="type">Column</span>(<span class="string">"CompanyId"</span>, Type.INT32, <span class="literal">true</span>));</span><br><span class="line">        columns.add(<span class="keyword">new</span><span class="type">Column</span>(<span class="string">"WorkId"</span>, Type.INT32, <span class="literal">false</span>));</span><br><span class="line">        columns.add(<span class="keyword">new</span><span class="type">Column</span>(<span class="string">"Name"</span>, Type.STRING, <span class="literal">false</span>));</span><br><span class="line">        columns.add(<span class="keyword">new</span><span class="type">Column</span>(<span class="string">"Gender"</span>, Type.STRING, <span class="literal">false</span>));</span><br><span class="line">        columns.add(<span class="keyword">new</span><span class="type">Column</span>(<span class="string">"Photo"</span>, Type.STRING, <span class="literal">false</span>));</span><br><span class="line">        Schema schema = <span class="keyword">new</span> <span class="type">Schema</span>(columns);</span><br><span class="line">    <span class="comment">//创建表时提供的所有选项</span></span><br><span class="line">    CreateTableOptions options = <span class="keyword">new</span> <span class="type">CreateTableOptions</span>();</span><br><span class="line">        </span><br><span class="line">    <span class="comment">// 设置表的replica备份和分区规则</span></span><br><span class="line">    List&lt;<span class="keyword">String</span>&gt; parcols = <span class="keyword">new</span> <span class="type">LinkedList</span>&lt;<span class="keyword">String</span>&gt;();</span><br><span class="line">        </span><br><span class="line">    parcols.add(<span class="string">"CompanyId"</span>);</span><br><span class="line">    <span class="comment">//设置表的备份数</span></span><br><span class="line">        options.setNumReplicas(<span class="number">1</span>);</span><br><span class="line">    <span class="comment">//设置range分区</span></span><br><span class="line">    options.setRangePartitionColumns(parcols);</span><br><span class="line">        </span><br><span class="line">    <span class="comment">//设置hash分区和数量</span></span><br><span class="line">    options.addHashPartitions(parcols, <span class="number">3</span>);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">    client.createTable(<span class="string">"person"</span>, schema, options);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (KuduException e) &#123;</span><br><span class="line">    e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">    client.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>使用impala创建外部表 ， 将kudu的表映射到impala上。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">在impala-shell中执行</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">EXTERNAL</span> <span class="keyword">TABLE</span> <span class="string">`person`</span> <span class="keyword">STORED</span> <span class="keyword">AS</span> KUDU</span><br><span class="line">TBLPROPERTIES(</span><br><span class="line">    <span class="string">'kudu.table_name'</span> = <span class="string">'person'</span>,</span><br><span class="line">    <span class="string">'kudu.master_addresses'</span> = <span class="string">'node1:7051,node2:7051,node3:7051'</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="3-使用impala对kudu进行DML"><a href="#3-使用impala对kudu进行DML" class="headerlink" title="3 使用impala对kudu进行DML"></a>3 使用impala对kudu进行DML</h3><p>1 插入数据</p>
+<p>impala 允许使用标准 SQL 语句将数据插入 Kudu 。</p>
+<p>首先建表：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">在impala-shell中</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> my_first_table1</span><br><span class="line">(</span><br><span class="line"><span class="keyword">id</span> <span class="built_in">BIGINT</span>,</span><br><span class="line"><span class="keyword">name</span> <span class="keyword">STRING</span>,</span><br><span class="line">PRIMARY <span class="keyword">KEY</span>(<span class="keyword">id</span>)</span><br><span class="line">)</span><br><span class="line"><span class="keyword">PARTITION</span> <span class="keyword">BY</span> <span class="keyword">HASH</span> <span class="keyword">PARTITIONS</span> <span class="number">16</span></span><br><span class="line"><span class="keyword">STORED</span> <span class="keyword">AS</span> KUDU </span><br><span class="line">TBLPROPERTIES(</span><br><span class="line">    <span class="string">'kudu.table_name'</span> = <span class="string">'person1'</span>,</span><br><span class="line">    <span class="string">'kudu.master_addresses'</span> = <span class="string">'node1:7051,node2:7051,node3:7051'</span>);</span><br></pre></td></tr></table></figure>
+<p>此示例插入单个行：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> my_first_table <span class="keyword">VALUES</span> (<span class="number">50</span>, <span class="string">"zhangsan"</span>);</span><br></pre></td></tr></table></figure>
+<p>此示例插入3行：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> my_first_table <span class="keyword">VALUES</span> (<span class="number">1</span>, <span class="string">"john"</span>), (<span class="number">2</span>, <span class="string">"jane"</span>), (<span class="number">3</span>, <span class="string">"jim"</span>);</span><br></pre></td></tr></table></figure>
+<p>批量导入数据：</p>
+<p>从 Impala 和 Kudu 的角度来看，通常表现最好的方法通常是使用 Impala 中的 SELECT FROM 语句导入数据。</p>
+<figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> my_first_table <span class="keyword">SELECT</span> * <span class="keyword">FROM</span> temp1;</span><br></pre></td></tr></table></figure>
+<p>2 更新数据</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">UPDATE</span> my_first_table <span class="keyword">SET</span> <span class="keyword">name</span>=<span class="string">"xiaowang"</span> <span class="keyword">where</span> <span class="keyword">id</span> =<span class="number">1</span> ;</span><br></pre></td></tr></table></figure>
+<p>3 删除数据</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">delete</span> <span class="keyword">from</span> my_first_table <span class="keyword">where</span> <span class="keyword">id</span> =<span class="number">2</span>;</span><br></pre></td></tr></table></figure>
+<p>4 更改表属性</p>
+<p>4.1重命名impala表</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> PERSON <span class="keyword">RENAME</span> <span class="keyword">TO</span> person_temp;</span><br></pre></td></tr></table></figure>
+<p> 4.2重新命名内部表的基础kudu表</p>
+<pre><code>4.1.1创建内部表
+</code></pre><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> kudu_student</span><br><span class="line">(</span><br><span class="line">CompanyId <span class="built_in">INT</span>,</span><br><span class="line">WorkId <span class="built_in">INT</span>,</span><br><span class="line"><span class="keyword">Name</span> <span class="keyword">STRING</span>,</span><br><span class="line">Gender <span class="keyword">STRING</span>,</span><br><span class="line">Photo <span class="keyword">STRING</span>,</span><br><span class="line">PRIMARY <span class="keyword">KEY</span>(CompanyId)</span><br><span class="line">)</span><br><span class="line"><span class="keyword">PARTITION</span> <span class="keyword">BY</span> <span class="keyword">HASH</span> <span class="keyword">PARTITIONS</span> <span class="number">16</span></span><br><span class="line"><span class="keyword">STORED</span> <span class="keyword">AS</span> KUDU</span><br><span class="line">TBLPROPERTIES (</span><br><span class="line"><span class="string">'kudu.master_addresses'</span> = <span class="string">'node1:7051,node2:7051,node3:7051'</span>,</span><br><span class="line"><span class="string">'kudu.table_name'</span> = <span class="string">'student'</span></span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<p>​                4.1.2如果表是内部表，则可以通过更改 kudu.table_name 属性重命名底层的 Kudu 表。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> kudu_student <span class="keyword">SET</span> TBLPROPERTIES(<span class="string">'kudu.table_name'</span> = <span class="string">'new_student'</span>);</span><br></pre></td></tr></table></figure>
+<p>4.3将外部表重新映射kudu表</p>
+<p>如果用户在使用过程中发现其他应用程序重新命名了kudu表，那么此时的外部表需要重新映射到kudu上。</p>
+<p>首先创建一个外部表：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">EXTERNAL</span> <span class="keyword">TABLE</span> external_table</span><br><span class="line">    <span class="keyword">STORED</span> <span class="keyword">AS</span> KUDU</span><br><span class="line">    TBLPROPERTIES (</span><br><span class="line">    <span class="string">'kudu.master_addresses'</span> = <span class="string">'node1:7051,node2:7051,node3:7051'</span>,</span><br><span class="line">    <span class="string">'kudu.table_name'</span> = <span class="string">'person'</span></span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<p>重新映射外部表，指向不同的kudu表：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> external_table</span><br><span class="line"><span class="keyword">SET</span> TBLPROPERTIES(<span class="string">'kudu.table_name'</span> = <span class="string">'hashTable'</span>)</span><br></pre></td></tr></table></figure>
+<p>上面的操作是：将external_table映射的PERSON表重新指向hashTable表。</p>
+<p>4.4 更改kudu master地址</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> my_table</span><br><span class="line"><span class="keyword">SET</span> TBLPROPERTIES(<span class="string">'kudu.master_addresses'</span> = <span class="string">'kudu-new-master.example.com:7051'</span>);</span><br></pre></td></tr></table></figure>
+<p>4.5 将内部表改为外部表</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> my_table <span class="keyword">SET</span> TBLPROPERTIES(<span class="string">'EXTERNAL'</span> = <span class="string">'TRUE'</span>);</span><br></pre></td></tr></table></figure>
+<p>##4 impala使用Java操作kudu</p>
+<p>对于impala而言，开发人员是可以通过JDBC连接impala的，有了JDBC，开发人员可以通过impala来间接操作 kudu。</p>
+<h3 id="1-引入依赖"><a href="#1-引入依赖" class="headerlink" title="1 引入依赖"></a>1 引入依赖</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">   <span class="comment">&lt;!--impala的jdbc操作--&gt;</span> </span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.cloudera<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>ImpalaJDBC41<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.5.42<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!--Caused by : ClassNotFound : thrift.protocol.TPro--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.thrift<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>libfb303<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>0.9.3<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">type</span>&gt;</span>pom<span class="tag">&lt;/<span class="name">type</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!--Caused by : ClassNotFound : thrift.protocol.TPro--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.thrift<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>libthrift<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>0.9.3<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">type</span>&gt;</span>pom<span class="tag">&lt;/<span class="name">type</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">   </span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.hive<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>hive-jdbc<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">exclusions</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">exclusion</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.hive<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>hive-service-rpc<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">exclusion</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">exclusion</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.hive<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>hive-service<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">exclusion</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">exclusions</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!--导入hive--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.hive<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>hive-service<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="2-jdbc连接impala操作kudu"><a href="#2-jdbc连接impala操作kudu" class="headerlink" title="2 jdbc连接impala操作kudu"></a>2 jdbc连接impala操作kudu</h3><p>使用JDBC连接impala操作kudu，与JDBC连接mysql做更重增删改查基本一样。</p>
+<p>创建实体类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> cn.itcast.impala.impala;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> companyId;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> workId;</span><br><span class="line">    <span class="keyword">private</span>  String name;</span><br><span class="line">    <span class="keyword">private</span>  String gender;</span><br><span class="line">    <span class="keyword">private</span>  String photo;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Person</span><span class="params">(<span class="keyword">int</span> companyId, <span class="keyword">int</span> workId, String name, String gender, String photo)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.companyId = companyId;</span><br><span class="line">        <span class="keyword">this</span>.workId = workId;</span><br><span class="line">        <span class="keyword">this</span>.name = name;</span><br><span class="line">        <span class="keyword">this</span>.gender = gender;</span><br><span class="line">        <span class="keyword">this</span>.photo = photo;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getCompanyId</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> companyId;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setCompanyId</span><span class="params">(<span class="keyword">int</span> companyId)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.companyId = companyId;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getWorkId</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> workId;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setWorkId</span><span class="params">(<span class="keyword">int</span> workId)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.workId = workId;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getName</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setName</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.name = name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getGender</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> gender;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setGender</span><span class="params">(String gender)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.gender = gender;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getPhoto</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> photo;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setPhoto</span><span class="params">(String photo)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.photo = photo;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="JDBC连接impala对kudu进行增删改查"><a href="#JDBC连接impala对kudu进行增删改查" class="headerlink" title="JDBC连接impala对kudu进行增删改查"></a>JDBC连接impala对kudu进行增删改查</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> cn.itcast.impala.impala;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.sql.*;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Contants</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> String JDBC_DRIVER=<span class="string">"com.cloudera.impala.jdbc41.Driver"</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span>  String CONNECTION_URL=<span class="string">"jdbc:impala://node1:21050/default;auth=noSasl"</span>;</span><br><span class="line">     <span class="comment">//定义数据库连接</span></span><br><span class="line">    <span class="keyword">static</span> Connection conn=<span class="keyword">null</span>;</span><br><span class="line">    <span class="comment">//定义PreparedStatement对象</span></span><br><span class="line">    <span class="keyword">static</span> PreparedStatement ps=<span class="keyword">null</span>;</span><br><span class="line">    <span class="comment">//定义查询的结果集</span></span><br><span class="line">    <span class="keyword">static</span> ResultSet rs= <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">//数据库连接</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Connection <span class="title">getConn</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Class.forName(JDBC_DRIVER);</span><br><span class="line">            conn=DriverManager.getConnection(CONNECTION_URL);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span>  conn;</span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//创建一个表</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">createTable</span><span class="params">()</span></span>&#123;</span><br><span class="line">        conn=getConn();</span><br><span class="line">        String sql=<span class="string">"CREATE TABLE impala_kudu_test"</span> +</span><br><span class="line">                <span class="string">"("</span> +</span><br><span class="line">                <span class="string">"companyId BIGINT,"</span> +</span><br><span class="line">                <span class="string">"workId BIGINT,"</span> +</span><br><span class="line">                <span class="string">"name STRING,"</span> +</span><br><span class="line">                <span class="string">"gender STRING,"</span> +</span><br><span class="line">                <span class="string">"photo STRING,"</span> +</span><br><span class="line">                <span class="string">"PRIMARY KEY(companyId)"</span> +</span><br><span class="line">                <span class="string">")"</span> +</span><br><span class="line">                <span class="string">"PARTITION BY HASH PARTITIONS 16 "</span> +</span><br><span class="line">                <span class="string">"STORED AS KUDU "</span> +</span><br><span class="line">                <span class="string">"TBLPROPERTIES ("</span> +</span><br><span class="line">                <span class="string">"'kudu.master_addresses' = 'node1:7051,node2:7051,node3:7051',"</span> +</span><br><span class="line">                <span class="string">"'kudu.table_name' = 'impala_kudu_test'"</span> +</span><br><span class="line">                <span class="string">");"</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            ps = conn.prepareStatement(sql);</span><br><span class="line">            ps.execute();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (SQLException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">//查询数据</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> ResultSet <span class="title">queryRows</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">//定义执行的sql语句</span></span><br><span class="line">            String sql=<span class="string">"select * from impala_kudu_test"</span>;</span><br><span class="line">            ps = getConn().prepareStatement(sql);</span><br><span class="line">            rs= ps.executeQuery();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (SQLException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span>  rs;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//打印结果</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span>  <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">printRows</span><span class="params">(ResultSet rs)</span></span>&#123;</span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         private int companyId;</span></span><br><span class="line"><span class="comment">         private int workId;</span></span><br><span class="line"><span class="comment">         private  String name;</span></span><br><span class="line"><span class="comment">         private  String gender;</span></span><br><span class="line"><span class="comment">         private  String photo;</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">while</span> (rs.next())&#123;</span><br><span class="line">                <span class="comment">//获取表的每一行字段信息</span></span><br><span class="line">                <span class="keyword">int</span> companyId = rs.getInt(<span class="string">"companyId"</span>);</span><br><span class="line">                <span class="keyword">int</span> workId = rs.getInt(<span class="string">"workId"</span>);</span><br><span class="line">                String name = rs.getString(<span class="string">"name"</span>);</span><br><span class="line">                String gender = rs.getString(<span class="string">"gender"</span>);</span><br><span class="line">                String photo = rs.getString(<span class="string">"photo"</span>);</span><br><span class="line">                System.out.print(<span class="string">"companyId:"</span>+companyId+<span class="string">" "</span>);</span><br><span class="line">                System.out.print(<span class="string">"workId:"</span>+workId+<span class="string">" "</span>);</span><br><span class="line">                System.out.print(<span class="string">"name:"</span>+name+<span class="string">" "</span>);</span><br><span class="line">                System.out.print(<span class="string">"gender:"</span>+gender+<span class="string">" "</span>);</span><br><span class="line">                System.out.println(<span class="string">"photo:"</span>+photo);</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (SQLException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;<span class="keyword">finally</span> &#123;</span><br><span class="line">            <span class="keyword">if</span>(ps!=<span class="keyword">null</span>)&#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    ps.close();</span><br><span class="line">                &#125; <span class="keyword">catch</span> (SQLException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span>(conn !=<span class="keyword">null</span>)&#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    conn.close();</span><br><span class="line">                &#125; <span class="keyword">catch</span> (SQLException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">//插入数据</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">insertRows</span><span class="params">(Person person)</span></span>&#123;</span><br><span class="line">        conn=getConn();</span><br><span class="line">        String sql=<span class="string">"insert into table impala_kudu_test(companyId,workId,name,gender,photo) values(?,?,?,?,?)"</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            ps=conn.prepareStatement(sql);</span><br><span class="line">            <span class="comment">//给占位符？赋值</span></span><br><span class="line">            ps.setInt(<span class="number">1</span>,person.getCompanyId());</span><br><span class="line">            ps.setInt(<span class="number">2</span>,person.getWorkId());</span><br><span class="line">            ps.setString(<span class="number">3</span>,person.getName());</span><br><span class="line">            ps.setString(<span class="number">4</span>,person.getGender());</span><br><span class="line">            ps.setString(<span class="number">5</span>,person.getPhoto());</span><br><span class="line">            ps.execute();</span><br><span class="line"></span><br><span class="line">        &#125; <span class="keyword">catch</span> (SQLException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;<span class="keyword">finally</span> &#123;</span><br><span class="line">            <span class="keyword">if</span>(ps !=<span class="keyword">null</span>)&#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    <span class="comment">//关闭</span></span><br><span class="line">                    ps.close();</span><br><span class="line">                &#125; <span class="keyword">catch</span> (SQLException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span>(conn !=<span class="keyword">null</span>)&#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                      <span class="comment">//关闭</span></span><br><span class="line">                    conn.close();</span><br><span class="line">                &#125; <span class="keyword">catch</span> (SQLException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//更新数据</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">updateRows</span><span class="params">(Person person)</span></span>&#123;</span><br><span class="line">       <span class="comment">//定义执行的sql语句</span></span><br><span class="line">        String sql=<span class="string">"update impala_kudu_test set workId="</span>+person.getWorkId()+</span><br><span class="line">                <span class="string">",name='"</span>+person.getName()+<span class="string">"' ,"</span>+<span class="string">"gender='"</span>+person.getGender()+<span class="string">"' ,"</span>+</span><br><span class="line">                <span class="string">"photo='"</span>+person.getPhoto()+<span class="string">"' where companyId="</span>+person.getCompanyId();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            ps= getConn().prepareStatement(sql);</span><br><span class="line">            ps.execute();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (SQLException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;<span class="keyword">finally</span> &#123;</span><br><span class="line">            <span class="keyword">if</span>(ps !=<span class="keyword">null</span>)&#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                      <span class="comment">//关闭</span></span><br><span class="line">                    ps.close();</span><br><span class="line">                &#125; <span class="keyword">catch</span> (SQLException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span>(conn !=<span class="keyword">null</span>)&#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                      <span class="comment">//关闭</span></span><br><span class="line">                    conn.close();</span><br><span class="line">                &#125; <span class="keyword">catch</span> (SQLException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//删除数据</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span>   <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">deleteRows</span><span class="params">(<span class="keyword">int</span> companyId)</span></span>&#123;</span><br><span class="line">      </span><br><span class="line">        <span class="comment">//定义sql语句</span></span><br><span class="line">        String sql=<span class="string">"delete from impala_kudu_test where companyId="</span>+companyId;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            ps =getConn().prepareStatement(sql);</span><br><span class="line">            ps.execute();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (SQLException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">   <span class="comment">//删除表</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">dropTable</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        String sql=<span class="string">"drop table if exists impala_kudu_test"</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            ps =getConn().prepareStatement(sql);</span><br><span class="line">            ps.execute();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (SQLException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="代码测试运行"><a href="#代码测试运行" class="headerlink" title="代码测试运行"></a>代码测试运行</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> cn.itcast.impala.impala;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.sql.Connection;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ImpalaJdbcClient</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Connection conn = Contants.getConn();</span><br><span class="line"></span><br><span class="line">        <span class="comment">//创建一个表</span></span><br><span class="line">       Contants.createTable();</span><br><span class="line"></span><br><span class="line">        <span class="comment">//插入数据</span></span><br><span class="line">       Contants.insertRows(<span class="keyword">new</span> Person(<span class="number">1</span>,<span class="number">100</span>,<span class="string">"lisi"</span>,<span class="string">"male"</span>,<span class="string">"lisi-photo"</span>));</span><br><span class="line"></span><br><span class="line">        <span class="comment">//查询表的数据</span></span><br><span class="line">        ResultSet rs = Contants.queryRows();</span><br><span class="line">        Contants.printRows(rs);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//更新数据</span></span><br><span class="line">        Contants.updateRows(<span class="keyword">new</span> Person(<span class="number">1</span>,<span class="number">200</span>,<span class="string">"zhangsan"</span>,<span class="string">"male"</span>,<span class="string">"zhangsan-photo"</span>));</span><br><span class="line"></span><br><span class="line">        <span class="comment">//删除数据</span></span><br><span class="line">        Contants.deleteRows(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//删除表</span></span><br><span class="line">        Contants.dropTable();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="六-Apache-KUDU的原理"><a href="#六-Apache-KUDU的原理" class="headerlink" title="六 Apache KUDU的原理"></a>六 Apache KUDU的原理</h1><h2 id="1．-table与schema"><a href="#1．-table与schema" class="headerlink" title="1． table与schema"></a>1． table与schema</h2><p>Kudu设计是面向结构化存储的，因此，Kudu的表需要用户在建表时定义它的Schema信息，这些Schema信息包含：列定义（含类型），Primary Key定义（用户指定的若干个列的有序组合）。数据的唯一性，依赖于用户所提供的Primary Key中的Column组合的值的唯一性。Kudu提供了Alter命令来增删列，但位于Primary Key中的列是不允许删除的。 </p>
+<p>从用户角度来看，Kudu是一种存储结构化数据表的存储系统。在一个Kudu集群中可以定义任意数量的table，每个table都需要预先定义好schema。每个table的列数是确定的，每一列都需要有名字和类型，每个表中可以把其中一列或多列定义为主键。这么看来，Kudu更像关系型数据库，而不是像HBase、Cassandra和MongoDB这些NoSQL数据库。不过Kudu目前还不能像关系型数据一样支持二级索引。</p>
+<p>Kudu使用确定的列类型，而不是类似于NoSQL的“everything is byte”。带来好处：确定的列类型使Kudu可以进行类型特有的编码,可以提供元数据给其他上层查询工具。</p>
+<h2 id="2-kudu底层数据模型"><a href="#2-kudu底层数据模型" class="headerlink" title="2 kudu底层数据模型"></a>2 kudu底层数据模型</h2><p>Kudu的底层数据文件的存储，未采用HDFS这样的较高抽象层次的分布式文件系统，而是自行开发了一套可基于Table/Tablet/Replica视图级别的底层存储系统。</p>
+<p>这套实现基于如下的几个设计目标：</p>
+<p>• 可提供快速的列式查询 </p>
+<p>• 可支持快速的随机更新 </p>
+<p>• 可提供更为稳定的查询性能保障</p>
+<p><img src="/images/kudu/dcs.png" alt="img"></p>
+<p>一张table会分成若干个tablet，每个tablet包括MetaData元信息及若干个RowSet。</p>
+<p>RowSet包含一个MemRowSet及若干个DiskRowSet，DiskRowSet中包含一个BloomFile、Ad_hoc Index、BaseData、DeltaMem及若干个RedoFile和UndoFile。</p>
+<p>MemRowSet：用于新数据insert及已在MemRowSet中的数据的更新，一个MemRowSet写满后会将数据刷到磁盘形成若干个DiskRowSet。默认是1G或者或者120S。</p>
+<p>DiskRowSet：用于老数据的变更，后台定期对DiskRowSet做compaction，以删除没用的数据及合并历史数据，减少查询过程中的IO开销。</p>
+<p>BloomFile：根据一个DiskRowSet中的key生成一个bloom filter，用于快速模糊定位某个key是否在DiskRowSet中。</p>
+<p>Ad_hocIndex：是主键的索引，用于定位key在DiskRowSet中的具体哪个偏移位置。</p>
+<p>BaseData是MemRowSet flush下来的数据，按列存储，按主键有序。</p>
+<p>UndoFile是基于BaseData之前时间的历史数据，通过在BaseData上apply UndoFile中的记录，可以获得历史数据。</p>
+<p>RedoFile是基于BaseData之后时间的变更记录，通过在BaseData上apply RedoFile中的记录，可获得较新的数据。</p>
+<p>DeltaMem用于DiskRowSet中数据的变更，先写到内存中，写满后flush到磁盘形成RedoFile。</p>
+<p>REDO与UNDO与关系型数据库中的REDO与UNDO日志类似（在关系型数据库中，REDO日志记录了更新后的数据，可以用来恢复尚未写入Data File的已成功事务更新的数据。而UNDO日志用来记录事务更新之前的数据，可以用来在事务失败时进行回滚）</p>
+<p><img src="/images/kudu/dcs2.png" alt="img"></p>
+<p>MemRowSets可以对比理解成HBase中的MemStore, 而DiskRowSets可理解成HBase中的HFile。</p>
+<p>MemRowSets中的数据被Flush到磁盘之后，形成DiskRowSets。 DisRowSets中的数据，按照32MB大小为单位，按序划分为一个个的DiskRowSet。 DiskRowSet中的数据按照Column进行组织，与Parquet类似。</p>
+<p>这是Kudu可支持一些分析性查询的基础。每一个Column的数据被存储在一个相邻的数据区域，而这个数据区域进一步被细分成一个个的小的Page单元，与HBase File中的Block类似，对每一个Column Page可采用一些Encoding算法，以及一些通用的Compression算法。 既然可对Column Page可采用Encoding以及Compression算法，那么，对单条记录的更改就会比较困难了。</p>
+<p>前面提到了Kudu可支持单条记录级别的更新/删除，是如何做到的？</p>
+<p>与HBase类似，也是通过增加一条新的记录来描述这次更新/删除操作的。DiskRowSet是不可修改了，那么 KUDU 要如何应对数据的更新呢？在KUDU中，把DiskRowSet分为了两部分：base data、delta stores。base data 负责存储基础数据，delta stores负责存储 base data 中的变更数据.</p>
+<p><img src="/images/kudu/dcs3.png" alt="img"></p>
+<p>如上图所示，数据从MemRowSet 刷到磁盘后就形成了一份 DiskRowSet（只包含 base data），每份 DiskRowSet 在内存中都会有一个对应的 DeltaMemStore，负责记录此 DiskRowSet 后续的数据变更（更新、删除）。DeltaMemStore 内部维护一个 B-树索引，映射到每个 row_offset 对应的数据变更。DeltaMemStore 数据增长到一定程度后转化成二进制文件存储到磁盘，形成一个 DeltaFile，随着 base data 对应数据的不断变更，DeltaFile 逐渐增长。</p>
+<h2 id="3-tablet发现过程"><a href="#3-tablet发现过程" class="headerlink" title="3 tablet发现过程"></a>3 tablet发现过程</h2><p>当创建Kudu客户端时，其会从主服务器上获取tablet位置信息，然后直接与服务于该tablet的服务器进行交谈。</p>
+<p>为了优化读取和写入路径，客户端将保留该信息的本地缓存，以防止他们在每个请求时需要查询主机的tablet位置信息。随着时间的推移，客户端的缓存可能会变得过时，并且当写入被发送到不再是tablet领导者的tablet服务器时，则将被拒绝。然后客户端将通过查询主服务器发现新领导者的位置来更新其缓存。</p>
+<p><img src="/images/kudu/f.png" alt="img"></p>
+<h2 id="4-kudu写流程"><a href="#4-kudu写流程" class="headerlink" title="4 kudu写流程"></a>4 kudu写流程</h2><p>当 Client 请求写数据时，先根据主键从Master Server中获取要访问的目标 Tablets，然后到依次对应的Tablet获取数据。</p>
+<p>因为KUDU表存在主键约束，所以需要进行主键是否已经存在的判断，这里就涉及到之前说的索引结构对读写的优化了。一个Tablet中存在很多个RowSets，为了提升性能，我们要尽可能地减少要扫描的RowSets数量。</p>
+<p>首先，我们先通过每个 RowSet 中记录的主键的（最大最小）范围，过滤掉一批不存在目标主键的RowSets，然后在根据RowSet中的布隆过滤器，过滤掉确定不存在目标主键的 RowSets，最后再通过RowSets中的 B-树索引，精确定位目标主键是否存在。</p>
+<p>如果主键已经存在，则报错（主键重复），否则就进行写数据（写 MemRowSet）。</p>
+<p><img src="/images/kudu/w.png" alt="img"></p>
+<h2 id="5kudu读流程"><a href="#5kudu读流程" class="headerlink" title="5kudu读流程"></a>5kudu读流程</h2><p>数据读取过程大致如下：先根据要扫描数据的主键范围，定位到目标的Tablets，然后读取Tablets 中的RowSets。</p>
+<p>在读取每个RowSet时，先根据主键过滤要scan范围，然后加载范围内的base data，再找到对应的delta stores，应用所有变更，最后union上MemRowSet中的内容，返回数据给Client。</p>
+<p><img src="/images/kudu/r.png" alt="img"></p>
+<h2 id="6kudu更新流程"><a href="#6kudu更新流程" class="headerlink" title="6kudu更新流程"></a>6kudu更新流程</h2><p>数据更新的核心是定位到待更新数据的位置，这块与写入的时候类似，就不展开了，等定位到具体位置后，然后将变更写到对应的delta store 中。</p>
+<p><img src="/images/kudu/updata.png" alt="img"></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+      <div>
+        <div id="reward-container">
+  <div>Thank you for your accept. mua！</div>
+  <button id="reward-button" disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/reward/wechatpay.jpg" alt="丨HF丨 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/reward/alipay.jpg" alt="丨HF丨 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        
+
+
+
+
+  
+
+
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>丨HF丨</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    
+    <a href="https://manzhong.github.io/2017/07/14/kudu.html" title="kudu">https://manzhong.github.io/2017/07/14/kudu.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+    <div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:16px;">-------------本文结束<i class="fa fa-heart"></i>感谢您的阅读-------------</div>
+    
+</div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/BigData/" rel="tag"><i class="fa fa-tag"></i> BigData</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/07/13/Hue.html" rel="next" title="Hue">
+                <i class="fa fa-chevron-left"></i> Hue
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/15/ClouderaManager.html" rel="prev" title="ClouderaManager">
+                ClouderaManager <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC81MDA2Mi8yNjU1Mw=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/hexo.jpg" alt="丨HF丨">
+            
+              <p class="site-author-name" itemprop="name">丨HF丨</p>
+              <div class="site-description motion-element" itemprop="description">第二名就是头号输家!!!</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">54</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/ipyker" title="GitHub &rarr; https://github.com/ipyker" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:pyker@qq.com" title="E-Mail &rarr; mailto:pyker@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://weibo.com/viszhang" title="Weibo &rarr; https://weibo.com/viszhang" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="tencent://message/?uin=123435796&Site=&menu=yes" title="QQ &rarr; tencent://message/?uin=123435796&Site=&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i>QQ</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-book"></i>
+                推荐阅读
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://www.54tianzhisheng.cn/tags/Flink/" title="http://www.54tianzhisheng.cn/tags/Flink/" rel="noopener" target="_blank">Flink</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://nginxconfig.io/" title="https://nginxconfig.io/" rel="noopener" target="_blank">Nginxconfig</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://linux.51yip.com/" title="http://linux.51yip.com/" rel="noopener" target="_blank">Linux命令手册</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://echarts.baidu.com/index.html" title="https://echarts.baidu.com/index.html" rel="noopener" target="_blank">echarts可视化库</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+        </div>
+      </div>
+
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" style=" text-align:center;">&copy; 2017 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HF</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"> 站点字数合计:</i>
+    </span>
+    
+    <span title="站点总字数">961k</span>
+  
+  
+  <span class="post-meta-divider">|</span>
+  <a href="http://www.beian.miit.gov.cn" rel="noopener" target="_blank">粤ICP备19028706号 </a>
+
+</div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+
+<div class="run_time" style=" text-align:center;">
+  <span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+  <script>
+    var now = new Date(); 
+    function createtime() { 
+        var grt= new Date("07/23/2017 10:00:00");//此处修改你的建站时间或者网站上线时间 
+        now.setTime(now.getTime()+250); 
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days); 
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours); 
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum); 
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;} 
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum); 
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;} 
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 "; 
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒"; 
+    } 
+    setInterval("createtime()",250);
+  </script>
+</div>
+        
+<div class="busuanzi-count" style=" text-align:center;">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      我的第 <span class="busuanzi-value" id="busuanzi_value_site_uv"></span> 位朋友，
+    </span>
+  
+
+
+
+  
+    <span class="site-pv">
+      历经 <span class="busuanzi-value" id="busuanzi_value_site_pv"></span> 次回眸才与你相遇
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+  
+    
+    
+      
+    
+  
+  <script color="255,0,255" opacity="0.7" zindex="-1" count="140" src="//cdn.jsdelivr.net/gh/theme-next/theme-next-canvas-nest@1.0.0/canvas-nest.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.1"></script>
+
+  <script src="/js/motion.js?v=7.1.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/schemes/muse.js?v=7.1.1"></script>
+
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.1"></script>
+<script src="/js/post-details.js?v=7.1.1"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.1"></script>
+
+
+  
+
+  
+
+  
+  
+  
+
+  
+
+  
+  
+  
+
+
+  
+
+
+  
+    <script>
+  window.livereOptions = {
+    refer: '2017/07/14/kudu.html'
+  };
+  (function(d, s) {
+    var j, e = d.getElementsByTagName(s)[0];
+    if (typeof LivereTower === 'function') { return; }
+    j = d.createElement(s);
+    j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+    j.async = true;
+    e.parentNode.insertBefore(j, e);
+  })(document, 'script');
+</script>
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <script src="/lib/bookmark/bookmark.min.js?v=1.0"></script>
+  <script>
+  
+    bookmark.scrollToMark('auto', "#更多");
+  
+  </script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

@@ -1,0 +1,1708 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="true">
+
+
+
+  
+  
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.1.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":true,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: true,
+    fastclick: true,
+    lazyload: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"shrinkIn","post_header":"slideLeftIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideDownIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="ClouderaManagercm 管理工具,用来安装cdh&amp;lt;hadoop,zookeeper,habse…….&amp;gt; cdh (cloudera distribute hadoop&amp;lt;hadoop,zookeeper,hbase……&amp;gt;) 版本:5.14.0 Cloudera Manager是cloudera公司提供的一种大数据的解决方案，可以通过ClouderaManager管">
+<meta name="keywords" content="BigData">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ClouderaManager">
+<meta property="og:url" content="https://manzhong.github.io/2017/07/15/ClouderaManager.html">
+<meta property="og:site_name" content="春雨里洗过的太阳">
+<meta property="og:description" content="ClouderaManagercm 管理工具,用来安装cdh&amp;lt;hadoop,zookeeper,habse…….&amp;gt; cdh (cloudera distribute hadoop&amp;lt;hadoop,zookeeper,hbase……&amp;gt;) 版本:5.14.0 Cloudera Manager是cloudera公司提供的一种大数据的解决方案，可以通过ClouderaManager管">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://manzhong.github.io/images/ClouderaManager/clip_image001.png">
+<meta property="og:image" content="https://manzhong.github.io/images/ClouderaManager/clip_image003.jpg">
+<meta property="og:image" content="https://manzhong.github.io/images/ClouderaManager/clip_image005.jpg">
+<meta property="og:image" content="https://manzhong.github.io/images/ClouderaManager/clip_image007.jpg">
+<meta property="og:image" content="https://manzhong.github.io/images/ClouderaManager/clip_image009.jpg">
+<meta property="og:image" content="https://manzhong.github.io/images/ClouderaManager/clip_image011.jpg">
+<meta property="og:image" content="https://manzhong.github.io/images/ClouderaManager/clip_image013.jpg">
+<meta property="og:image" content="https://manzhong.github.io/images/ClouderaManager/clip_image015.jpg">
+<meta property="og:image" content="https://manzhong.github.io/images/ClouderaManager/clip_image017.jpg">
+<meta property="og:image" content="https://manzhong.github.io/images/ClouderaManager/clip_image019.jpg">
+<meta property="og:image" content="https://manzhong.github.io/images/ClouderaManager/clip_image021.jpg">
+<meta property="og:image" content="https://manzhong.github.io/images/ClouderaManager/clip_image023.jpg">
+<meta property="og:updated_time" content="2019-07-28T09:35:19.067Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ClouderaManager">
+<meta name="twitter:description" content="ClouderaManagercm 管理工具,用来安装cdh&amp;lt;hadoop,zookeeper,habse…….&amp;gt; cdh (cloudera distribute hadoop&amp;lt;hadoop,zookeeper,hbase……&amp;gt;) 版本:5.14.0 Cloudera Manager是cloudera公司提供的一种大数据的解决方案，可以通过ClouderaManager管">
+<meta name="twitter:image" content="https://manzhong.github.io/images/ClouderaManager/clip_image001.png">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="春雨里洗过的太阳" type="application/atom+xml">
+
+
+
+  
+  
+  <link rel="canonical" href="https://manzhong.github.io/2017/07/15/ClouderaManager">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>ClouderaManager | 春雨里洗过的太阳</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+ 
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">春雨里洗过的太阳</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-bookmark"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-互动">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/guestbook/" rel="section"><i class="menu-item-icon fa fa-fw fa-comments"></i> <br>互动</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://manzhong.github.io/2017/07/15/ClouderaManager.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="丨HF丨">
+      <meta itemprop="description" content="第二名就是头号输家!!!">
+      <meta itemprop="image" content="/images/hexo.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="春雨里洗过的太阳">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ClouderaManager
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2017-07-15 08:54:53" itemprop="dateCreated datePublished" datetime="2017-07-15T08:54:53+08:00">2017-07-15</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-07-28 17:35:19" itemprop="dateModified" datetime="2019-07-28T17:35:19+08:00">2019-07-28</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">8k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">7 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="ClouderaManager"><a href="#ClouderaManager" class="headerlink" title="ClouderaManager"></a>ClouderaManager</h1><p>cm 管理工具,用来安装cdh&lt;hadoop,zookeeper,habse…….&gt;</p>
+<p>cdh (cloudera distribute hadoop&lt;hadoop,zookeeper,hbase……&gt;)</p>
+<p>版本:5.14.0</p>
+<p>Cloudera Manager是cloudera公司提供的一种大数据的解决方案，可以通过ClouderaManager管理界面来对我们的集群进行安装和操作，提供了良好的UI界面交互，使得我们管理集群不用熟悉任何的linux技术，只需要通过网页浏览器就可以实现我们的集群的操作和管理，让我们使用和管理集群更加的方便。</p>
+<h1 id="1、ClouderaManager整体架构"><a href="#1、ClouderaManager整体架构" class="headerlink" title="1、ClouderaManager整体架构"></a>1、ClouderaManager整体架构</h1><p><img src="/images/ClouderaManager/clip_image001.png" alt="img"></p>
+<p>Cloudera Manager的核心是Cloudera Manager Server。Server托管Admin Console Web Server和应用程序逻辑。它负责安装软件、配置、启动和停止服务以及管理运行服务的群集。</p>
+<p>解释：</p>
+<p>·        Agent：安装在每台主机上。它负责启动和停止进程，解压缩配置，触发安装和监控主机</p>
+<p>·        Management Service：执行各种监控、报警和报告功能的一组角色的服务。</p>
+<p>·        Database：存储配置和监控信息</p>
+<p>·        Cloudera Repository：可供Cloudera Manager分配的软件的存储库（repo库）</p>
+<p>·        Client：用于与服务器进行交互的接口： </p>
+<p>·        Admin Console：管理员控制台</p>
+<p>·        API：开发人员使用 API可以创建自定义的Cloudera Manager应用程序</p>
+<h2 id="Cloudera-Management-Service"><a href="#Cloudera-Management-Service" class="headerlink" title="Cloudera Management Service"></a><strong>Cloudera Management Service</strong></h2><p>Cloudera Management Service 可作为一组角色实施各种管理功能</p>
+<p>·        Activity Monitor：收集有关服务运行的活动的信息</p>
+<p>·        Host Monitor：收集有关主机的运行状况和指标信息</p>
+<p>·        Service Monitor：收集有关服务的运行状况和指标信息</p>
+<p>·        Event Server：聚合组件的事件并将其用于警报和搜索</p>
+<p>·        Alert Publisher ：为特定类型的事件生成和提供警报</p>
+<p>·        Reports Manager：生成图表报告，它提供用户、用户组的目录的磁盘使用率、磁盘、io等历史视图</p>
+<h2 id="信号检测"><a href="#信号检测" class="headerlink" title="信号检测"></a><strong>信号检测</strong></h2><p>默认情况下，Agent 每隔 15 秒向 Cloudera Manager Server 发送一次检测信号。但是，为了减少用户延迟，在状态变化时会提高频率。</p>
+<h2 id="状态管理"><a href="#状态管理" class="headerlink" title="状态管理"></a><strong>状态管理</strong></h2><p>·        模型状态捕获什么进程应在何处运行以及具有什么配置</p>
+<p>·        运行时状态是哪些进程正在何处运行以及正在执行哪些命令（例如，重新平衡 HDFS 或执行备份/灾难恢复计划或滚动升级或停止）</p>
+<p>·        当您更新配置（例如Hue Server Web 端口）时，您即更新了模型状态。但是，如果 Hue 在更新时正在运行，则它仍将使用旧端口。当出现这种不匹配情况时，角色会标记为具有”过时的配置”。要重新同步，您需重启角色（这会触发重新生成配置和重启进程）</p>
+<p>·        特殊情况如果要加入一些clouder manager控制台没有的属性时候都在高级里面嵌入</p>
+<h2 id="服务器和客户端配置"><a href="#服务器和客户端配置" class="headerlink" title="服务器和客户端配置"></a><strong>服务器和客户端配置</strong></h2><p>·        如使用HDFS，文件 /etc/hadoop/conf/hdfs-site.xml 仅包含与 HDFS 客户端相关的配置</p>
+<p>·        而 HDFS 角色实例（例如，NameNode 和 DataNode）会从/var/run/cloudera-scm-agent/process/unique-process-name下的每个进程专用目录获取它们的配置</p>
+<h2 id="进程管理"><a href="#进程管理" class="headerlink" title="进程管理"></a><strong>进程管理</strong></h2><p>·        在 Cloudera Manager 管理的群集中，只能通过 Cloudera Manager 启动或停止服务。ClouderaManager 使用一种名为 supervisord的开源进程管理工具，它会重定向日志文件，通知进程失败，为合适用户设置调用进程的有效用户 ID 等等</p>
+<p>·        Cloudera Manager 支持自动重启崩溃进程。如果一个角色实例在启动后反复失败，Cloudera Manager还会用不良状态标记该实例</p>
+<p>·        特别需要注意的是，停止 Cloudera Manager 和 Cloudera Manager Agent 不会停止群集；所有正在运行的实例都将保持运行</p>
+<p>·        Agent 的一项主要职责是启动和停止进程。当 Agent 从检测信号检测到新进程时，Agent 会在/var/run/cloudera-scm-agent 中为它创建一个目录，并解压缩配置</p>
+<p>·        Agent 受到监控，属于 Cloudera Manager 的主机监控的一部分：如果 Agent 停止检测信号，主机将被标记为运行状况不良</p>
+<h2 id="主机管理"><a href="#主机管理" class="headerlink" title="主机管理"></a><strong>主机管理</strong></h2><p>·        Cloudera Manager 自动将作为群集中的托管主机身份：JDK、Cloudera Manager Agent、CDH、Impala、Solr 等参与所需的所有软件部署到主机</p>
+<p>·        Cloudera Manager 提供用于管理参与主机生命周期的操作以及添加和删除主机的操作</p>
+<p>·        Cloudera Management Service Host Monitor 角色执行运行状况检查并收集主机度量，以使您可以监控主机的运行状况和性能</p>
+<h2 id="安全"><a href="#安全" class="headerlink" title="安全"></a><strong>安全</strong></h2><p>·        <strong>身份验证</strong> </p>
+<p>·        Hadoop中身份验证的目的仅仅是证明用户或服务确实是他或她所声称的用户或服务，通常，企业中的身份验证通过单个分布式系统（例如，轻型目录访问协议 (LDAP) 目录）进行管理。LDAP身份验证包含由各种存储系统提供支持的简单用户名/密码服务</p>
+<p>·        Hadoop 生态系统的许多组件会汇总到一起来使用 Kerberos 身份验证并提供用于在 LDAP 或 AD 中管理和存储凭据的选项</p>
+<p>·        <strong>授权</strong><br> CDH 当前提供以下形式的访问控制： </p>
+<p>·        适用于目录和文件的传统 POSIX 样式的权限</p>
+<p>·        适用于 HDFS 的扩展的访问控制列表 (ACL)</p>
+<p>·        Apache HBase 使用 ACL 来按列、列族和列族限定符授权各种操作 (READ, WRITE, CREATE, ADMIN)</p>
+<p>·        使用 Apache Sentry 基于角色进行访问控制</p>
+<p>·        <strong>加密</strong> </p>
+<p>·        需要获得企业版的Cloudera（Cloudera Navigator 许可）</p>
+<h1 id="2、clouderaManager环境安装前准备"><a href="#2、clouderaManager环境安装前准备" class="headerlink" title="2、clouderaManager环境安装前准备"></a>2、clouderaManager环境安装前准备</h1><p>准备两台虚拟机，其中一台作为我们的主节点，安装我们的ClouderaManager Server与ClouderaManager  agent，另外一台作为我们的从节点只安装我们的clouderaManager  agent</p>
+<p>机器规划如下</p>
+<table>
+<thead>
+<tr>
+<th>服务器IP</th>
+<th>192.168.52.100</th>
+<th>192.168.52.110</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>主机名</td>
+<td>node01.hadoop.com</td>
+<td>node02.hadoop.com</td>
+</tr>
+<tr>
+<td>主机名与IP地址映射</td>
+<td>是</td>
+<td>是</td>
+</tr>
+<tr>
+<td>防火墙</td>
+<td>关闭</td>
+<td>关闭</td>
+</tr>
+<tr>
+<td>selinux</td>
+<td>关闭</td>
+<td>关闭</td>
+</tr>
+<tr>
+<td>jdk</td>
+<td>安装</td>
+<td>安装</td>
+</tr>
+<tr>
+<td>ssh免密码登录</td>
+<td>是</td>
+<td>是</td>
+</tr>
+<tr>
+<td>mysql数据库</td>
+<td>否</td>
+<td>是</td>
+</tr>
+<tr>
+<td>服务器内存</td>
+<td>16G</td>
+<td>8G</td>
+</tr>
+</tbody>
+</table>
+<p>所有机器统一两个路径</p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> -p /<span class="keyword">export</span>/softwares/</span><br><span class="line"><span class="built_in">mkdir</span> -p /<span class="keyword">export</span>/servers/</span><br></pre></td></tr></table></figure>
+<h2 id="2-1、两台机器更改主机名"><a href="#2-1、两台机器更改主机名" class="headerlink" title="2.1、两台机器更改主机名"></a>2.1、两台机器更改主机名</h2><p>第一台机器更改主机名</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/sysconfig/network</span><br><span class="line"><span class="attribute">NETWORKING</span>=<span class="literal">yes</span></span><br><span class="line"><span class="attribute">HOSTNAME</span>=node01.hadoop.com</span><br></pre></td></tr></table></figure>
+<p>第二台机器更改主机名</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/sysconfig/network</span><br><span class="line"><span class="attribute">NETWORKING</span>=<span class="literal">yes</span></span><br><span class="line"><span class="attribute">HOSTNAME</span>=node02.hadoop.com</span><br></pre></td></tr></table></figure>
+<h2 id="2-2、更改主机名与IP地址的映射"><a href="#2-2、更改主机名与IP地址的映射" class="headerlink" title="2.2、更改主机名与IP地址的映射"></a>2.2、更改主机名与IP地址的映射</h2><p>两台机器更改hosts文件</p>
+<figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/hosts</span><br><span class="line"><span class="number">192.168</span><span class="number">.52</span><span class="number">.100</span> node01.hadoop.com  node01</span><br><span class="line"><span class="number">192.168</span><span class="number">.52</span><span class="number">.110</span> node02.hadoop.com  node02</span><br></pre></td></tr></table></figure>
+<h2 id="2-3、两台机器关闭防火墙"><a href="#2-3、两台机器关闭防火墙" class="headerlink" title="2.3、两台机器关闭防火墙"></a>2.3、两台机器关闭防火墙</h2><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">service</span> iptables stop</span><br><span class="line">chkconfig iptables <span class="literal">off</span></span><br></pre></td></tr></table></figure>
+<h2 id="2-4、两台机器关闭selinux"><a href="#2-4、两台机器关闭selinux" class="headerlink" title="2.4、两台机器关闭selinux"></a>2.4、两台机器关闭selinux</h2><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/selinux/config</span><br><span class="line"><span class="attribute">SELINUX</span>=disabled</span><br></pre></td></tr></table></figure>
+<p><img src="/images/ClouderaManager/clip_image003.jpg" alt="img"></p>
+<h2 id="2-5、两台机器安装jdk"><a href="#2-5、两台机器安装jdk" class="headerlink" title="2.5、两台机器安装jdk"></a>2.5、两台机器安装jdk</h2><p>将我们的jdk的压缩包上传到node01.hadoop.com的/export/softwares路径下</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /<span class="built_in">export</span>/softwares/</span><br><span class="line">tar -zxvf jdk-8u141-linux-x64.tar.gz  -C /<span class="built_in">export</span>/servers/</span><br></pre></td></tr></table></figure>
+<p>配置环境变量</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/profile</span><br><span class="line"></span><br><span class="line"><span class="builtin-name">export</span> <span class="attribute">JAVA_HOME</span>=/export/servers/jdk1.8.0_141</span><br><span class="line"><span class="builtin-name">export</span> <span class="attribute">PATH</span>=:$JAVA_HOME/bin:PATH</span><br><span class="line"></span><br><span class="line">source /etc/profile</span><br></pre></td></tr></table></figure>
+<p>第二台机器同样安装jdk即可</p>
+<h2 id="2-6、两台机器实现SSH免密码登录"><a href="#2-6、两台机器实现SSH免密码登录" class="headerlink" title="2.6、两台机器实现SSH免密码登录"></a>2.6、两台机器实现SSH免密码登录</h2><h3 id="第一步：两台器生成公钥与私钥"><a href="#第一步：两台器生成公钥与私钥" class="headerlink" title="第一步：两台器生成公钥与私钥"></a>第一步：两台器生成公钥与私钥</h3><p>两台机器上面执行以下命令，然后按下三个回车键即可生成公钥与私钥</p>
+<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">ssh-keygen -t rsa</span></span><br></pre></td></tr></table></figure>
+<p><img src="/images/ClouderaManager/clip_image005.jpg" alt="img"></p>
+<h3 id="第二步：两台机器将公钥拷贝到同一个文件当中去"><a href="#第二步：两台机器将公钥拷贝到同一个文件当中去" class="headerlink" title="第二步：两台机器将公钥拷贝到同一个文件当中去"></a>第二步：两台机器将公钥拷贝到同一个文件当中去</h3><p>两台机器执行以下命令</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-copy-id node01<span class="selector-class">.hadoop</span><span class="selector-class">.com</span></span><br></pre></td></tr></table></figure>
+<h3 id="第三步：拷贝authorized-keys到其他机器"><a href="#第三步：拷贝authorized-keys到其他机器" class="headerlink" title="第三步：拷贝authorized_keys到其他机器"></a>第三步：拷贝authorized_keys到其他机器</h3><p>第一台机器上将authorized_keys拷贝到第二台机器</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scp <span class="regexp">/root/</span>.ssh<span class="regexp">/authorized_keys node02.hadoop.com:/</span>root<span class="regexp">/.ssh/</span></span><br></pre></td></tr></table></figure>
+<h2 id="2-7、第二台机器安装mysql数据库"><a href="#2-7、第二台机器安装mysql数据库" class="headerlink" title="2.7、第二台机器安装mysql数据库"></a>2.7、第二台机器安装mysql数据库</h2><p>通过yum源，在线安装mysql</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">yum  <span class="keyword">install</span>  mysql  mysql-<span class="keyword">server</span>  mysql-devel</span><br><span class="line">/etc/init.d/mysqld <span class="keyword">start</span></span><br><span class="line">/usr/<span class="keyword">bin</span>/mysql_secure_installation</span><br><span class="line"> <span class="keyword">grant</span> <span class="keyword">all</span> <span class="keyword">privileges</span> <span class="keyword">on</span> . <span class="keyword">to</span> <span class="string">'root'</span>@<span class="string">'%'</span> <span class="keyword">identified</span> <span class="keyword">by</span> <span class="string">'123456'</span> <span class="keyword">with</span> <span class="keyword">grant</span> <span class="keyword">option</span>;</span><br><span class="line"> <span class="keyword">flush</span> <span class="keyword">privileges</span>;</span><br></pre></td></tr></table></figure>
+<p><img src="/images/ClouderaManager/clip_image007.jpg" alt="img"></p>
+<h2 id="2-8、解除linux系统打开文件最大数量的限制"><a href="#2-8、解除linux系统打开文件最大数量的限制" class="headerlink" title="2.8、解除linux系统打开文件最大数量的限制"></a>2.8、解除linux系统打开文件最大数量的限制</h2><p>两台机器都需要执行</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">vi</span> /etc/security/limits.<span class="keyword">conf</span></span><br></pre></td></tr></table></figure>
+<p>添加以下内容</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">*   </span>soft noproc 11000</span><br><span class="line"></span><br><span class="line"><span class="bullet">*   </span>hard noproc 11000</span><br><span class="line"></span><br><span class="line"><span class="bullet">*   </span>soft nofile 65535</span><br><span class="line"></span><br><span class="line"><span class="bullet">*   </span>hard nofile 65535</span><br></pre></td></tr></table></figure>
+<h2 id="2-9、设置linux交换区内存"><a href="#2-9、设置linux交换区内存" class="headerlink" title="2.9、设置linux交换区内存"></a>2.9、设置linux交换区内存</h2><p>两台机器都要执行</p>
+<p>执行命令</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo <span class="number">10</span> &gt; <span class="regexp">/proc/</span>sys<span class="regexp">/vm/</span>swappiness</span><br></pre></td></tr></table></figure>
+<p>并编辑文件sysctl.conf：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/sysctl.conf</span><br><span class="line"></span><br><span class="line">添加或修改</span><br><span class="line"></span><br><span class="line">vm<span class="selector-class">.swappiness</span> = <span class="number">0</span></span><br></pre></td></tr></table></figure>
+<p>两台机器都要执行：</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">echo never &gt; <span class="regexp">/sys/kernel</span><span class="regexp">/mm/transparent</span>_hugepage/defrag</span><br><span class="line">echo never &gt; <span class="regexp">/sys/kernel</span><span class="regexp">/mm/transparent</span>_hugepage/enabled</span><br></pre></td></tr></table></figure>
+<p>并编辑文件rc.local ：</p>
+<figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">vim <span class="meta-keyword">/etc/</span>rc.local</span><br><span class="line"></span><br><span class="line">echo never &gt; <span class="meta-keyword">/sys/</span>kernel<span class="meta-keyword">/mm/</span>transparent_hugepage/defrag</span><br><span class="line">echo never &gt; <span class="meta-keyword">/sys/</span>kernel<span class="meta-keyword">/mm/</span>transparent_hugepage/enabled</span><br></pre></td></tr></table></figure>
+<p><img src="/images/ClouderaManager/clip_image009.jpg" alt="img"></p>
+<h2 id="2-10、两台机器时钟同步"><a href="#2-10、两台机器时钟同步" class="headerlink" title="2.10、两台机器时钟同步"></a>2.10、两台机器时钟同步</h2><p>两台机器需要进行时钟同步操作，保证两台机器时间相同</p>
+<h1 id="3、clouderaManager安装资源下载"><a href="#3、clouderaManager安装资源下载" class="headerlink" title="3、clouderaManager安装资源下载"></a>3、clouderaManager安装资源下载</h1><h2 id="第一步：下载安装资源并上传到服务器"><a href="#第一步：下载安装资源并上传到服务器" class="headerlink" title="第一步：下载安装资源并上传到服务器"></a>第一步：下载安装资源并上传到服务器</h2><p>我们这里安装CM5.14.0这个版本，需要下载以下这些资源，一共是四个文件即可</p>
+<p>下载cm5的压缩包</p>
+<p>下载地址：<a href="http://archive.cloudera.com/cm5/cm/5/" target="_blank" rel="noopener">http://archive.cloudera.com/cm5/cm/5/</a></p>
+<p>具体文件地址：</p>
+<p><a href="http://archive.cloudera.com/cm5/cm/5/cloudera-manager-el6-cm5.14.0_x86_64.tar.gz" target="_blank" rel="noopener">http://archive.cloudera.com/cm5/cm/5/cloudera-manager-el6-cm5.14.0_x86_64.tar.gz</a></p>
+<p>下载cm5的parcel包</p>
+<p>下载地址：</p>
+<p><a href="http://archive.cloudera.com/cdh5/parcels/" target="_blank" rel="noopener">http://archive.cloudera.com/cdh5/parcels/</a></p>
+<p>第一个文件具体下载地址：</p>
+<p><a href="http://archive.cloudera.com/cdh5/parcels/5.14.0/CDH-5.14.0-1.cdh5.14.0.p0.24-el6.parcel" target="_blank" rel="noopener">http://archive.cloudera.com/cdh5/parcels/5.14.0/CDH-5.14.0-1.cdh5.14.0.p0.24-el6.parcel</a></p>
+<p>第二个文件具体下载地址：</p>
+<p><a href="http://archive.cloudera.com/cdh5/parcels/5.14.0/CDH-5.14.0-1.cdh5.14.0.p0.24-el6.parcel.sha1" target="_blank" rel="noopener">http://archive.cloudera.com/cdh5/parcels/5.14.0/CDH-5.14.0-1.cdh5.14.0.p0.24-el6.parcel.sha1</a></p>
+<p>第三个文件具体下载地址：</p>
+<p><a href="http://archive.cloudera.com/cdh5/parcels/5.14.0/manifest.json" target="_blank" rel="noopener">http://archive.cloudera.com/cdh5/parcels/5.14.0/manifest.json</a></p>
+<p>将这四个安装包都上传到第一台机器的/opt/softwares路径下</p>
+<p><img src="/images/ClouderaManager/clip_image011.jpg" alt="img"></p>
+<h2 id="第二步：解压压缩包到指定路径"><a href="#第二步：解压压缩包到指定路径" class="headerlink" title="第二步：解压压缩包到指定路径"></a>第二步：解压压缩包到指定路径</h2><p>解压CM安装包到/opt路径下去</p>
+<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cd</span> <span class="string">/export/softwares</span></span><br><span class="line"></span><br><span class="line">tar -zxvf cloudera-manager-el6-cm5.14.0_x86_64.tar.gz -C <span class="string">/opt/</span></span><br></pre></td></tr></table></figure>
+<h2 id="第三步：将我们的parcel包的三个文件拷贝到对应路径"><a href="#第三步：将我们的parcel包的三个文件拷贝到对应路径" class="headerlink" title="第三步：将我们的parcel包的三个文件拷贝到对应路径"></a>第三步：将我们的parcel包的三个文件拷贝到对应路径</h2><p>将我们的parcel包含三个文件，拷贝到/opt/cloudera/parcel-repo路径下面去，并记得有个文件需要重命名</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cd /export/softwares/</span><br><span class="line"></span><br><span class="line">cp CDH-<span class="number">5.14</span>.<span class="number">0</span>-<span class="number">1</span><span class="selector-class">.cdh5</span>.<span class="number">14.0</span><span class="selector-class">.p0</span>.<span class="number">24</span>-el6<span class="selector-class">.parcel</span> CDH-<span class="number">5.14</span>.<span class="number">0</span>-<span class="number">1</span><span class="selector-class">.cdh5</span>.<span class="number">14.0</span><span class="selector-class">.p0</span>.<span class="number">24</span>-el6<span class="selector-class">.parcel</span><span class="selector-class">.sha1</span> manifest<span class="selector-class">.json</span>  /opt/cloudera/parcel-repo/</span><br></pre></td></tr></table></figure>
+<p><img src="/images/ClouderaManager/clip_image013.jpg" alt="img"></p>
+<p>重命名标黄的这个文件</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cd /opt/cloudera/parcel-repo/</span><br><span class="line"></span><br><span class="line">mv CDH-<span class="number">5.14</span>.<span class="number">0</span>-<span class="number">1</span><span class="selector-class">.cdh5</span>.<span class="number">14.0</span><span class="selector-class">.p0</span>.<span class="number">24</span>-el6<span class="selector-class">.parcel</span><span class="selector-class">.sha1</span> CDH-<span class="number">5.14</span>.<span class="number">0</span>-<span class="number">1</span><span class="selector-class">.cdh5</span>.<span class="number">14.0</span><span class="selector-class">.p0</span>.<span class="number">24</span>-el6<span class="selector-class">.parcel</span><span class="selector-class">.sha</span></span><br></pre></td></tr></table></figure>
+<p><img src="/images/ClouderaManager/clip_image015.jpg" alt="img"></p>
+<h2 id="第四步：所有节点添加普通用户并给与sudo权限"><a href="#第四步：所有节点添加普通用户并给与sudo权限" class="headerlink" title="第四步：所有节点添加普通用户并给与sudo权限"></a>第四步：所有节点添加普通用户并给与sudo权限</h2><p>在node01机器上面添加普通用户并赋予sudo权限</p>
+<p>执行以下命令创建普通用户cloudera-scm</p>
+<figure class="highlight dsconfig"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">useradd </span><span class="built_in">--system</span> <span class="built_in">--home=/opt/cm-5.14.0/run/cloudera-scm-server</span> <span class="built_in">--no-create-home</span> <span class="built_in">--shell=/bin/false</span> <span class="built_in">--comment</span> <span class="string">"Cloudera SCM User"</span> <span class="string">cloudera-scm</span></span><br></pre></td></tr></table></figure>
+<p>赋予cloudera-scm普通用户的sudo权限</p>
+<figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/sudoers</span><br><span class="line"></span><br><span class="line">cloudera-scm <span class="keyword">ALL</span>=(<span class="keyword">ALL</span>) NOPASSWD: <span class="keyword">ALL</span></span><br></pre></td></tr></table></figure>
+<p><img src="/images/ClouderaManager/clip_image017.jpg" alt="img"></p>
+<h2 id="第五步：更改主节点的配置文件"><a href="#第五步：更改主节点的配置文件" class="headerlink" title="第五步：更改主节点的配置文件"></a>第五步：更改主节点的配置文件</h2><p>node01机器上面更改配置文件</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">vim /opt/cm-<span class="number">5.14</span>.<span class="number">0</span>/etc/cloudera-scm-agent/config.ini</span><br><span class="line"></span><br><span class="line">server_host=node01<span class="selector-class">.hadoop</span><span class="selector-class">.com</span></span><br></pre></td></tr></table></figure>
+<p><img src="/images/ClouderaManager/clip_image019.jpg" alt="img"></p>
+<h2 id="第六步：将-opt目录下的安装包发放到其他机器"><a href="#第六步：将-opt目录下的安装包发放到其他机器" class="headerlink" title="第六步：将/opt目录下的安装包发放到其他机器"></a>第六步：将/opt目录下的安装包发放到其他机器</h2><p>将第一台机器的安装包发放到其他机器</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cd</span> /<span class="keyword">opt</span></span><br><span class="line"></span><br><span class="line">scp -r cloudera/ <span class="keyword">cm</span>-<span class="number">5.14</span>.<span class="number">0</span>/ node02:/<span class="keyword">opt</span></span><br></pre></td></tr></table></figure>
+<h2 id="第七步：创建一些数据库备用"><a href="#第七步：创建一些数据库备用" class="headerlink" title="第七步：创建一些数据库备用"></a>第七步：创建一些数据库备用</h2><p>node02机器上面创建数据库</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">hive 数据库</span><br><span class="line"></span><br><span class="line">create database hive<span class="built_in"> DEFAULT </span>CHARSET utf8 COLLATE utf8_general_ci;</span><br><span class="line"></span><br><span class="line">集群监控数据库</span><br><span class="line"></span><br><span class="line">create database amon<span class="built_in"> DEFAULT </span>CHARSET utf8 COLLATE utf8_general_ci;</span><br><span class="line"></span><br><span class="line">hue 数据库</span><br><span class="line"></span><br><span class="line">create database hue<span class="built_in"> DEFAULT </span>CHARSET utf8 COLLATE utf8_general_ci;</span><br><span class="line"></span><br><span class="line">oozie 数据库</span><br><span class="line"></span><br><span class="line">create database oozie<span class="built_in"> DEFAULT </span>CHARSET utf8 COLLATE utf8_general_ci;</span><br></pre></td></tr></table></figure>
+<h2 id="第八步：准备数据库连接的驱动包"><a href="#第八步：准备数据库连接的驱动包" class="headerlink" title="第八步：准备数据库连接的驱动包"></a>第八步：准备数据库连接的驱动包</h2><p>在所有机器上面都准备一份数据库的连接驱动jar包放到/usr/share/java路径下</p>
+<p>准备一份mysql的驱动连接包，放到/usr/share/java路径下去</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">cd <span class="regexp">/export/</span>softwares/</span><br><span class="line"></span><br><span class="line">wget <span class="string">https:</span><span class="comment">//dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-5.1.45.tar.gz</span></span><br><span class="line"></span><br><span class="line">tar -zxvf mysql-connector-java<span class="number">-5.1</span><span class="number">.45</span>.tar.gz</span><br><span class="line"></span><br><span class="line">cd <span class="regexp">/export/</span>softwares/mysql-connector-java<span class="number">-5.1</span><span class="number">.45</span></span><br><span class="line"></span><br><span class="line">cp mysql-connector-java<span class="number">-5.1</span><span class="number">.45</span>-bin.jar <span class="regexp">/usr/</span>share<span class="regexp">/java/</span>mysql-connector-java.jar</span><br></pre></td></tr></table></figure>
+<p>拷贝驱动包到第二台机器</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cd /usr/share/java</span><br><span class="line"></span><br><span class="line">scp mysql-connector-java<span class="selector-class">.jar</span> node02:<span class="variable">$PWD</span></span><br></pre></td></tr></table></figure>
+<h2 id="第九步：为clouderaManager创建数据库"><a href="#第九步：为clouderaManager创建数据库" class="headerlink" title="第九步：为clouderaManager创建数据库"></a>第九步：为clouderaManager创建数据库</h2><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="regexp">/opt/</span>cm-<span class="number">5.14</span>.<span class="number">0</span><span class="regexp">/share/</span>cmf<span class="regexp">/schema/</span>scm_prepare_database.sh mysql -hnode02  -uroot -p123456 --scm-host node01 scm root <span class="number">123456</span></span><br></pre></td></tr></table></figure>
+<p>命令说明：/<strong>opt</strong>/<strong>cm</strong>-5.14.0/share/cmf/schema/scm_prepare_database.<strong>sh</strong> 数据库类型 -h数据库主机 –u数据库用户名 –p数据库密码 –scm-host <strong>cm</strong>主机  数据库名称  用户名  密码</p>
+<p><img src="/images/ClouderaManager/clip_image021.jpg" alt="img"></p>
+<h2 id="第十步：启动服务"><a href="#第十步：启动服务" class="headerlink" title="第十步：启动服务"></a>第十步：启动服务</h2><p>主节点启动clouderaManager Server与ClouderaManager  agent服务</p>
+<figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta-keyword">/opt/</span>cm<span class="number">-5.14</span><span class="number">.0</span><span class="meta-keyword">/etc/</span>init.d/cloudera-scm-server start</span><br><span class="line"></span><br><span class="line"><span class="meta-keyword">/opt/</span>cm<span class="number">-5.14</span><span class="number">.0</span><span class="meta-keyword">/etc/</span>init.d/cloudera-scm-agent start</span><br></pre></td></tr></table></figure>
+<p><img src="/images/ClouderaManager/clip_image023.jpg" alt="img"></p>
+<p>从节点node02启动ClouderaManager agent服务</p>
+<h2 id="第十一步：浏览器页面访问"><a href="#第十一步：浏览器页面访问" class="headerlink" title="第十一步：浏览器页面访问"></a>第十一步：浏览器页面访问</h2><p><a href="http://node01:7180/cmf/login" target="_blank" rel="noopener">http://node01:7180/cmf/login</a></p>
+<p>默认用户名admin</p>
+<p>密码 admin</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+      <div>
+        <div id="reward-container">
+  <div>Thank you for your accept. mua！</div>
+  <button id="reward-button" disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/reward/wechatpay.jpg" alt="丨HF丨 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/reward/alipay.jpg" alt="丨HF丨 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        
+
+
+
+
+  
+
+
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>丨HF丨</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    
+    <a href="https://manzhong.github.io/2017/07/15/ClouderaManager.html" title="ClouderaManager">https://manzhong.github.io/2017/07/15/ClouderaManager.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+    <div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:16px;">-------------本文结束<i class="fa fa-heart"></i>感谢您的阅读-------------</div>
+    
+</div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/BigData/" rel="tag"><i class="fa fa-tag"></i> BigData</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/07/14/kudu.html" rel="next" title="kudu">
+                <i class="fa fa-chevron-left"></i> kudu
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/16/Kafka.html" rel="prev" title="Kafka">
+                Kafka <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC81MDA2Mi8yNjU1Mw=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/hexo.jpg" alt="丨HF丨">
+            
+              <p class="site-author-name" itemprop="name">丨HF丨</p>
+              <div class="site-description motion-element" itemprop="description">第二名就是头号输家!!!</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">54</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/ipyker" title="GitHub &rarr; https://github.com/ipyker" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:pyker@qq.com" title="E-Mail &rarr; mailto:pyker@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://weibo.com/viszhang" title="Weibo &rarr; https://weibo.com/viszhang" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="tencent://message/?uin=123435796&Site=&menu=yes" title="QQ &rarr; tencent://message/?uin=123435796&Site=&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i>QQ</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-book"></i>
+                推荐阅读
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://www.54tianzhisheng.cn/tags/Flink/" title="http://www.54tianzhisheng.cn/tags/Flink/" rel="noopener" target="_blank">Flink</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://nginxconfig.io/" title="https://nginxconfig.io/" rel="noopener" target="_blank">Nginxconfig</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://linux.51yip.com/" title="http://linux.51yip.com/" rel="noopener" target="_blank">Linux命令手册</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://echarts.baidu.com/index.html" title="https://echarts.baidu.com/index.html" rel="noopener" target="_blank">echarts可视化库</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+        </div>
+      </div>
+
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" style=" text-align:center;">&copy; 2017 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HF</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"> 站点字数合计:</i>
+    </span>
+    
+    <span title="站点总字数">961k</span>
+  
+  
+  <span class="post-meta-divider">|</span>
+  <a href="http://www.beian.miit.gov.cn" rel="noopener" target="_blank">粤ICP备19028706号 </a>
+
+</div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+
+<div class="run_time" style=" text-align:center;">
+  <span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+  <script>
+    var now = new Date(); 
+    function createtime() { 
+        var grt= new Date("07/23/2017 10:00:00");//此处修改你的建站时间或者网站上线时间 
+        now.setTime(now.getTime()+250); 
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days); 
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours); 
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum); 
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;} 
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum); 
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;} 
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 "; 
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒"; 
+    } 
+    setInterval("createtime()",250);
+  </script>
+</div>
+        
+<div class="busuanzi-count" style=" text-align:center;">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      我的第 <span class="busuanzi-value" id="busuanzi_value_site_uv"></span> 位朋友，
+    </span>
+  
+
+
+
+  
+    <span class="site-pv">
+      历经 <span class="busuanzi-value" id="busuanzi_value_site_pv"></span> 次回眸才与你相遇
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+  
+    
+    
+      
+    
+  
+  <script color="255,0,255" opacity="0.7" zindex="-1" count="140" src="//cdn.jsdelivr.net/gh/theme-next/theme-next-canvas-nest@1.0.0/canvas-nest.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.1"></script>
+
+  <script src="/js/motion.js?v=7.1.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/schemes/muse.js?v=7.1.1"></script>
+
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.1"></script>
+<script src="/js/post-details.js?v=7.1.1"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.1"></script>
+
+
+  
+
+  
+
+  
+  
+  
+
+  
+
+  
+  
+  
+
+
+  
+
+
+  
+    <script>
+  window.livereOptions = {
+    refer: '2017/07/15/ClouderaManager.html'
+  };
+  (function(d, s) {
+    var j, e = d.getElementsByTagName(s)[0];
+    if (typeof LivereTower === 'function') { return; }
+    j = d.createElement(s);
+    j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+    j.async = true;
+    e.parentNode.insertBefore(j, e);
+  })(document, 'script');
+</script>
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <script src="/lib/bookmark/bookmark.min.js?v=1.0"></script>
+  <script>
+  
+    bookmark.scrollToMark('auto', "#更多");
+  
+  </script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

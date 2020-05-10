@@ -1,0 +1,2101 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="true">
+
+
+
+  
+  
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.1.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":true,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: true,
+    fastclick: true,
+    lazyload: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"shrinkIn","post_header":"slideLeftIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideDownIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="一 原理1 spark部署情况在 Spark 部分的底层执行逻辑开始之前, 还是要先认识一下 Spark 的部署情况, 根据部署情况, 从而理解如何调度.  针对于上图, 首先可以看到整体上在集群中运行的角色有如下几个:  Master Daemon 负责管理 Master 节点, 协调资源的获取, 以及连接 Worker 节点来运行 Executor, 是 Spark 集群中的协调节点  Wor">
+<meta name="keywords" content="BigData">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spark原理浅析2">
+<meta property="og:url" content="https://manzhong.github.io/2017/08/22/spark原理浅析2.html">
+<meta property="og:site_name" content="春雨里洗过的太阳">
+<meta property="og:description" content="一 原理1 spark部署情况在 Spark 部分的底层执行逻辑开始之前, 还是要先认识一下 Spark 的部署情况, 根据部署情况, 从而理解如何调度.  针对于上图, 首先可以看到整体上在集群中运行的角色有如下几个:  Master Daemon 负责管理 Master 节点, 协调资源的获取, 以及连接 Worker 节点来运行 Executor, 是 Spark 集群中的协调节点  Wor">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/dc1.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/dc2.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/dc3.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/dc4.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/dc5.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/dcy1.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/dcy2.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/dcy3.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/dcy4.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/dcy5.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/dcy6.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/dcy7.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/dcy8.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/dcw1.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/dcw2.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/dcw4.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/dcw2.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/dcw5.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/dcw6.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/dcw7.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/dcw8.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/dcw9.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/dcw10.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/dcw11.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/dcw12.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/dcw13.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/dcw14.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/dcw15.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/dcw16.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/dcw17.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/dcw18.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/dcw19.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/dcw20.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/dcw21.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/dcw22.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/dcw23.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/bb.jpg">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/ljq.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkyl/sgb.png">
+<meta property="og:updated_time" content="2020-03-15T15:02:58.020Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="spark原理浅析2">
+<meta name="twitter:description" content="一 原理1 spark部署情况在 Spark 部分的底层执行逻辑开始之前, 还是要先认识一下 Spark 的部署情况, 根据部署情况, 从而理解如何调度.  针对于上图, 首先可以看到整体上在集群中运行的角色有如下几个:  Master Daemon 负责管理 Master 节点, 协调资源的获取, 以及连接 Worker 节点来运行 Executor, 是 Spark 集群中的协调节点  Wor">
+<meta name="twitter:image" content="https://manzhong.github.io/images/sparkyl/dc1.png">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="春雨里洗过的太阳" type="application/atom+xml">
+
+
+
+  
+  
+  <link rel="canonical" href="https://manzhong.github.io/2017/08/22/spark原理浅析2">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>spark原理浅析2 | 春雨里洗过的太阳</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+ 
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">春雨里洗过的太阳</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-bookmark"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-互动">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/guestbook/" rel="section"><i class="menu-item-icon fa fa-fw fa-comments"></i> <br>互动</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://manzhong.github.io/2017/08/22/spark原理浅析2.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="丨HF丨">
+      <meta itemprop="description" content="第二名就是头号输家!!!">
+      <meta itemprop="image" content="/images/hexo.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="春雨里洗过的太阳">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">spark原理浅析2
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2017-08-22 10:21:20" itemprop="dateCreated datePublished" datetime="2017-08-22T10:21:20+08:00">2017-08-22</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2020-03-15 23:02:58" itemprop="dateModified" datetime="2020-03-15T23:02:58+08:00">2020-03-15</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/BigData/" itemprop="url" rel="index"><span itemprop="name">BigData</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">27k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">24 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="一-原理"><a href="#一-原理" class="headerlink" title="一 原理"></a>一 原理</h1><h2 id="1-spark部署情况"><a href="#1-spark部署情况" class="headerlink" title="1 spark部署情况"></a>1 spark部署情况</h2><p>在 <code>Spark</code> 部分的底层执行逻辑开始之前, 还是要先认识一下 <code>Spark</code> 的部署情况, 根据部署情况, 从而理解如何调度.</p>
+<p><img src="/images/sparkyl/dc1.png" alt="img"></p>
+<p>针对于上图, 首先可以看到整体上在集群中运行的角色有如下几个:</p>
+<ul>
+<li><p><code>Master Daemon</code></p>
+<p>负责管理 <code>Master</code> 节点, 协调资源的获取, 以及连接 <code>Worker</code> 节点来运行 <code>Executor</code>, 是 Spark 集群中的协调节点</p>
+</li>
+<li><p><code>Worker Daemon</code></p>
+<p><code>Workers</code> 也称之为叫 <code>Slaves</code>, 是 Spark 集群中的计算节点, 用于和 Master 交互并管理 <code>Executor</code>.</p>
+<p>当一个 <code>Spark Job</code> 提交后, 会创建 <code>SparkContext</code>, 后 <code>Worker</code> 会启动对应的 <code>Executor</code>.</p>
+</li>
+<li><p><code>Executor Backend</code></p>
+<p>上面有提到 <code>Worker</code> 用于控制 <code>Executor</code> 的启停, 其实 <code>Worker</code> 是通过 <code>Executor Backend</code> 来进行控制的, <code>Executor Backend</code> 是一个进程(是一个 <code>JVM</code> 实例), 持有一个 <code>Executor</code> 对象</p>
+</li>
+</ul>
+<p>另外在启动程序的时候, 有三种程序需要运行在集群上:</p>
+<ul>
+<li><p><code>Driver</code>  <strong>action 操作的最终获得结果,是把结果存放在Driver中</strong></p>
+<p><code>Driver</code> 是一个 <code>JVM</code> 实例, 是一个进程, 是 <code>Spark Application</code> 运行时候的领导者, 其中运行了 <code>SparkContext</code>.</p>
+<p><code>Driver</code> 控制 <code>Job</code> 和 <code>Task</code>, 并且提供 <code>WebUI</code>.</p>
+</li>
+<li><p><code>Executor</code></p>
+<p><code>Executor</code> 对象中通过线程池来运行 <code>Task</code>, 一个 <code>Executor</code> 中只会运行一个 <code>Spark Application</code> 的 <code>Task</code>, 不同的 <code>Spark Application</code> 的 <code>Task</code> 会由不同的 <code>Executor</code> 来运行</p>
+</li>
+</ul>
+<h2 id="2-逻辑执行图-简述"><a href="#2-逻辑执行图-简述" class="headerlink" title="2 逻辑执行图  简述"></a>2 逻辑执行图  简述</h2><p><strong>描述数据如何流动,如何计算  实际并不存在,只是保存了rdd之间的关系</strong></p>
+<p><img src="/images/sparkyl/dc2.png" alt="img"></p>
+<p>其实 RDD 并没有什么严格的逻辑执行图和物理执行图的概念, 这里也只是借用这个概念, 从而让整个 RDD 的原理可以解释, 好理解.</p>
+<p>对于 RDD 的逻辑执行图, 起始于第一个入口 RDD 的创建, 结束于 Action 算子执行之前, 主要的过程就是生成一组互相有依赖关系的 RDD, 其并不会真的执行, 只是表示 RDD 之间的关系, 数据的流转过程.</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rdd<span class="selector-class">.toDebugString</span>  预运行  结果就是一个逻辑执行图</span><br></pre></td></tr></table></figure>
+<h2 id="3-物理执行图-简述"><a href="#3-物理执行图-简述" class="headerlink" title="3 物理执行图 简述"></a>3 物理执行图 简述</h2><p>当触发 Action 执行的时候, 这一组互相依赖的 RDD 要被处理, 所以要转化为可运行的物理执行图, 调度到集群中执行.</p>
+<p>因为大部分 RDD 是不真正存放数据的, 只是数据从中流转, 所以, 不能直接在集群中运行 RDD, 要有一种 Pipeline 的思想, 需要将这组 RDD 转为 Stage 和 Task, 从而运行 Task, 优化整体执行速度.</p>
+<p>以上的逻辑执行图会生成如下的物理执行图, 这一切发生在 Action 操作被执行时.</p>
+<p><img src="/images/sparkyl/dc3.png" alt="img"></p>
+<p>从上图可以总结如下几个点</p>
+<ul>
+<li>1 —&gt; 2–&gt;3在第一个 <code>Stage</code> 中, 每一个这样的执行流程是一个 <code>Task</code>, 也就是在同一个 Stage 中的所有 RDD 的对应分区, 在同一个 Task 中执行</li>
+<li>Stage 的划分是由 Shuffle 操作来确定的, 有 Shuffle 的地方, Stage 断开</li>
+</ul>
+<h2 id="4-逻辑执行图-详述"><a href="#4-逻辑执行图-详述" class="headerlink" title="4 逻辑执行图 详述"></a>4 逻辑执行图 详述</h2><h3 id="1-明确逻辑计划的边界"><a href="#1-明确逻辑计划的边界" class="headerlink" title="1 明确逻辑计划的边界"></a>1 明确逻辑计划的边界</h3><p>在 <code>Action</code> 调用之前, 会生成一系列的 <code>RDD</code>, 这些 <code>RDD</code> 之间的关系, 其实就是整个逻辑计划</p>
+<p> 如果生成逻辑计划的, 会生成如下一些 <code>RDD</code>, 这些 <code>RDD</code> 是相互关联的, 这些 <code>RDD</code> 之间, 其实本质上生成的就是一个 <strong>计算链</strong></p>
+<p><img src="/images/sparkyl/dc4.png" alt="img"></p>
+<p>接下来, 采用迭代渐进式的方式, 一步一步的查看一下整体上的生成过程</p>
+<p>开始: 第一个rdd创建开始</p>
+<p>结束:  逻辑图到action算子执行之前及结束 </p>
+<p>逻辑图就是一组rdd和其之间的关系</p>
+<p>rdd五大属性: 1 分区列表 2 依赖关系 3 计算函数  4 最佳位置5 分区函数</p>
+<h3 id="2textFile-算子的背后"><a href="#2textFile-算子的背后" class="headerlink" title="2textFile 算子的背后"></a>2<code>textFile</code> <strong>算子的背后</strong></h3><p>研究 <code>RDD</code> 的功能或者表现的时候, 其实本质上研究的就是 <code>RDD</code> 中的五大属性, 因为 <code>RDD</code> 透过五大属性来提供功能和表现, 所以如果要研究 <code>textFile</code> 这个算子, 应该从五大属性着手, 那么第一步就要看看生成的 <code>RDD</code> 是什么类型的 <code>RDD</code></p>
+<h4 id="1textFile-生成的是-HadoopRDD"><a href="#1textFile-生成的是-HadoopRDD" class="headerlink" title="1textFile 生成的是 HadoopRDD"></a>1<code>textFile</code> 生成的是 <code>HadoopRDD</code></h4><p>HadoopRDD 重写了分区列表和计算函数</p>
+<p>源码:</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">textFile</span></span>(</span><br><span class="line">      path: <span class="type">String</span>,</span><br><span class="line">      minPartitions: <span class="type">Int</span> = defaultMinPartitions): <span class="type">RDD</span>[<span class="type">String</span>] = withScope &#123;</span><br><span class="line">    assertNotStopped()</span><br><span class="line">    hadoopFile(path, classOf[<span class="type">TextInputFormat</span>], classOf[<span class="type">LongWritable</span>], classOf[<span class="type">Text</span>],</span><br><span class="line">      minPartitions).map(pair =&gt; pair._2.toString).setName(path)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hadoopFile</span></span>[<span class="type">K</span>, <span class="type">V</span>](</span><br><span class="line">      path: <span class="type">String</span>,</span><br><span class="line">      inputFormatClass: <span class="type">Class</span>[_ &lt;: <span class="type">InputFormat</span>[<span class="type">K</span>, <span class="type">V</span>]],</span><br><span class="line">      keyClass: <span class="type">Class</span>[<span class="type">K</span>],</span><br><span class="line">      valueClass: <span class="type">Class</span>[<span class="type">V</span>],</span><br><span class="line">      minPartitions: <span class="type">Int</span> = defaultMinPartitions): <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">V</span>)] = withScope &#123;</span><br><span class="line">    assertNotStopped()</span><br><span class="line"></span><br><span class="line">    <span class="comment">// This is a hack to enforce loading hdfs-site.xml.</span></span><br><span class="line">    <span class="comment">// See SPARK-11227 for details.</span></span><br><span class="line">    <span class="type">FileSystem</span>.getLocal(hadoopConfiguration)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// A Hadoop configuration can be about 10 KB, which is pretty big, so broadcast it.</span></span><br><span class="line">    <span class="keyword">val</span> confBroadcast = broadcast(<span class="keyword">new</span> <span class="type">SerializableConfiguration</span>(hadoopConfiguration))</span><br><span class="line">    <span class="keyword">val</span> setInputPathsFunc = (jobConf: <span class="type">JobConf</span>) =&gt; <span class="type">FileInputFormat</span>.setInputPaths(jobConf, path)</span><br><span class="line">    <span class="keyword">new</span> <span class="type">HadoopRDD</span>(</span><br><span class="line">      <span class="keyword">this</span>,</span><br><span class="line">      confBroadcast,</span><br><span class="line">      <span class="type">Some</span>(setInputPathsFunc),</span><br><span class="line">      inputFormatClass,</span><br><span class="line">      keyClass,</span><br><span class="line">      valueClass,</span><br><span class="line">      minPartitions).setName(path)</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2HadoopRDD-的-Partitions-对应了-HDFS-的-Blocks"><a href="#2HadoopRDD-的-Partitions-对应了-HDFS-的-Blocks" class="headerlink" title="2HadoopRDD 的 Partitions 对应了 HDFS 的 Blocks"></a>2<code>HadoopRDD</code> 的 <code>Partitions</code> 对应了 <code>HDFS</code> 的 <code>Blocks</code></h4><p><img src="/images/sparkyl/dc5.png" alt="img"></p>
+<p>其实本质上每个 <code>HadoopRDD</code> 的 <code>Partition</code> 都是对应了一个 <code>Hadoop</code> 的 <code>Block</code>, 通过 <code>InputFormat</code> 来确定 <code>Hadoop</code> 中的 <code>Block</code> 的位置和边界, 从而可以供一些算子使用</p>
+<h4 id="3HadoopRDD-的-compute-函数就是在读取-HDFS-中的-Block"><a href="#3HadoopRDD-的-compute-函数就是在读取-HDFS-中的-Block" class="headerlink" title="3HadoopRDD 的 compute 函数就是在读取 HDFS 中的 Block"></a>3<code>HadoopRDD</code> 的 <code>compute</code> 函数就是在读取 <code>HDFS</code> 中的 <code>Block</code></h4><p>本质上, <code>compute</code> 还是依然使用 <code>InputFormat</code> 来读取 <code>HDFS</code> 中对应分区的 <code>Block</code></p>
+<h4 id="4textFile-这个算子生成的其实是一个-MapPartitionsRDD"><a href="#4textFile-这个算子生成的其实是一个-MapPartitionsRDD" class="headerlink" title="4textFile 这个算子生成的其实是一个 MapPartitionsRDD"></a>4<code>textFile</code> 这个算子生成的其实是一个 <code>MapPartitionsRDD</code></h4><p><code>textFile</code> 这个算子的作用是读取 <code>HDFS</code> 上的文件, 但是 <code>HadoopRDD</code> 中存放是一个元组, 其 <code>Key</code> 是行号, 其 <code>Value</code> 是 <code>Hadoop</code> 中定义的 <code>Text</code> 对象, 这一点和 <code>MapReduce</code> 程序中的行为是一致的</p>
+<p>但是并不适合 <code>Spark</code> 的场景, 所以最终会通过一个 <code>map</code> 算子, 将 <code>(LineNum, Text)</code> 转为 <code>String</code> 形式的一行一行的数据, 所以最终 <code>textFile</code> 这个算子生成的 <code>RDD</code> 并不是 <code>HadoopRDD</code>, 而是一个 <code>MapPartitionsRDD</code></p>
+<h3 id="2-map-算子的底层"><a href="#2-map-算子的底层" class="headerlink" title="2 map 算子的底层"></a>2 <code>map</code> <strong>算子的底层</strong></h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">map</span></span>[<span class="type">U</span>: <span class="type">ClassTag</span>](f: <span class="type">T</span> =&gt; <span class="type">U</span>): <span class="type">RDD</span>[<span class="type">U</span>] = withScope &#123;</span><br><span class="line">    <span class="keyword">val</span> cleanF = sc.clean(f)</span><br><span class="line">    <span class="keyword">new</span> <span class="type">MapPartitionsRDD</span>[<span class="type">U</span>, <span class="type">T</span>](<span class="keyword">this</span>, (context, pid, iter) =&gt; iter.map(cleanF))</span><br><span class="line">  &#125;</span><br><span class="line"><span class="comment">//iter为每个分区的数组</span></span><br><span class="line"><span class="comment">// MapPartitionsRDD的compute函数,处理整个rdd中的每个分区的每一条数据,通过穿入map的函数来进行处理</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><p><code>map</code> 算子生成了 <code>MapPartitionsRDD</code></p>
+<p>由源码可知, 当 <code>val rdd2 = rdd1.map()</code> 的时候, 其实生成的新 <code>RDD</code> 是 <code>rdd2</code>, <code>rdd2</code> 的类型是 <code>MapPartitionsRDD</code>, 每个 <code>RDD</code> 中的五大属性都会有一些不同, 由 <code>map</code> 算子生成的 <code>RDD</code> 中的计算函数, 本质上就是遍历对应分区的数据, 将每一个数据转成另外的形式</p>
+</li>
+<li><p><code>MapPartitionsRDD</code> 的计算函数是 <code>collection.map( function )</code></p>
+<p>真正运行的集群中的处理单元是 <code>Task</code>, 每个 <code>Task</code> 对应一个 <code>RDD</code> 的分区, 所以 <code>collection</code> 对应一个 <code>RDD</code> 分区的所有数据, 而这个计算的含义就是将一个 <code>RDD</code> 的分区上所有数据当作一个集合, 通过这个 <code>Scala</code> 集合的 <code>map</code> 算子, 来执行一个转换操作, 其转换操作的函数就是传入 <code>map</code> 算子的 <code>function</code></p>
+</li>
+<li><p>传入 <code>map</code> 算子的函数会被清理</p>
+</li>
+</ul>
+<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">val cleanF</span> = sc.clean(f)</span><br></pre></td></tr></table></figure>
+<p>这个清理主要是处理闭包中的依赖, 使得这个闭包可以被序列化发往不同的集群节点运行</p>
+<h3 id="3-flatMap-算子的底层"><a href="#3-flatMap-算子的底层" class="headerlink" title="3 flatMap 算子的底层"></a>3 <code>flatMap</code> 算子的底层</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">flatMap</span></span>[<span class="type">U</span>: <span class="type">ClassTag</span>](f: <span class="type">T</span> =&gt; <span class="type">TraversableOnce</span>[<span class="type">U</span>]): <span class="type">RDD</span>[<span class="type">U</span>] = withScope &#123;</span><br><span class="line">    <span class="keyword">val</span> cleanF = sc.clean(f)</span><br><span class="line">    <span class="keyword">new</span> <span class="type">MapPartitionsRDD</span>[<span class="type">U</span>, <span class="type">T</span>](<span class="keyword">this</span>, (context, pid, iter) =&gt; iter.flatMap(cleanF))</span><br><span class="line">  &#125;</span><br><span class="line">map与flatmap的区别从本质上来说就是作用于分区数据集合的算子不同  一个是iter.flatMap(cleanF))和iter.map(cleanF))</span><br><span class="line"><span class="comment">// MapPartitionsRDD的compute函数,处理整个rdd中的每个分区的每一条数据,通过传入flatMap的函数来进行处理</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">flatMap` 和 `map` 算子其实本质上是一样的, 其步骤和生成的 `RDD` 都是一样, 只是对于传入函数的处理不同, `map` 是 `collect.map( function )` 而 `flatMap` 是 `collect.flatMap( function )</span><br></pre></td></tr></table></figure>
+<p>从侧面印证了, 其实 <code>Spark</code> 中的 <code>flatMap</code> 和 <code>Scala</code> 基础中的 <code>flatMap</code> 其实是一样的</p>
+<p><strong>总结</strong></p>
+<p><strong>如何生成 <code>RDD</code> ?</strong></p>
+<p>生成 <code>RDD</code> 的常见方式有三种</p>
+<ul>
+<li>从本地集合创建</li>
+<li>从外部数据集创建</li>
+<li>从其它 <code>RDD</code> 衍生</li>
+</ul>
+<p>通过外部数据集创建 <code>RDD</code>, 是通过 <code>Hadoop</code> 或者其它外部数据源的 <code>SDK</code> 来进行数据读取, 同时如果外部数据源是有分片的话, <code>RDD</code> 会将分区与其分片进行对照</p>
+<p>通过其它 <code>RDD</code> 衍生的话, 其实本质上就是通过不同的算子生成不同的 <code>RDD</code> 的子类对象, 从而控制 <code>compute</code> 函数的行为来实现算子功能</p>
+<p><strong>生成哪些 <code>RDD</code> ?</strong></p>
+<p>不同的算子生成不同的 <code>RDD</code>, 生成 <code>RDD</code> 的类型取决于算子, 例如 <code>map</code> 和 <code>flatMap</code> 都会生成 <code>RDD</code> 的子类 <code>MapPartitions</code> 的对象</p>
+<p><strong>如何计算 <code>RDD</code> 中的数据 ?</strong></p>
+<p>虽然前面我们提到过 <code>RDD</code> 是偏向计算的, 但是其实 <code>RDD</code> 还只是表示数据, 纵观 <code>RDD</code> 的五大属性中有三个是必须的, 分别如下</p>
+<ul>
+<li><code>Partitions List</code> 分区列表</li>
+<li><code>Compute function</code> 计算函数</li>
+<li><code>Dependencies</code> 依赖</li>
+</ul>
+<p>虽然计算函数是和计算有关的, 但是只有调用了这个函数才会进行计算, <code>RDD</code> 显然不会自己调用自己的 <code>Compute</code> 函数, 一定是由外部调用的, 所以 <code>RDD</code> 更多的意义是用于表示数据集以及其来源, 和针对于数据的计算</p>
+<p>所以如何计算 <code>RDD</code> 中的数据呢? 一定是通过其它的组件来计算的, 而计算的规则, 由 <code>RDD</code> 中的 <code>Compute</code> 函数来指定, 不同类型的 <code>RDD</code> 子类有不同的 <code>Compute</code> 函数</p>
+<h3 id="4-rdd之间的依赖关系"><a href="#4-rdd之间的依赖关系" class="headerlink" title="4 rdd之间的依赖关系"></a>4 rdd之间的依赖关系</h3><p>这个关系不是指rdd之间的关系,而是分区之间的关系   map 和flatMap这两个算子的关系是1 对1 </p>
+<p>有shuffle的不是一对一  而是多对一</p>
+<h4 id="4-1-什么是依赖"><a href="#4-1-什么是依赖" class="headerlink" title="4.1 什么是依赖"></a>4.1 什么是依赖</h4><p><img src="/images/sparkyl/dcy1.png" alt="img"></p>
+<ul>
+<li><p>什么是关系(依赖关系) ?</p>
+<p>从算子视角上来看, <code>splitRDD</code> 通过 <code>map</code> 算子得到了 <code>tupleRDD</code>, 所以 <code>splitRDD</code> 和 <code>tupleRDD</code> 之间的关系是 <code>map</code></p>
+<p>但是仅仅这样说, 会不够全面, 从细节上来看, <code>RDD</code> 只是数据和关于数据的计算, 而具体执行这种计算得出结果的是一个神秘的其它组件, 所以, 这两个 <code>RDD</code> 的关系可以表示为 <code>splitRDD</code> 的数据通过 <code>map</code> 操作, 被传入 <code>tupleRDD</code>, 这是它们之间更细化的关系</p>
+<p>但是 <code>RDD</code> 这个概念本身并不是数据容器, 数据真正应该存放的地方是 <code>RDD</code> 的分区, 所以如果把视角放在数据这一层面上的话, 直接讲这两个 RDD 之间有关系是不科学的, 应该从这两个 RDD 的分区之间的关系来讨论它们之间的关系</p>
+</li>
+<li><p>那这些分区之间是什么关系?</p>
+<p>如果仅仅说 <code>splitRDD</code> 和 <code>tupleRDD</code> 之间的话, 那它们的分区之间就是一对一的关系</p>
+<p>但是 <code>tupleRDD</code> 到 <code>reduceRDD</code> 呢? <code>tupleRDD</code> 通过算子 <code>reduceByKey</code> 生成 <code>reduceRDD</code>, 而这个算子是一个 <code>Shuffle</code>操作, <code>Shuffle</code> 操作的两个 <code>RDD</code> 的分区之间并不是一对一, <code>reduceByKey</code> 的一个分区对应 <code>tupleRDD</code> 的多个分区</p>
+</li>
+</ul>
+<p><strong><code>reduceByKey</code> 算子会生成 <code>ShuffledRDD</code></strong></p>
+<p><code>reduceByKey</code> 是由算子 <code>combineByKey</code> 来实现的, <code>combineByKey</code> 内部会创建 <code>ShuffledRDD</code> 返回, 而整个 <code>reduceByKey</code> 操作大致如下过程</p>
+<p><img src="/images/sparkyl/dcy2.png" alt="img"></p>
+<p>去掉两个 <code>reducer</code> 端的分区, 只留下一个的话, 如下</p>
+<p><img src="/images/sparkyl/dcy3.png" alt="img"></p>
+<p>所以, 对于 <code>reduceByKey</code> 这个 <code>Shuffle</code> 操作来说, <code>reducer</code> 端的一个分区, 会从多个 <code>mapper</code> 端的分区拿取数据, 是一个多对一的关系</p>
+<p>至此为止, 出现了两种分区见的关系了, 一种是一对一, 一种是多对一</p>
+<p>整体流程:</p>
+<p><img src="/images/sparkyl/dcy4.png" alt="img"></p>
+<h4 id="4-2-rdd之间依赖详解"><a href="#4-2-rdd之间依赖详解" class="headerlink" title="4.2 rdd之间依赖详解"></a>4.2 rdd之间依赖详解</h4><p>窄依赖  无shuffle的为窄依赖  </p>
+<p>宽依赖  有shuffle的为宽依赖    </p>
+<p>判断一个是什么依赖  只需看返回值是NarrowDependency 还是ShuffleDependency</p>
+<p><strong>如果有shuffle是没办法吧两个rdd的分区放在同一个流水线工作的</strong></p>
+<p>4.2.1 窄依赖 NarrowDependency</p>
+<p>假如 <code>rddB = rddA.transform(…)</code>, 如果 <code>rddB</code> 中一个分区依赖 <code>rddA</code> 也就是其父 <code>RDD</code> 的少量分区, 这种 <code>RDD</code> 之间的依赖关系称之为窄依赖</p>
+<p>换句话说, 子 RDD 的每个分区依赖父 RDD 的少量个数的分区, 这种依赖关系称之为窄依赖</p>
+<p>例如:</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">lass <span class="type">ZDemo</span> &#123;</span><br><span class="line">  <span class="meta">@Test</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">zD</span></span>(): <span class="type">Unit</span> =&#123;</span><br><span class="line">    <span class="keyword">val</span> conf = <span class="keyword">new</span> <span class="type">SparkConf</span>().setMaster(<span class="string">"local[3]"</span>).setAppName(<span class="string">"cache"</span>)</span><br><span class="line">    <span class="keyword">val</span> context =<span class="keyword">new</span>  <span class="type">SparkContext</span>(conf)</span><br><span class="line">    <span class="keyword">val</span> rdd1 = context.parallelize(<span class="type">Seq</span>(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>))</span><br><span class="line">    <span class="keyword">val</span> rdd2 = context.parallelize(<span class="type">Seq</span>(<span class="string">"a"</span>,<span class="string">"b"</span>))</span><br><span class="line">    <span class="comment">//求笛卡尔积  是一个窄依赖</span></span><br><span class="line">    rdd1.cartesian(rdd2).collect().foreach(println(_))</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>上述代码的 <code>cartesian</code> 是求得两个集合的笛卡尔积</li>
+<li>上述代码的运行结果是 <code>rddA</code> 中每个元素和 <code>rddB</code> 中的所有元素结合, 最终的结果数量是两个 <code>RDD</code> 数量之和</li>
+<li><code>rddC</code> 有两个父 <code>RDD</code>, 分别为 <code>rddA</code> 和 <code>rddB</code></li>
+</ul>
+<p>对于 <code>cartesian</code> 来说, 依赖关系如下</p>
+<p><img src="/images/sparkyl/dcy5.png" alt="img"><br>  上述图形中清晰展示如下现象</p>
+<ol>
+<li><code>rddC</code> 中的分区数量是两个父 <code>RDD</code> 的分区数量之乘积</li>
+<li><code>rddA</code> 中每个分区对应 <code>rddC</code> 中的两个分区 (因为 <code>rddB</code> 中有两个分区), <code>rddB</code> 中的每个分区对应 <code>rddC</code> 中的三个分区 (因为 <code>rddA</code> 有三个分区)</li>
+</ol>
+<p>它们之间是窄依赖, 事实上在 <code>cartesian</code> 中也是 <code>NarrowDependency</code> 这个所有窄依赖的父类的唯一一次直接使用, 为什么呢?</p>
+<p><strong>因为所有的分区之间是拷贝关系, 并不是 Shuffle 关系</strong></p>
+<ul>
+<li><code>rddC</code> 中的每个分区并不是依赖多个父 <code>RDD</code> 中的多个分区</li>
+<li><code>rddC</code> 中每个分区的数量来自一个父 <code>RDD</code> 分区中的所有数据, 是一个 <code>FullDependence</code>, 所以数据可以直接从父 <code>RDD</code> 流动到子 <code>RDD</code></li>
+<li>不存在一个父 <code>RDD</code> 中一部分数据分发过去, 另一部分分发给其它的 <code>RDD</code></li>
+</ul>
+<h5 id="4-2-2-宽依赖"><a href="#4-2-2-宽依赖" class="headerlink" title="4.2.2 宽依赖"></a>4.2.2 宽依赖</h5><p>并没有所谓的宽依赖, 宽依赖应该称作为 <code>ShuffleDependency</code></p>
+<p>在 <code>ShuffleDependency</code> 的类声明上如下写到</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Represents a dependency on the output of a shuffle stage.</span><br></pre></td></tr></table></figure>
+<p>上面非常清楚的说道, 宽依赖就是 <code>Shuffle</code> 中的依赖关系, 换句话说, 只有 <code>Shuffle</code> 产生的地方才是宽依赖</p>
+<p>那么宽窄依赖的判断依据就非常简单明确了, <strong>是否有 Shuffle ?</strong></p>
+<p>举个 <code>reduceByKey</code> 的例子, <code>rddB = rddA.reduceByKey( (curr, agg) ⇒ curr + agg )</code> 会产生如下的依赖关系</p>
+<p><img src="/images/sparkyl/dcy6.png" alt="img"></p>
+<p>分区函数:  key.hashCode% rddb的分区数 = 1 或者2</p>
+<p>Hadoop.分区 =1  spark.分区=2</p>
+<ul>
+<li><code>rddB</code> 的每个分区都几乎依赖 <code>rddA</code> 的所有分区</li>
+<li>对于 <code>rddA</code> 中的一个分区来说, 其将一部分分发给 <code>rddB</code> 的 <code>p1</code>, 另外一部分分发给 <code>rddB</code> 的 <code>p2</code>, 这不是数据流动, 而是分发</li>
+</ul>
+<h5 id="4-2-3-宽窄依赖分辨"><a href="#4-2-3-宽窄依赖分辨" class="headerlink" title="4.2.3 宽窄依赖分辨"></a>4.2.3 宽窄依赖分辨</h5><figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">首先  看是不是一对一  如是  就是窄依赖</span><br><span class="line">若是多对一  则看是否有数据分发  就是是否有<span class="keyword">shuffle </span> </span><br><span class="line">若是看不出来  直接看源码  的getDependencies 的返回值是什么是NarrowDependency为窄依赖  <span class="keyword">shuffleDependency为宽依赖 </span> 若是没有getDependencies方法 就看他的父类</span><br></pre></td></tr></table></figure>
+<h5 id="4-2-4-常见窄依赖-类型"><a href="#4-2-4-常见窄依赖-类型" class="headerlink" title="4.2.4 常见窄依赖 类型"></a>4.2.4 常见窄依赖 类型</h5><p>NarrowDependency和shuffleDependency的共同父类为Dependency</p>
+<p><strong>一对一窄依赖</strong></p>
+<p>其实 <code>RDD</code> 中默认的是 <code>OneToOneDependency</code>, 后被不同的 <code>RDD</code> 子类指定为其它的依赖类型, 常见的一对一依赖是 <code>map</code> 算子所产生的依赖, 例如 <code>rddB = rddA.map(…)</code><br>  每个分区之间一一对应, 所以叫做一对一窄依赖</p>
+<p><strong>Range 窄依赖</strong></p>
+<p><code>Range</code> 窄依赖其实也是一对一窄依赖, 但是保留了中间的分隔信息, 可以通过某个分区获取其父分区, 目前只有一个算子生成这种窄依赖, 就是 <code>union</code> 算子, 例如 <code>rddC = rddA.union(rddB)</code></p>
+<p><img src="/images/sparkyl/dcy7.png" alt="img"></p>
+<ul>
+<li><code>rddC</code> 其实就是 <code>rddA</code> 拼接 <code>rddB</code> 生成的, 所以 <code>rddC</code> 的 <code>p5</code> 和 <code>p6</code> 就是 <code>rddB</code> 的 <code>p1</code> 和 <code>p2</code></li>
+<li>所以需要有方式获取到 <code>rddC</code> 的 <code>p5</code> 其父分区是谁, 于是就需要记录一下边界, 其它部分和一对一窄依赖一样</li>
+</ul>
+<p><strong>多对一窄依赖</strong></p>
+<p>多对一窄依赖其图形和 <code>Shuffle</code> 依赖非常相似, 所以在遇到的时候, 要注意其 <code>RDD</code> 之间是否有 <code>Shuffle</code> 过程, 比较容易让人困惑, 常见的多对一依赖就是重分区算子 <code>coalesce</code>, 例如 <code>rddB = rddA.coalesce(2, shuffle = false)</code>, 但同时也要注意, 如果 <code>shuffle = true</code> 那就是完全不同的情况了</p>
+<p><img src="/images/sparkyl/dcy8.png" alt="img"></p>
+<p>因为没有 <code>Shuffle</code>, 所以这是一个窄依赖</p>
+<p><strong>再谈宽窄依赖的区别</strong></p>
+<p>宽窄依赖的区别非常重要, 因为涉及了一件非常重要的事情: <strong>如何计算 RDD ?</strong></p>
+<p>宽窄以来的核心区别是: <strong>窄依赖的 RDD 可以放在一个 Task 中运行</strong></p>
+<h2 id="5-物理图执行详解"><a href="#5-物理图执行详解" class="headerlink" title="5 物理图执行详解"></a>5 物理图执行详解</h2><h3 id="1物理图作用"><a href="#1物理图作用" class="headerlink" title="1物理图作用"></a>1物理图作用</h3><p><strong>问题一: 物理图的意义是什么?</strong></p>
+<p>物理图解决的其实就是 <code>RDD</code> 流程生成以后, 如何计算和运行的问题, 也就是如何把 RDD 放在集群中执行的问题</p>
+<p><img src="/images/sparkyl/dcw1.png" alt="img"></p>
+<p><strong>问题二: 如果要确定如何运行的问题, 则需要先确定集群中有什么组件</strong></p>
+<ul>
+<li>首先集群中物理元件就是一台一台的机器</li>
+<li>其次这些机器上跑的守护进程有两种: <code>Master</code>, <code>Worker</code><ul>
+<li>每个守护进程其实就代表了一台机器, 代表这台机器的角色, 代表这台机器和外界通信</li>
+<li>例如我们常说一台机器是 <code>Master</code>, 其含义是这台机器中运行了一个 <code>Master</code> 守护进程, 如果一台机器运行了 <code>Master</code>的同时又运行了 <code>Worker</code>, 则说这台机器是 <code>Master</code> 也可以, 说它是 <code>Worker</code> 也行</li>
+</ul>
+</li>
+<li>真正能运行 <code>RDD</code> 的组件是: <code>Executor</code>, 也就是说其实 <code>RDD</code> 最终是运行在 <code>Executor</code> 中的, 也就是说, 无论是 <code>Master</code> 还是 <code>Worker</code> 其实都是用于管理 <code>Executor</code> 和调度程序的</li>
+</ul>
+<p>结论是 <code>RDD</code> 一定在 <code>Executor</code> 中计算, 而 <code>Master</code> 和 <code>Worker</code> 负责调度和管理 <code>Executor</code></p>
+<p><strong>问题三: 物理图的生成需要考虑什么问题?</strong></p>
+<ul>
+<li>要计算 <code>RDD</code>, 不仅要计算, 还要很快的计算 → 优化性能</li>
+<li>要考虑容错, 容错的常见手段是缓存 → <code>RDD</code> 要可以缓存</li>
+</ul>
+<p>结论是在生成物理图的时候, 不仅要考虑效率问题, 还要考虑一种更合适的方式, 让 <code>RDD</code> 运行的更好</p>
+<h3 id="2谁来计算-RDD"><a href="#2谁来计算-RDD" class="headerlink" title="2谁来计算 RDD ?"></a><strong>2谁来计算 RDD ?</strong></h3><ul>
+<li><p>问题一: RDD 是什么, 用来做什么 ?</p>
+<p>回顾一下 <code>RDD</code> 的五个属性<code>A list of partitions`</code>A function for computing each split<code>A list of dependencies on other RDDs</code>Optionally, a Partitioner for key-value RDDs (e.g. to say that the RDD is hash-partitioned)<code></code>Optionally, a list of preferred locations to compute each split on (e.g. block locations for an HDFS file)<code>简单的说就是: 分区列表, 计算函数, 依赖关系, 分区函数, 最佳位置分区列表, 分区函数, 最佳位置, 这三个属性其实说的就是数据集在哪, 在哪更合适, 如何分区计算函数和依赖关系, 这两个属性其实说的是数据集从哪来所以结论是</code>RDD` 是一个数据集的表示, 不仅表示了数据集, 还表示了这个数据集从哪来, 如何计算但是问题是, 谁来计算 ? 如果为一台汽车设计了一个设计图, 那么设计图自己生产汽车吗 ?</p>
+</li>
+<li><p>问题二: 谁来计算 ?</p>
+<p>前面我们明确了两件事, <code>RDD</code> 在哪被计算? 在 <code>Executor</code> 中. <code>RDD</code> 是什么? 是一个数据集以及其如何计算的图纸.直接使用 <code>Executor</code> 也是不合适的, 因为一个计算的执行总是需要一个容器, 例如 <code>JVM</code> 是一个进程, 只有进程中才能有线程, 所以这个计算 <code>RDD</code> 的线程应该运行在一个进程中, 这个进程就是 <code>Exeutor</code>, <code>Executor</code> 有如下两个职责</p>
+<p>和 <code>Driver</code> 保持交互从而认领属于自己的任务<img src="/images/sparkyl/dcw2.png" alt="img"></p>
+<p>接受任务后, 运行任务</p>
+<p><img src="/images/sparkyl/dcw4.png" alt="img"></p>
+</li>
+</ul>
+<p>所以, 应该由一个线程来执行 <code>RDD</code> 的计算任务, 而 <code>Executor</code> 作为执行这个任务的容器, 也就是一个进程, 用于创建和执行线程, 这个执行具体计算任务的线程叫做 <code>Task</code></p>
+<h3 id="3-Task-该如何设计"><a href="#3-Task-该如何设计" class="headerlink" title="3 Task 该如何设计"></a>3 Task 该如何设计</h3><p>第一个想法是每个 <code>RDD</code> 都由一个 <code>Task</code> 来计算 第二个想法是一整个逻辑执行图中所有的 <code>RDD</code> 都由一组 <code>Task</code> 来执行 第三个想法是分阶段执行</p>
+<p>第一个想法: 为每个 RDD 的分区设置一组 Task</p>
+<p><img src="/images/sparkyl/dcw2.png" alt="img"></p>
+<p>大概就是每个 <code>RDD</code> 都有三个 <code>Task</code>, 每个 <code>Task</code> 对应一个 <code>RDD</code> 的分区, 执行一个分区的数据的计算</p>
+<p>但是这么做有一个非常难以解决的问题, 就是数据存储的问题, 例如 <code>Task 1, 4, 7, 10, 13, 16</code> 在同一个流程上, 但是这些 <code>Task</code> 之间需要交换数据, 因为这些 <code>Task</code> 可能被调度到不同的机器上上, 所以 <code>Task1</code> 执行完了数据以后需要暂存, 后交给 <code>Task4</code> 来获取</p>
+<p>这只是一个简单的逻辑图, 如果是一个复杂的逻辑图, 会有什么表现? 要存储多少数据? 无论是放在磁盘还是放在内存中, 是不是都是一种极大的负担?</p>
+<p>第二个想法: 让数据流动</p>
+<p>很自然的, 第一个想法的问题是数据需要存储和交换, 那不存储不就好了吗? 对, 可以让数据流动起来</p>
+<p>第一个要解决的问题就是, 要为数据创建管道(<code>Pipeline</code>), 有了管道, 就可以流动</p>
+<p><img src="/images/sparkyl/dcw5.png" alt="img"></p>
+<p>简单来说, 就是为所有的 <code>RDD</code> 有关联的分区使用同一个 <code>Task</code>, 但是就没问题了吗? 请关注红框部分</p>
+<p><img src="/images/sparkyl/dcw6.png" alt="img"></p>
+<p>这两个 <code>RDD</code> 之间是 <code>Shuffle</code> 关系, 也就是说, 右边的 <code>RDD</code> 的一个分区可能依赖左边 <code>RDD</code> 的所有分区, 这样的话, 数据在这个地方流不动了, 怎么办?</p>
+<p>第三个想法: 划分阶段</p>
+<p>既然在 <code>Shuffle</code> 处数据流不动了, 那就可以在这个地方中断一下, 后面 <code>Stage</code> 部分详解</p>
+<h3 id="4如何划分阶段"><a href="#4如何划分阶段" class="headerlink" title="4如何划分阶段 ?"></a>4<strong>如何划分阶段 ?</strong></h3><p>为了减少执行任务, 减少数据暂存和交换的机会, 所以需要创建管道, 让数据沿着管道流动, 其实也就是原先每个 <code>RDD</code> 都有一组 <code>Task</code>, 现在改为所有的 <code>RDD</code> 共用一组 <code>Task</code>, 但是也有问题, 问题如下</p>
+<p><img src="/images/sparkyl/dcw7.png" alt="img"></p>
+<p>就是说, 在 <code>Shuffle</code> 处, 必须断开管道, 进行数据交换, 交换过后, 继续流动, 所以整个流程可以变为如下样子</p>
+<p><img src="/images/sparkyl/dcw8.png" alt="img"></p>
+<p>把 <code>Task</code> 断开成两个部分, <code>Task4</code> 可以从 <code>Task 1, 2, 3</code> 中获取数据, 后 <code>Task4</code> 又作为管道, 继续让数据在其中流动</p>
+<p>但是还有一个问题, 说断开就直接断开吗? 不用打个招呼的呀? 这个断开即没有道理, 也没有规则, 所以可以为这个断开增加一个概念叫做阶段, 按照阶段断开, 阶段的英文叫做 <code>Stage</code>, 如下</p>
+<p><img src="/images/sparkyl/dcw9.png" alt="img"></p>
+<p>所以划分阶段的本身就是设置断开点的规则, 那么该如何划分阶段呢?</p>
+<ol>
+<li>第一步, 从最后一个 <code>RDD</code>, 也就是逻辑图中最右边的 <code>RDD</code> 开始, 向前滑动 <code>Stage</code> 的范围, 为 <code>Stage0</code></li>
+<li>第二步, 遇到 <code>ShuffleDependency</code> 断开 <code>Stage</code>, 从下一个 <code>RDD</code> 开始创建新的 <code>Stage</code>, 为 <code>Stage1</code></li>
+<li>第三步, 新的 <code>Stage</code> 按照同样的规则继续滑动, 直到包裹所有的 <code>RDD</code></li>
+</ol>
+<p>总结来看, 就是针对于宽窄依赖来判断, 一个 <code>Stage</code> 中只有窄依赖, 因为只有窄依赖才能形成数据的 <code>Pipeline</code>.</p>
+<p>如果要进行 <code>Shuffle</code> 的话, 数据是流不过去的, 必须要拷贝和拉取. 所以遇到 <code>RDD</code> 宽依赖的两个 <code>RDD</code> 时, 要切断这两个 <code>RDD</code> 的 <code>Stage</code>.</p>
+<p>这样一个 RDD 依赖的链条, 我们称之为 RDD 的血统, 其中有宽依赖也有窄依赖</p>
+<h3 id="5-数据流动"><a href="#5-数据流动" class="headerlink" title="5 数据流动"></a>5 数据流动</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> sc = ...</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> textRDD = sc.parallelize(<span class="type">Seq</span>(<span class="string">"Hadoop Spark"</span>, <span class="string">"Hadoop Flume"</span>, <span class="string">"Spark Sqoop"</span>))</span><br><span class="line"><span class="keyword">val</span> splitRDD = textRDD.flatMap(_.split(<span class="string">" "</span>))</span><br><span class="line"><span class="keyword">val</span> tupleRDD = splitRDD.map((_, <span class="number">1</span>))</span><br><span class="line"><span class="keyword">val</span> reduceRDD = tupleRDD.reduceByKey(_ + _)</span><br><span class="line"><span class="keyword">val</span> strRDD = reduceRDD.map(item =&gt; <span class="string">s"<span class="subst">$&#123;item._1&#125;</span>, <span class="subst">$&#123;item._2&#125;</span>"</span>)</span><br><span class="line"></span><br><span class="line">strRDD.collect.foreach(item =&gt; println(item))</span><br></pre></td></tr></table></figure>
+<p>上述代码是这个章节我们一直使用的代码流程, 如下是其完整的逻辑执行图</p>
+<p><img src="/images/sparkyl/dcw10.png" alt="img"></p>
+<p>如果放在集群中运行, 通过 <code>WebUI</code> 可以查看到如下 <code>DAG</code> 结构</p>
+<p><img src="/images/sparkyl/dcw11.png" alt="img"><br>  Step 1: 从 <code>ResultStage</code> 开始执行</p>
+<p>最接近 <code>Result</code> 部分的 <code>Stage id</code> 为 0, 这个 <code>Stage</code> 被称之为 <code>ResultStage</code></p>
+<p>由代码可以知道, 最终调用 <code>Action</code> 促使整个流程执行的是最后一个 <code>RDD</code>, <code>strRDD.collect</code>, 所以当执行 <code>RDD</code> 的计算时候, 先计算的也是这个 <code>RDD</code></p>
+<p>Step 2: <code>RDD</code> 之间是有关联的</p>
+<p>前面已经知道, 最后一个 <code>RDD</code> 先得到执行机会, 先从这个 <code>RDD</code> 开始执行, 但是这个 <code>RDD</code> 中有数据吗 ? 如果没有数据, 它的计算是什么? 它的计算是从父 <code>RDD</code> 中获取数据, 并执行传入的算子的函数</p>
+<p>简单来说, 从产生 <code>Result</code> 的地方开始计算, 但是其 <code>RDD</code> 中是没数据的, 所以会找到父 <code>RDD</code> 来要数据, 父 <code>RDD</code> 也没有数据, 继续向上要, 所以, 计算从 <code>Result</code> 处调用, 但是从整个逻辑图中的最左边 <code>RDD</code> 开始, 类似一个递归的过程</p>
+<p><img src="/images/sparkyl/dcw12.png" alt="img"></p>
+<h3 id="6-调度过程"><a href="#6-调度过程" class="headerlink" title="6 调度过程"></a>6 调度过程</h3><h4 id="6-1-逻辑图调度"><a href="#6-1-逻辑图调度" class="headerlink" title="6.1 逻辑图调度"></a>6.1 逻辑图调度</h4><p>是什么 怎么生成 具体怎么生成</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> textRDD = sc.parallelize(<span class="type">Seq</span>(<span class="string">"Hadoop Spark"</span>, <span class="string">"Hadoop Flume"</span>, <span class="string">"Spark Sqoop"</span>))</span><br><span class="line"><span class="keyword">val</span> splitRDD = textRDD.flatMap(_.split(<span class="string">" "</span>))</span><br><span class="line"><span class="keyword">val</span> tupleRDD = splitRDD.map((_, <span class="number">1</span>))</span><br><span class="line"><span class="keyword">val</span> reduceRDD = tupleRDD.reduceByKey(_ + _)</span><br><span class="line"><span class="keyword">val</span> strRDD = reduceRDD.map(item =&gt; <span class="string">s"<span class="subst">$&#123;item._1&#125;</span>, <span class="subst">$&#123;item._2&#125;</span>"</span>)</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>逻辑图如何生成</p>
+<p>上述代码在 <code>Spark Application</code> 的 <code>main</code> 方法中执行, 而 <code>Spark Application</code> 在 <code>Driver</code> 中执行, 所以上述代码在 <code>Driver</code> 中被执行, 那么这段代码执行的结果是什么呢?一段 <code>Scala</code> 代码的执行结果就是最后一行的执行结果, 所以上述的代码, 从逻辑上执行结果就是最后一个 <code>RDD</code>, 最后一个 <code>RDD</code>也可以认为就是逻辑执行图, 为什么呢?例如 <code>rdd2 = rdd1.map(…)</code> 中, 其实本质上 <code>rdd2</code> 是一个类型为 <code>MapPartitionsRDD</code> 的对象, 而创建这个对象的时候, 会通过构造函数传入当前 <code>RDD</code> 对象, 也就是父 <code>RDD</code>, 也就是调用 <code>map</code> 算子的 <code>rdd1</code>, <code>rdd1</code> 是 <code>rdd2</code> 的父 <code>RDD</code></p>
+<p><img src="/images/sparkyl/dcw13.png" alt="img"></p>
+<p>一个 <code>RDD</code> 依赖另外一个 <code>RDD</code>, 这个 <code>RDD</code> 又依赖另外的 <code>RDD</code>, 一个 <code>RDD</code> 可以通过 <code>getDependency</code> 获得其父 <code>RDD</code>, 这种环环相扣的关系, 最终从最后一个 <code>RDD</code> 就可以推演出前面所有的 <code>RDD</code></p>
+</li>
+<li><p>逻辑图是什么, 干啥用</p>
+<p>逻辑图其实本质上描述的就是数据的计算过程, 数据从哪来, 经过什么样的计算, 得到什么样的结果, 再执行什么计算, 得到什么结果</p>
+</li>
+</ul>
+<p>可是数据的计算是描述好了, 这种计算该如何执行呢?</p>
+<h4 id="6-2-物理图"><a href="#6-2-物理图" class="headerlink" title="6.2 物理图"></a>6.2 物理图</h4><p><strong>DAGScheduler  1 Stage中有多个task  2 每个task计算一个分区  job就是一个求值过程</strong></p>
+<p>数据的计算表示好了, 该正式执行了, 但是如何执行? 如何执行更快更好更酷? 就需要为其执行做一个规划, 所以需要生成物理执行图</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">strRDD.collect.foreach(item =&gt; println(item))</span><br></pre></td></tr></table></figure>
+<p>上述代码其实就是最后的一个 <code>RDD</code> 调用了 <code>Action</code> 方法, 调用 <code>Action</code> 方法的时候, 会请求一个叫做 <code>DAGScheduler</code> 的组件, <code>DAGScheduler</code> 会创建用于执行 <code>RDD</code> 的 <code>Stage</code> 和 <code>Task</code></p>
+<p><code>DAGScheduler</code> 是一个由 <code>SparkContext</code> 创建, 运行在 <code>Driver</code> 上的组件, 其作用就是将由 <code>RDD</code> 构建出来的逻辑计划, 构建成为由真正在集群中运行的 <code>Task</code> 组成的物理执行计划, <code>DAGScheduler</code> 主要做如下三件事</p>
+<ol>
+<li>帮助每个 <code>Job</code> 计算 <code>DAG</code> 并发给 <code>TaskSheduler</code> 调度</li>
+<li>确定每个 <code>Task</code> 的最佳位置</li>
+<li>跟踪 <code>RDD</code> 的缓存状态, 避免重新计算</li>
+</ol>
+<p>从字面意思上来看, <code>DAGScheduler</code> 是调度 <code>DAG</code> 去运行的, <code>DAG</code> 被称作为有向无环图, 其实可以将 <code>DAG</code> 理解为就是 <code>RDD</code> 的逻辑图, 其呈现两个特点: <code>RDD</code> 的计算是有方向的, <code>RDD</code> 的计算是无环的, 所以 <code>DAGScheduler</code> 也可以称之为 <code>RDD Scheduler</code>, 但是真正运行在集群中的并不是 <code>RDD</code>, 而是 <code>Task</code> 和 <code>Stage</code>, <code>DAGScheduler</code> 负责这种转换</p>
+<h4 id="6-3-job简介"><a href="#6-3-job简介" class="headerlink" title="6.3 job简介"></a>6.3 job简介</h4><p><strong><code>job</code> 什么时候生成 ?</strong></p>
+<p>当一个 <code>RDD</code> 调用了 <code>Action</code> 算子的时候, 在 <code>Action</code> 算子内部, 会使用 <code>sc.runJob()</code> 调用 <code>SparkContext</code> 中的 <code>runJob</code>方法, 这个方法又会调用 <code>DAGScheduler</code> 中的 <code>runJob</code>, 后在 <code>DAGScheduler</code> 中使用消息驱动的形式创建 <code>Job</code></p>
+<p>简而言之, <code>Job</code> 在 <code>RDD</code> 调用 <code>Action</code> 算子的时候生成, 而且调用一次 <code>Action</code> 算子, 就会生成一个 <code>Job</code>, 如果一个 <code>SparkApplication</code> 中调用了多次 <code>Action</code> 算子, 会生成多个 <code>Job</code> 串行执行, 每个 <code>Job</code> 独立运作, 被独立调度, 所以 <code>RDD</code> 的计算也会被执行多次</p>
+<p><strong><code>Job</code> 是什么 ?</strong></p>
+<p>如果要将 <code>Spark</code> 的程序调度到集群中运行, <code>Job</code> 是粒度最大的单位, 调度以 <code>Job</code> 为最大单位, 将 <code>Job</code> 拆分为 <code>Stage</code> 和 <code>Task</code> 去调度分发和运行, 一个 <code>Job</code> 就是一个 <code>Spark</code> 程序从 <code>读取 → 计算 → 运行</code> 的过程</p>
+<p>一个 <code>Spark Application</code> 可以包含多个 <code>Job</code>, 这些 <code>Job</code> 之间是串行的, 也就是第二个 <code>Job</code> 需要等待第一个 <code>Job</code> 的执行结束后才会开始执行</p>
+<h4 id="6-4-job-与Stage的关系"><a href="#6-4-job-与Stage的关系" class="headerlink" title="6.4 job 与Stage的关系"></a>6.4 job 与Stage的关系</h4><p><strong>一个job有多个Stage   stage之间是串行的   左侧的接近起始Stage的最先执行,从左向右执行</strong></p>
+<p><code>Job</code> 是一个最大的调度单位, 也就是说 <code>DAGScheduler</code> 会首先创建一个 <code>Job</code> 的相关信息, 后去调度 <code>Job</code>, 但是没办法直接调度 <code>Job</code>, 比如说现在要做一盘手撕包菜, 不可能直接去炒一整颗包菜, 要切好撕碎, 再去炒</p>
+<p><strong>为什么</strong> <code>Job</code> <strong>需要切分 ?</strong></p>
+<p><img src="/images/sparkyl/dcw14.png" alt="img"></p>
+<ul>
+<li><p>因为 <code>Job</code> 的含义是对整个 <code>RDD</code> 血统求值, 但是 <code>RDD</code> 之间可能会有一些宽依赖</p>
+</li>
+<li><p>如果遇到宽依赖的话, 两个 <code>RDD</code> 之间需要进行数据拉取和复制</p>
+<p>如果要进行拉取和复制的话, 那么一个 <code>RDD</code> 就必须等待它所依赖的 <code>RDD</code> 所有分区先计算完成, 然后再进行拉取</p>
+</li>
+<li><p>由上得知, 一个 <code>Job</code> 是无法计算完整个 <code>RDD</code> 血统的</p>
+</li>
+</ul>
+<p><strong>如何切分 ?</strong></p>
+<p>创建一个 <code>Stage</code>, 从后向前回溯 <code>RDD</code>, 遇到 <code>Shuffle</code> 依赖就结束 <code>Stage</code>, 后创建新的 <code>Stage</code> 继续回溯. 这个过程上面已经详细的讲解过, 但是问题是切分以后如何执行呢, 从后向前还是从前向后, 是串行执行多个 <code>Stage</code>, 还是并行执行多个 <code>Stage</code></p>
+<p><strong>问题一: 执行顺序</strong></p>
+<p>在图中, <code>Stage 0</code> 的计算需要依赖 <code>Stage 1</code> 的数据, 因为 <code>reduceRDD</code> 中一个分区可能需要多个 <code>tupleRDD</code> 分区的数据, 所以 <code>tupleRDD</code> 必须先计算完, 所以, 应该在逻辑图中自左向右执行 <code>Stage</code></p>
+<p><strong>问题二: 串行还是并行</strong></p>
+<p>还是同样的原因, <code>Stage 0</code> 如果想计算, <code>Stage 1</code> 必须先计算完, 因为 <code>Stage 0</code> 中每个分区都依赖 <code>Stage 1</code> 中的所有分区, 所以 <code>Stage 1</code> 不仅需要先执行, 而且 <code>Stage 1</code> 执行完之前 <code>Stage 0</code> 无法执行, 它们只能串行执行</p>
+<p><strong>总结</strong></p>
+<ul>
+<li>一个 <code>Stage</code> 就是物理执行计划中的一个步骤, 一个 <code>Spark Job</code> 就是划分到不同 <code>Stage</code> 的计算过程</li>
+<li><code>Stage</code> 之间的边界由 <code>Shuffle</code> 操作来确定<ul>
+<li><code>Stage</code> 内的 <code>RDD</code> 之间都是窄依赖, 可以放在一个管道中执行</li>
+<li>而 <code>Shuffle</code> 后的 <code>Stage</code> 需要等待前面 <code>Stage</code> 的执行</li>
+</ul>
+</li>
+</ul>
+<p><strong><code>Stage</code> 有两种</strong></p>
+<ul>
+<li><code>ShuffMapStage</code>, 其中存放窄依赖的 <code>RDD</code></li>
+<li><code>ResultStage</code>, 每个 <code>Job</code> 只有一个, 负责计算结果, 一个 <code>ResultStage</code> 执行完成标志着整个 <code>Job</code> 执行完毕</li>
+</ul>
+<h4 id="6-5-Stage-和-Task-的关系"><a href="#6-5-Stage-和-Task-的关系" class="headerlink" title="6.5 Stage 和 Task 的关系"></a>6.5 <code>Stage</code> <strong>和</strong> <code>Task</code> <strong>的关系</strong></h4><p><strong>rdd本身不存储数据,数据存储在分区中</strong></p>
+<p><strong>一个task对应一个分区,一个Stage 中有几个task(分区) 由Stage中的最后一个rdd决定 一个stage就是一个TaskSet  一个TaskSet就是一组task</strong></p>
+<p><img src="/images/sparkyl/dcw15.png" alt="img"></p>
+<p>前面我们说到 <code>Job</code> 无法直接执行, 需要先划分为多个 <code>Stage</code>, 去执行 <code>Stage</code>, 那么 <code>Stage</code> 可以直接执行吗?</p>
+<ul>
+<li><p>第一点: <code>Stage</code> 中的 <code>RDD</code> 之间是窄依赖</p>
+<p>因为 <code>Stage</code> 中的所有 <code>RDD</code> 之间都是窄依赖, 窄依赖 <code>RDD</code> 理论上是可以放在同一个 <code>Pipeline(管道, 流水线)</code> 中执行的, 似乎可以直接调度 <code>Stage</code> 了? 其实不行, 看第二点</p>
+</li>
+<li><p>第二点: 别忘了 <code>RDD</code> 还有分区</p>
+<p>一个 <code>RDD</code> 只是一个概念, 而真正存放和处理数据时, 都是以分区作为单位的</p>
+<p><code>Stage</code> 对应的是多个整体上的 <code>RDD</code>, 而真正的运行是需要针对 <code>RDD</code> 的分区来进行的</p>
+</li>
+<li><p>第三点: 一个 <code>Task</code> 对应一个 <code>RDD</code> 的分区</p>
+<p>一个比 <code>Stage</code> 粒度更细的单元叫做 <code>Task</code>, <code>Stage</code> 是由 <code>Task</code> 组成的, 之所以有 <code>Task</code> 这个概念, 是因为 <code>Stage</code> 针对整个 <code>RDD</code>, 而计算的时候, 要针对 <code>RDD</code> 的分区</p>
+<p>假设一个 <code>Stage</code> 中有 10 个 <code>RDD</code>, 这些 <code>RDD</code> 中的分区各不相同, 但是分区最多的 <code>RDD</code> 有 30 个分区, 而且很显然, 它们之间是窄依赖关系</p>
+<p>那么, 这个 <code>Stage</code> 中应该有多少 <code>Task</code> 呢? 应该有 30 个 <code>Task</code>, 因为一个 <code>Task</code> 计算一个 <code>RDD</code> 的分区. 这个 <code>Stage</code> 至多有 30 个分区需要计算</p>
+</li>
+<li><p>总结</p>
+<ul>
+<li>一个 <code>Stage</code> 就是一组并行的 <code>Task</code> 集合</li>
+<li>Task 是 Spark 中最小的独立执行单元, 其作用是处理一个 RDD 分区</li>
+<li>一个 Task 只可能存在于一个 Stage 中, 并且只能计算一个 RDD 的分区</li>
+</ul>
+</li>
+</ul>
+<h4 id="6-6-TaskSet"><a href="#6-6-TaskSet" class="headerlink" title="6.6 TaskSet"></a>6.6 <strong>TaskSet</strong></h4><p>梳理一下这几个概念, <code>Job &gt; Stage &gt; Task</code>, <code>Job 中包含 Stage 中包含 Task</code></p>
+<p>而 <code>Stage</code> 中经常会有一组 <code>Task</code> 需要同时执行, 所以针对于每一个 <code>Task</code> 来进行调度太过繁琐, 而且没有意义, 所以每个 <code>Stage</code>中的 <code>Task</code> 们会被收集起来, 放入一个 <code>TaskSet</code> 集合中</p>
+<ul>
+<li>一个 <code>Stage</code> 有一个 <code>TaskSet</code></li>
+<li><code>TaskSet</code> 中 <code>Task</code> 的个数由 <code>Stage</code> 中的最大分区数决定</li>
+</ul>
+<h4 id="6-7-整体流程"><a href="#6-7-整体流程" class="headerlink" title="6.7 整体流程"></a>6.7 整体流程</h4><p><img src="/images/sparkyl/dcw16.png" alt="img"></p>
+<h4 id="6-8-shuffle过程"><a href="#6-8-shuffle过程" class="headerlink" title="6.8 shuffle过程"></a>6.8 shuffle过程</h4><h5 id="6-8-1Shuffle-过程的组件结构"><a href="#6-8-1Shuffle-过程的组件结构" class="headerlink" title="6.8.1Shuffle 过程的组件结构"></a>6.8.1<code>Shuffle</code> <strong>过程的组件结构</strong></h5><p>从整体视角上来看, <code>Shuffle</code> 发生在两个 <code>Stage</code> 之间, 一个 <code>Stage</code> 把数据计算好, 整理好, 等待另外一个 <code>Stage</code> 来拉取</p>
+<p><img src="/images/sparkyl/dcw17.png" alt="img"></p>
+<p>放大视角, 会发现, 其实 <code>Shuffle</code> 发生在 <code>Task</code> 之间, 一个 <code>Task</code> 把数据整理好, 等待 <code>Reducer</code> 端的 <code>Task</code> 来拉取</p>
+<p><img src="/images/sparkyl/dcw18.png" alt="img"></p>
+<p>如果更细化一下, <code>Task</code> 之间如何进行数据拷贝的呢? 其实就是一方 <code>Task</code> 把文件生成好, 然后另一方 <code>Task</code> 来拉取</p>
+<p><img src="/images/sparkyl/dcw19.png" alt="img"></p>
+<p>现在是一个 <code>Reducer</code> 的情况, 如果有多个 <code>Reducer</code> 呢? 如果有多个 <code>Reducer</code> 的话, 就可以在每个 <code>Mapper</code> 为所有的 <code>Reducer</code> 生成各一个文件, 这种叫做 <code>Hash base shuffle</code>, 这种 <code>Shuffle</code> 的方式问题大家也知道, 就是生成中间文件过多, 而且生成文件的话需要缓冲区, 占用内存过大</p>
+<p><img src="/images/sparkyl/dcw20.png" alt="img"></p>
+<p>那么可以把这些文件合并起来, 生成一个文件返回, 这种 <code>Shuffle</code> 方式叫做 <code>Sort base shuffle</code>, 每个 <code>Reducer</code> 去文件的不同位置拿取数据</p>
+<p><img src="/images/sparkyl/dcw21.png" alt="img"><br>  如果再细化一下, 把参与这件事的组件也放置进去, 就会是如下这样</p>
+<p><img src="/images/sparkyl/dcw22.png" alt="img"></p>
+<p><strong>有哪些 <code>ShuffleWriter</code> ?</strong></p>
+<p>大致上有三个 <code>ShufflWriter</code>, <code>Spark</code> 会按照一定的规则去使用这三种不同的 <code>Writer</code></p>
+<ul>
+<li><p><code>BypassMergeSortShuffleWriter</code></p>
+<p>这种 <code>Shuffle Writer</code> 也依然有 <code>Hash base shuffle</code> 的问题, 它会在每一个 <code>Mapper</code> 端对所有的 <code>Reducer</code> 生成一个文件, 然后再合并这个文件生成一个统一的输出文件, 这个过程中依然是有很多文件产生的, 所以只适合在小量数据的场景下使用</p>
+<p><code>Spark</code> 有考虑去掉这种 <code>Writer</code>, 但是因为结构中有一些依赖, 所以一直没去掉</p>
+<p>当 <code>Reducer</code> 个数小于 <code>spark.shuffle.sort.bypassMergeThreshold</code>, 并且没有 <code>Mapper</code> 端聚合的时候启用这种方式</p>
+</li>
+<li><p><code>SortShuffleWriter</code></p>
+<p>这种 <code>ShuffleWriter</code> 写文件的方式非常像 <code>MapReduce</code> 了, 后面详说</p>
+<p>当其它两种 <code>Shuffle</code> 不符合开启条件时, 这种 <code>Shuffle</code> 方式是默认的</p>
+</li>
+<li><p><code>UnsafeShuffleWriter</code></p>
+<p>这种 <code>ShuffWriter</code> 会将数据序列化, 然后放入缓冲区进行排序, 排序结束后 <code>Spill</code> 到磁盘, 最终合并 <code>Spill</code> 文件为一个大文件, 同时在进行内存存储的时候使用了 <code>Java</code> 得 <code>Unsafe API</code>, 也就是使用堆外内存, 是钨丝计划的一部分</p>
+<p>也不是很常用, 只有在满足如下三个条件时候才会启用</p>
+<ul>
+<li>序列化器序列化后的数据, 必须支持排序</li>
+<li>没有 <code>Mapper</code> 端的聚合</li>
+<li><code>Reducer</code> 的个数不能超过支持的上限 (2 ^ 24)</li>
+</ul>
+</li>
+</ul>
+<p><strong><code>SortShuffleWriter</code> 的执行过程</strong></p>
+<p><img src="/images/sparkyl/dcw23.png" alt="img"></p>
+<p>整个 <code>SortShuffleWriter</code> 如上述所说, 大致有如下几步</p>
+<ol>
+<li>首先 <code>SortShuffleWriter</code> 在 <code>write</code> 方法中回去写文件, 这个方法中创建了 <code>ExternalSorter</code></li>
+<li><code>write</code> 中将数据 <code>insertAll</code> 到 <code>ExternalSorter</code> 中</li>
+<li>在 <code>ExternalSorter</code> 中排序<ol>
+<li>如果要聚合, 放入 <code>AppendOnlyMap</code> 中, 如果不聚合, 放入 <code>PartitionedPairBuffer</code> 中</li>
+<li>在数据结构中进行排序, 排序过程中如果内存数据大于阈值则溢写到磁盘</li>
+</ol>
+</li>
+<li>使用 <code>ExternalSorter</code> 的 <code>writePartitionedFile</code> 写入输入文件<ol>
+<li>将所有的溢写文件通过类似 <code>MergeSort</code> 的算法合并</li>
+<li>将数据写入最终的目标文件中</li>
+</ol>
+</li>
+</ol>
+<h3 id="7-闭包-RDD-的分布式共享变量"><a href="#7-闭包-RDD-的分布式共享变量" class="headerlink" title="7 闭包    RDD 的分布式共享变量"></a>7 闭包    RDD 的分布式共享变量</h3><p><strong>什么是闭包</strong></p>
+<p>闭包是一个必须要理解, 但是又不太好理解的知识点, 先看一个小例子</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function">def <span class="title">test</span><span class="params">()</span>: Unit </span>= &#123;</span><br><span class="line">  val areaFunction = closure()</span><br><span class="line">  val area = areaFunction(<span class="number">2</span>)</span><br><span class="line">  println(area)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">def <span class="title">closure</span><span class="params">()</span>: Int </span>=&gt; Double = &#123;</span><br><span class="line">  val factor = <span class="number">3.14</span></span><br><span class="line">  val areaFunction = (r: Int) =&gt; math.pow(r, <span class="number">2</span>) * factor</span><br><span class="line">  areaFunction</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上述例子中, <code>closure</code>方法返回的一个函数的引用, 其实就是一个闭包, 闭包本质上就是一个封闭的作用域, 要理解闭包, 是一定要和作用域联系起来的.</p>
+<ul>
+<li><p>能否在 <code>test</code> 方法中访问 <code>closure</code> 定义的变量?</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span></span>(): <span class="type">Unit</span> = &#123;</span><br><span class="line">  println(factor)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">closure</span></span>(): <span class="type">Int</span> =&gt; <span class="type">Double</span> = &#123;</span><br><span class="line">  <span class="keyword">val</span> factor = <span class="number">3.14</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<ul>
+<li><p>有没有什么间接的方式?</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span></span>(): <span class="type">Unit</span> = &#123;</span><br><span class="line">  <span class="keyword">val</span> areaFunction = closure()</span><br><span class="line">  areaFunction()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">closure</span></span>(): () =&gt; <span class="type">Unit</span> = &#123;</span><br><span class="line">  <span class="keyword">val</span> factor = <span class="number">3.14</span></span><br><span class="line">  <span class="keyword">val</span> areaFunction = () =&gt; println(factor)</span><br><span class="line">  areaFunction</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<ul>
+<li><p>什么是闭包?</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> areaFunction = closure()</span><br><span class="line">areaFunction()</span><br></pre></td></tr></table></figure>
+<p>通过 <code>closure</code> 返回的函数 <code>areaFunction</code> 就是一个闭包, 其函数内部的作用域并不是 <code>test</code> 函数的作用域, 这种连带作用域一起打包的方式, 我们称之为闭包, 在 Scala 中<strong>Scala 中的闭包本质上就是一个对象, 是 FunctionX 的实例</strong></p>
+</li>
+</ul>
+<p><strong>分发闭包</strong></p>
+<p>​    </p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyClass</span> </span>&#123;</span><br><span class="line">  <span class="keyword">val</span> field = <span class="string">"Hello"</span></span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">doStuff</span></span>(rdd: <span class="type">RDD</span>[<span class="type">String</span>]): <span class="type">RDD</span>[<span class="type">String</span>] = &#123;</span><br><span class="line">    rdd.map(x =&gt; field + x)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;       </span><br><span class="line"><span class="comment">// rdd.map(x =&gt; field + x)引用了MyClass 对象中的一个成员变量 说明其可以访问MyClass这个类的作用域</span></span><br><span class="line"><span class="comment">//也是一个闭包  封闭的是MyClass这个作用域</span></span><br></pre></td></tr></table></figure>
+<p><img src="/images/sparkyl/bb.jpg" alt="img"></p>
+<p><strong>总结</strong></p>
+<ol>
+<li>闭包就是一个封闭的作用域, 也是一个对象</li>
+<li>Spark 算子所接受的函数, 本质上是一个闭包, 因为其需要封闭作用域, 并且序列化自身和依赖, 分发到不同的节点中运行</li>
+</ol>
+<h4 id="7-1-累加器"><a href="#7-1-累加器" class="headerlink" title="7.1 累加器"></a>7.1 累加器</h4><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ZDemo</span> </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> num= <span class="number">0</span></span><br><span class="line">  <span class="meta">@Test</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">addErr</span></span>(): <span class="type">Unit</span> =&#123;</span><br><span class="line">    <span class="keyword">val</span> conf = <span class="keyword">new</span> <span class="type">SparkConf</span>().setMaster(<span class="string">"local[3]"</span>).setAppName(<span class="string">"cache"</span>)</span><br><span class="line">    <span class="keyword">val</span> context =<span class="keyword">new</span>  <span class="type">SparkContext</span>(conf)</span><br><span class="line">    context.parallelize(<span class="type">Seq</span>(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>),<span class="number">3</span>)</span><br><span class="line">      <span class="comment">//闭包会报错</span></span><br><span class="line">      .foreach(num += _)</span><br><span class="line">    println(num)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面这段代码是一个非常错误的使用, 请不要仿照, 这段代码只是为了证明一些事情</p>
+<p>先明确两件事, <code>var count = 0</code> 是在 Driver 中定义的, <code>foreach(count += _)</code> 这个算子以及传递进去的闭包运行在 Executor 中</p>
+<p>这段代码整体想做的事情是累加一个变量, 但是这段代码的写法却做不到这件事, 原因也很简单, 因为具体的算子是闭包, 被分发给不同的节点运行, 所以这个闭包中累加的并不是 Driver 中的这个变量</p>
+<p><strong>全局累加器</strong></p>
+<p>Accumulators(累加器) 是一个只支持 <code>added</code>(添加) 的分布式变量, 可以在分布式环境下保持一致性, 并且能够做到高效的并发.</p>
+<p>原生 Spark 支持数值型的累加器, 可以用于实现计数或者求和, 开发者也可以使用自定义累加器以实现更高级的需求</p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">val <span class="built_in">config</span> = <span class="keyword">new</span> SparkConf().setAppName(<span class="string">"ip_ana"</span>).setMaster(<span class="string">"local[6]"</span>)</span><br><span class="line">val sc = <span class="keyword">new</span> SparkContext(<span class="built_in">config</span>)</span><br><span class="line"></span><br><span class="line">val counter = sc.longAccumulator(<span class="string">"counter"</span>)</span><br><span class="line"></span><br><span class="line">sc.parallelize(Seq(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>))</span><br><span class="line">  .foreach(counter.add(_))</span><br><span class="line"></span><br><span class="line"><span class="comment">// 运行结果: 15</span></span><br><span class="line"><span class="built_in">println</span>(counter.value)</span><br></pre></td></tr></table></figure>
+<p>注意点:</p>
+<ul>
+<li>Accumulator 是支持并发并行的, 在任何地方都可以通过 <code>add</code> 来修改数值, 无论是 Driver 还是 Executor</li>
+<li>只能在 Driver 中才能调用 <code>value</code> 来获取数值</li>
+</ul>
+<p>在 WebUI 中关于 Job 部分也可以看到 Accumulator 的信息, 以及其运行的情况</p>
+<p><img src="/images/sparkyl/ljq.png" alt="img"></p>
+<p><strong>累计器件还有两个小特性</strong></p>
+<p> 第一, 累加器能保证在 Spark 任务出现问题被重启的时候不会出现重复计算. </p>
+<p>第二, 累加器只有在 Action 执行的时候才会被触发.</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> config = <span class="keyword">new</span> <span class="type">SparkConf</span>().setAppName(<span class="string">"ip_ana"</span>).setMaster(<span class="string">"local[6]"</span>)</span><br><span class="line"><span class="keyword">val</span> sc = <span class="keyword">new</span> <span class="type">SparkContext</span>(config)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> counter = sc.longAccumulator(<span class="string">"counter"</span>)</span><br><span class="line"></span><br><span class="line">sc.parallelize(<span class="type">Seq</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>))</span><br><span class="line">  .map(counter.add(_)) <span class="comment">// 这个地方不是 Action, 而是一个 Transformation</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 运行结果是 0</span></span><br><span class="line">println(counter.value)</span><br></pre></td></tr></table></figure>
+<p><strong>自定义累加器</strong></p>
+<p>开发者可以通过自定义累加器来实现更多类型的累加器, 累加器的作用远远不只是累加, 比如可以实现一个累加器, 用于向里面添加一些运行信息</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//自定义累加器</span></span><br><span class="line">  <span class="comment">//参数 一个累加的值是什么类型String  一个返回值类型Set[String]</span></span><br><span class="line">  <span class="class"><span class="keyword">class</span> <span class="title">NumAccu</span> <span class="keyword">extends</span> <span class="title">AccumulatorV2</span>[<span class="type">String</span>, <span class="type">Set</span>[<span class="type">String</span>]] </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> nums: mutable.<span class="type">Set</span>[<span class="type">String</span>] = mutable.<span class="type">Set</span>()</span><br><span class="line"></span><br><span class="line">    <span class="comment">//告诉spark框架 这个spark累加器是否是空的</span></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">isZero</span></span>: <span class="type">Boolean</span> = &#123;</span><br><span class="line">      nums.isEmpty</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//提供给spark框架一个拷贝的累加器</span></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">copy</span></span>(): <span class="type">AccumulatorV2</span>[<span class="type">String</span>, <span class="type">Set</span>[<span class="type">String</span>]] = &#123;</span><br><span class="line">      <span class="keyword">val</span> accu = <span class="keyword">new</span> <span class="type">NumAccu</span>()</span><br><span class="line">      nums.synchronized() &#123;</span><br><span class="line">        accu.nums ++= <span class="keyword">this</span>.nums</span><br><span class="line">      &#125;</span><br><span class="line">      accu</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//帮助spark清理,累加器里的内容</span></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">reset</span></span>(): <span class="type">Unit</span> = &#123;</span><br><span class="line">      nums.clear()</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//外部传入要累加的内容 ,在这个方法中累加</span></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">add</span></span>(v: <span class="type">String</span>): <span class="type">Unit</span> = &#123;</span><br><span class="line">      nums += v</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//累加器在累加的时候,可能每个分布式节点都有一个实例,在最后Driver进行合并,把所有的实例内容合并</span></span><br><span class="line">    <span class="comment">//起来,会调用这个方法</span></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">merge</span></span>(other: <span class="type">AccumulatorV2</span>[<span class="type">String</span>, <span class="type">Set</span>[<span class="type">String</span>]]): <span class="type">Unit</span> = &#123;</span><br><span class="line">      nums ++= other.value</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//就是上面的value</span></span><br><span class="line">    <span class="comment">//提供给外部累加结果</span></span><br><span class="line">    <span class="comment">//为何不可变 ,因为外部有可能再次进行修改,如是可变集合,外部修改会影响内部得值</span></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">value</span></span>: <span class="type">Set</span>[<span class="type">String</span>] = &#123;</span><br><span class="line">      nums.toSet    <span class="comment">//不可变得set</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">//测试自定义累加器</span></span><br><span class="line">  <span class="meta">@Test</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">accTest</span></span>(): <span class="type">Unit</span> =&#123;</span><br><span class="line">     <span class="keyword">val</span> conf = <span class="keyword">new</span> <span class="type">SparkConf</span>().setMaster(<span class="string">"local[3]"</span>).setAppName(<span class="string">"cache"</span>)</span><br><span class="line">    <span class="keyword">val</span> context = <span class="keyword">new</span> <span class="type">SparkContext</span>(conf)</span><br><span class="line">    <span class="keyword">val</span> accu = <span class="keyword">new</span> <span class="type">NumAccu</span>()</span><br><span class="line">    <span class="comment">//注册给Spark</span></span><br><span class="line">    context.register(accu,<span class="string">"acc"</span>)</span><br><span class="line"></span><br><span class="line">    context.parallelize(<span class="type">Seq</span>(<span class="string">"1"</span>,<span class="string">"2"</span>))</span><br><span class="line">      .foreach(it =&gt; accu.add(it))</span><br><span class="line">    println(accu.value)</span><br><span class="line">    context.stop()</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//外部这个类要继承Serializable 才可以否则可能报错</span></span><br></pre></td></tr></table></figure>
+<p>注意点:</p>
+<ul>
+<li>可以通过继承 <code>AccumulatorV2</code> 来创建新的累加器</li>
+<li>有几个方法需要重写<ul>
+<li>reset 方法用于把累加器重置为 0</li>
+<li>add 方法用于把其它值添加到累加器中</li>
+<li>merge 方法用于指定如何合并其他的累加器</li>
+</ul>
+</li>
+<li><code>value</code> 需要返回一个不可变的集合, 因为不能因为外部的修改而影响自身的值</li>
+</ul>
+<h4 id="7-2-广播变量"><a href="#7-2-广播变量" class="headerlink" title="7.2 广播变量"></a>7.2 广播变量</h4><p><strong>广播变量的作用</strong></p>
+<p>广播变量允许开发者将一个 <code>Read-Only</code> 的变量缓存到集群中每个节点中, 而不是传递给每一个 Task 一个副本.</p>
+<ul>
+<li>集群中每个节点, 指的是一个机器</li>
+<li>每一个 Task, 一个 Task 是一个 Stage 中的最小处理单元, 一个 Executor 中可以有多个 Stage, 每个 Stage 有多个 Task</li>
+</ul>
+<p>所以在需要跨多个 Stage 的多个 Task 中使用相同数据的情况下, 广播特别的有用</p>
+<p><img src="/images/sparkyl/sgb.png" alt="img"></p>
+<p><strong>广播变量的API</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">方法名</th>
+<th style="text-align:left">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>id</code></td>
+<td style="text-align:left">唯一标识</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>value</code></td>
+<td style="text-align:left">广播变量的值</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>unpersist</code></td>
+<td style="text-align:left">在 Executor 中异步的删除缓存副本</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>destroy</code></td>
+<td style="text-align:left">销毁所有此广播变量所关联的数据和元数据</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>toString</code></td>
+<td style="text-align:left">字符串表示</td>
+</tr>
+</tbody>
+</table>
+<p>使用广播变量的一般套路</p>
+<p>可以通过如下方式创建广播变量</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> b = sc.broadcast(<span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+<p>如果 Log 级别为 DEBUG 的时候, 会打印如下信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">DEBUG BlockManager: Put block broadcast_0 locally took  430 ms</span><br><span class="line">DEBUG BlockManager: Putting block broadcast_0 without replication took  431 ms</span><br><span class="line">DEBUG BlockManager: Told master about block broadcast_0_piece0</span><br><span class="line">DEBUG BlockManager: Put block broadcast_0_piece0 locally took  4 ms</span><br><span class="line">DEBUG BlockManager: Putting block broadcast_0_piece0 without replication took  4 ms</span><br></pre></td></tr></table></figure>
+<p>创建后可以使用 <code>value</code> 获取数据</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">b.value</span><br></pre></td></tr></table></figure>
+<p>获取数据的时候会打印如下信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">DEBUG BlockManager: Getting local block broadcast_0</span><br><span class="line">DEBUG BlockManager: Level for block broadcast_0 is StorageLevel(disk, memory, deserialized, 1 replicas)</span><br></pre></td></tr></table></figure>
+<p>广播变量使用完了以后, 可以使用 <code>unpersist</code> 删除数据</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">b.unpersist</span><br></pre></td></tr></table></figure>
+<p>删除数据以后, 可以使用 <code>destroy</code> 销毁变量, 释放内存空间</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">b.destroy</span><br></pre></td></tr></table></figure>
+<p>销毁以后, 会打印如下信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">DEBUG BlockManager: Removing broadcast 0</span><br><span class="line">DEBUG BlockManager: Removing block broadcast_0_piece0</span><br><span class="line">DEBUG BlockManager: Told master about block broadcast_0_piece0</span><br><span class="line">DEBUG BlockManager: Removing block broadcast_0</span><br></pre></td></tr></table></figure>
+<p>使用 <code>value</code> 方法的注意点</p>
+<p>方法签名 <code>value: T</code></p>
+<p>在 <code>value</code> 方法内部会确保使用获取数据的时候, 变量必须是可用状态, 所以必须在变量被 <code>destroy</code> 之前使用 <code>value</code> 方法, 如果使用 <code>value</code> 时变量已经失效, 则会爆出以下错误</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">org.apache.spark.SparkException: Attempted to use Broadcast(0) after it was destroyed (destroy at &lt;console&gt;:27)</span><br><span class="line">  at org.apache.spark.broadcast.Broadcast.assertValid(Broadcast.scala:144)</span><br><span class="line">  at org.apache.spark.broadcast.Broadcast.value(Broadcast.scala:69)</span><br><span class="line">  ... 48 elided</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>使用 <code>destroy</code> 方法的注意点</p>
+<p>方法签名 <code>destroy(): Unit`</code>destroy<code>方法会移除广播变量, 彻底销毁掉, 但是如果你试图多次</code>destroy` 广播变量, 则会爆出以下错误</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">org<span class="selector-class">.apache</span><span class="selector-class">.spark</span><span class="selector-class">.SparkException</span>: Attempted to use Broadcast(<span class="number">0</span>) after it was destroyed (destroy at &lt;console&gt;:<span class="number">27</span>)</span><br><span class="line">  at org<span class="selector-class">.apache</span><span class="selector-class">.spark</span><span class="selector-class">.broadcast</span><span class="selector-class">.Broadcast</span><span class="selector-class">.assertValid</span>(Broadcast<span class="selector-class">.scala</span>:<span class="number">144</span>)</span><br><span class="line">  at org<span class="selector-class">.apache</span><span class="selector-class">.spark</span><span class="selector-class">.broadcast</span><span class="selector-class">.Broadcast</span><span class="selector-class">.destroy</span>(Broadcast<span class="selector-class">.scala</span>:<span class="number">107</span>)</span><br><span class="line">  at org<span class="selector-class">.apache</span><span class="selector-class">.spark</span><span class="selector-class">.broadcast</span><span class="selector-class">.Broadcast</span><span class="selector-class">.destroy</span>(Broadcast<span class="selector-class">.scala</span>:<span class="number">98</span>)</span><br><span class="line">  ... <span class="number">48</span> elided</span><br></pre></td></tr></table></figure>
+<p>广播变量的使用场景</p>
+<p>假设我们在某个算子中需要使用一个保存了项目和项目的网址关系的 <code>Map[String, String]</code> 静态集合, 如下</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> pws = <span class="type">Map</span>(<span class="string">"Apache Spark"</span> -&gt; <span class="string">"http://spark.apache.org/"</span>, <span class="string">"Scala"</span> -&gt; <span class="string">"http://www.scala-lang.org/"</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> websites = sc.parallelize(<span class="type">Seq</span>(<span class="string">"Apache Spark"</span>, <span class="string">"Scala"</span>)).map(pws).collect</span><br></pre></td></tr></table></figure>
+<p>上面这段代码是没有问题的, 可以正常运行的, 但是非常的低效, 因为虽然可能 <code>pws</code> 已经存在于某个 <code>Executor</code> 中了, 但是在需要的时候还是会继续发往这个 <code>Executor</code>, 如果想要优化这段代码, 则需要尽可能的降低网络开销</p>
+<p>可以使用广播变量进行优化, 因为广播变量会缓存在集群中的机器中, 比 <code>Executor</code> 在逻辑上更 “大”</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> pwsB = sc.broadcast(pws)</span><br><span class="line"><span class="keyword">val</span> websites = sc.parallelize(<span class="type">Seq</span>(<span class="string">"Apache Spark"</span>, <span class="string">"Scala"</span>)).map(pwsB.value).collect</span><br></pre></td></tr></table></figure>
+<p>上面两段代码所做的事情其实是一样的, 但是当需要运行多个 <code>Executor</code> (以及多个 <code>Task</code>) 的时候, 后者的效率更高</p>
+</li>
+</ul>
+<p><strong>扩展</strong></p>
+<p>正常情况下使用 Task 拉取数据的时候, 会将数据拷贝到 Executor 中多次, 但是使用广播变量的时候只会复制一份数据到 Executor 中, 所以在两种情况下特别适合使用广播变量</p>
+<ul>
+<li>一个 Executor 中有多个 Task 的时候</li>
+<li>一个变量比较大的时候</li>
+</ul>
+<p>而且在 Spark 中还有一个约定俗称的做法, 当一个 RDD 很大并且还需要和另外一个 RDD 执行 <code>join</code> 的时候, 可以将较小的 RDD 广播出去, 然后使用大的 RDD 在算子 <code>map</code> 中直接 <code>join</code>, 从而实现在 Map 端 <code>join</code></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> acMap = sc.broadcast(myRDD.map &#123; <span class="keyword">case</span> (a,b,c,b) =&gt; (a, c) &#125;.collectAsMap)</span><br><span class="line"><span class="keyword">val</span> otherMap = sc.broadcast(myOtherRDD.collectAsMap)</span><br><span class="line"></span><br><span class="line">myBigRDD.map &#123; <span class="keyword">case</span> (a, b, c, d) =&gt;</span><br><span class="line">  (acMap.value.get(a).get, otherMap.value.get(c).get)</span><br><span class="line">&#125;.collect</span><br></pre></td></tr></table></figure>
+<p>一般情况下在这种场景下, 会广播 Map 类型的数据, 而不是数组, 因为这样容易使用 Key 找到对应的 Value 简化使用</p>
+<p><strong>总结</strong></p>
+<ol>
+<li>广播变量用于将变量缓存在集群中的机器中, 避免机器内的 Executors 多次使用网络拉取数据</li>
+<li>广播变量的使用步骤: (1) 创建 (2) 在 Task 中获取值 (3) 销毁</li>
+</ol>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+      <div>
+        <div id="reward-container">
+  <div>Thank you for your accept. mua！</div>
+  <button id="reward-button" disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/reward/wechatpay.jpg" alt="丨HF丨 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/reward/alipay.jpg" alt="丨HF丨 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        
+
+
+
+
+  
+
+
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>丨HF丨</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    
+    <a href="https://manzhong.github.io/2017/08/22/spark原理浅析2.html" title="spark原理浅析2">https://manzhong.github.io/2017/08/22/spark原理浅析2.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+    <div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:16px;">-------------本文结束<i class="fa fa-heart"></i>感谢您的阅读-------------</div>
+    
+</div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/BigData/" rel="tag"><i class="fa fa-tag"></i> BigData</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/08/20/spark原理浅析.html" rel="next" title="spark原理浅析">
+                <i class="fa fa-chevron-left"></i> spark原理浅析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/20/SparkSQL.html" rel="prev" title="SparkSQL">
+                SparkSQL <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC81MDA2Mi8yNjU1Mw=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/hexo.jpg" alt="丨HF丨">
+            
+              <p class="site-author-name" itemprop="name">丨HF丨</p>
+              <div class="site-description motion-element" itemprop="description">第二名就是头号输家!!!</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">54</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/ipyker" title="GitHub &rarr; https://github.com/ipyker" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:pyker@qq.com" title="E-Mail &rarr; mailto:pyker@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://weibo.com/viszhang" title="Weibo &rarr; https://weibo.com/viszhang" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="tencent://message/?uin=123435796&Site=&menu=yes" title="QQ &rarr; tencent://message/?uin=123435796&Site=&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i>QQ</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-book"></i>
+                推荐阅读
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://www.54tianzhisheng.cn/tags/Flink/" title="http://www.54tianzhisheng.cn/tags/Flink/" rel="noopener" target="_blank">Flink</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://nginxconfig.io/" title="https://nginxconfig.io/" rel="noopener" target="_blank">Nginxconfig</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://linux.51yip.com/" title="http://linux.51yip.com/" rel="noopener" target="_blank">Linux命令手册</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://echarts.baidu.com/index.html" title="https://echarts.baidu.com/index.html" rel="noopener" target="_blank">echarts可视化库</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+        </div>
+      </div>
+
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" style=" text-align:center;">&copy; 2017 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HF</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"> 站点字数合计:</i>
+    </span>
+    
+    <span title="站点总字数">961k</span>
+  
+  
+  <span class="post-meta-divider">|</span>
+  <a href="http://www.beian.miit.gov.cn" rel="noopener" target="_blank">粤ICP备19028706号 </a>
+
+</div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+
+<div class="run_time" style=" text-align:center;">
+  <span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+  <script>
+    var now = new Date(); 
+    function createtime() { 
+        var grt= new Date("07/23/2017 10:00:00");//此处修改你的建站时间或者网站上线时间 
+        now.setTime(now.getTime()+250); 
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days); 
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours); 
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum); 
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;} 
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum); 
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;} 
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 "; 
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒"; 
+    } 
+    setInterval("createtime()",250);
+  </script>
+</div>
+        
+<div class="busuanzi-count" style=" text-align:center;">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      我的第 <span class="busuanzi-value" id="busuanzi_value_site_uv"></span> 位朋友，
+    </span>
+  
+
+
+
+  
+    <span class="site-pv">
+      历经 <span class="busuanzi-value" id="busuanzi_value_site_pv"></span> 次回眸才与你相遇
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+  
+    
+    
+      
+    
+  
+  <script color="255,0,255" opacity="0.7" zindex="-1" count="140" src="//cdn.jsdelivr.net/gh/theme-next/theme-next-canvas-nest@1.0.0/canvas-nest.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.1"></script>
+
+  <script src="/js/motion.js?v=7.1.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/schemes/muse.js?v=7.1.1"></script>
+
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.1"></script>
+<script src="/js/post-details.js?v=7.1.1"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.1"></script>
+
+
+  
+
+  
+
+  
+  
+  
+
+  
+
+  
+  
+  
+
+
+  
+
+
+  
+    <script>
+  window.livereOptions = {
+    refer: '2017/08/22/spark原理浅析2.html'
+  };
+  (function(d, s) {
+    var j, e = d.getElementsByTagName(s)[0];
+    if (typeof LivereTower === 'function') { return; }
+    j = d.createElement(s);
+    j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+    j.async = true;
+    e.parentNode.insertBefore(j, e);
+  })(document, 'script');
+</script>
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <script src="/lib/bookmark/bookmark.min.js?v=1.0"></script>
+  <script>
+  
+    bookmark.scrollToMark('auto', "#更多");
+  
+  </script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

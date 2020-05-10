@@ -1,0 +1,1770 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="true">
+
+
+
+  
+  
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.1.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":true,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: true,
+    fastclick: true,
+    lazyload: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"shrinkIn","post_header":"slideLeftIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideDownIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="MapReduce详解1 .MapReduce的运行机制详解全流程: 1.1:MapTask 工作机制简单概述：inputFile通过split被逻辑切分为多个split文件，通过Record按行读取内容给map（用户自己实现的）进行处理，数据被map处理结束之后交给OutputCollector收集器，对其结果key进行分区（默认使用hash分区），然后写入buffer，每个map task都有">
+<meta name="keywords" content="BigData">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MapReduce2">
+<meta property="og:url" content="https://manzhong.github.io/2017/07/06/MapReduce2.html">
+<meta property="og:site_name" content="春雨里洗过的太阳">
+<meta property="og:description" content="MapReduce详解1 .MapReduce的运行机制详解全流程: 1.1:MapTask 工作机制简单概述：inputFile通过split被逻辑切分为多个split文件，通过Record按行读取内容给map（用户自己实现的）进行处理，数据被map处理结束之后交给OutputCollector收集器，对其结果key进行分区（默认使用hash分区），然后写入buffer，每个map task都有">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://manzhong.github.io/images/MapReduce/1-MapReduce工作机制-全流程.jpg">
+<meta property="og:image" content="https://manzhong.github.io/images/MapReduce/2-Reduce端join操作.bmp">
+<meta property="og:image" content="https://manzhong.github.io/images/MapReduce/3-Reduce端join操作问题.bmp">
+<meta property="og:image" content="https://manzhong.github.io/images/MapReduce/4-Map端join操作.bmp">
+<meta property="og:image" content="https://manzhong.github.io/images/MapReduce/5-求共同好友.bmp">
+<meta property="og:image" content="https://manzhong.github.io/images/MapReduce/1-自定义InputFormat.bmp">
+<meta property="og:image" content="https://manzhong.github.io/images/MapReduce/2-自定义OutputFormat.bmp">
+<meta property="og:image" content="https://manzhong.github.io/images/MapReduce/3-自定义分组求TopN.bmp">
+<meta property="og:updated_time" content="2020-03-16T15:33:56.992Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MapReduce2">
+<meta name="twitter:description" content="MapReduce详解1 .MapReduce的运行机制详解全流程: 1.1:MapTask 工作机制简单概述：inputFile通过split被逻辑切分为多个split文件，通过Record按行读取内容给map（用户自己实现的）进行处理，数据被map处理结束之后交给OutputCollector收集器，对其结果key进行分区（默认使用hash分区），然后写入buffer，每个map task都有">
+<meta name="twitter:image" content="https://manzhong.github.io/images/MapReduce/1-MapReduce工作机制-全流程.jpg">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="春雨里洗过的太阳" type="application/atom+xml">
+
+
+
+  
+  
+  <link rel="canonical" href="https://manzhong.github.io/2017/07/06/MapReduce2">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>MapReduce2 | 春雨里洗过的太阳</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+ 
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">春雨里洗过的太阳</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-bookmark"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-互动">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/guestbook/" rel="section"><i class="menu-item-icon fa fa-fw fa-comments"></i> <br>互动</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://manzhong.github.io/2017/07/06/MapReduce2.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="丨HF丨">
+      <meta itemprop="description" content="第二名就是头号输家!!!">
+      <meta itemprop="image" content="/images/hexo.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="春雨里洗过的太阳">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">MapReduce2
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2017-07-06 16:44:32" itemprop="dateCreated datePublished" datetime="2017-07-06T16:44:32+08:00">2017-07-06</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2020-03-16 23:33:56" itemprop="dateModified" datetime="2020-03-16T23:33:56+08:00">2020-03-16</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">31k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">28 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="MapReduce详解"><a href="#MapReduce详解" class="headerlink" title="MapReduce详解"></a>MapReduce详解</h1><h2 id="1-MapReduce的运行机制详解"><a href="#1-MapReduce的运行机制详解" class="headerlink" title="1 .MapReduce的运行机制详解"></a>1 .MapReduce的运行机制详解</h2><h2 id="全流程"><a href="#全流程" class="headerlink" title="全流程:"></a>全流程:</h2><p><img src="/images/MapReduce/1-MapReduce工作机制-全流程.jpg" alt="img"></p>
+<h3 id="1-1-MapTask-工作机制"><a href="#1-1-MapTask-工作机制" class="headerlink" title="1.1:MapTask 工作机制"></a>1.1:MapTask 工作机制</h3><p>简单概述：inputFile通过split被逻辑切分为多个split文件，通过Record按行读取内容给map（用户自己实现的）进行处理，数据被map处理结束之后交给OutputCollector收集器，对其结果key进行分区（默认使用hash分区），然后写入buffer，每个map task都有一个内存缓冲区，存储着map的输出结果，当缓冲区快满的时候需要将缓冲区的数据以一个临时文件的方式存放到磁盘，当整个map task结束后再对磁盘中这个map task产生的所有临时文件做合并，生成最终的正式输出文件，然后等待reduce task来拉数据</p>
+<h5 id="详细步骤"><a href="#详细步骤" class="headerlink" title="详细步骤"></a>详细步骤</h5><ol>
+<li><p>读取数据组件 <strong>InputFormat</strong> (默认 TextInputFormat) 会通过 <code>getSplits</code> 方法对输入目录中文件进行逻辑切片规划得到 <code>block</code>, 有多少个 <code>block</code>就对应启动多少个 <code>MapTask</code>。</p>
+</li>
+<li><p>将输入文件切分为 <code>block</code> 之后, 由 <code>RecordReader</code> 对象 (默认是LineRecordReader) 进行<strong>读取</strong>, 以 <code>\n</code> 作为分隔符, 读取一行数据, 返回 <code>&lt;key，value&gt;</code>. Key 表示每行首字符偏移值, Value 表示这一行文本内容</p>
+</li>
+<li><p>读取 <code>block</code> 返回 <code>&lt;key,value&gt;</code>, <strong>进入用户自己继承的 Mapper 类中</strong>，执行用户重写的 map 函数, RecordReader 读取一行这里调用一次</p>
+</li>
+<li><p>Mapper 逻辑结束之后, 将 Mapper 的每条结果通过 <code>context.write</code> 进行collect数据收集. 在 collect 中, 会先对其进行分区处理，默认使用 <strong>HashPartitioner</strong></p>
+<ul>
+<li><blockquote>
+<p>MapReduce 提供 <code>Partitioner</code> 接口, 它的作用就是根据 <code>Key</code> 或 <code>Value</code> 及 <code>Reducer</code> 的数量来决定当前的这对输出数据最终应该交由哪个 <code>Reduce task</code> 处理, 默认对 Key Hash 后再以 Reducer 数量取模. 默认的取模方式只是为了平均 Reducer 的处理能力, 如果用户自己对 Partitioner 有需求, 可以订制并设置到 Job 上</p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li><p>接下来, 会将数据写入内存, 内存中这片区域叫做环形缓冲区, 缓冲区的作用是批量收集 Mapper 结果, 减少磁盘 IO 的影响. 我们的 <strong>Key/Value 对以及 Partition 的结果都会被写入缓冲区</strong>. 当然, 写入之前，Key 与 Value 值都会被序列化成字节数组</p>
+<ul>
+<li><blockquote>
+<p>环形缓冲区其实是一个数组, 数组中存放着 Key, Value 的序列化数据和 Key, Value 的元数据信息, 包括 Partition, Key 的起始位置, Value 的起始位置以及 Value 的长度，环形结构是一个抽象概念</p>
+</blockquote>
+</li>
+<li><blockquote>
+<p>缓冲区是有大小限制, 默认是 100MB，当 Mapper 的输出结果很多时, 就可能会撑爆内存, 所以需要在一定条件下将缓冲区中的数据临时写入磁盘, 然后重新利用这块缓冲区， 这个从内存往磁盘写数据的过程被称为 Spill, 中文可译为溢写，这个溢写是由单独线程来完成, 不影响往缓冲区写 Mapper 结果的线程. 溢写线程启动时不应该阻止 Mapper 的结果输出, 所以整个缓冲区有个溢写的比例 <code>spill.percent</code>，这个比例默认是 0.8, 也就是当缓冲区的数据已经达到阈值 <code>buffer size * spill percent = 100MB * 0.8 = 80MB</code>, 溢写线程启动, 锁定这 80MB 的内存, 执行溢写过程. Mapper 的输出结果还可以往剩下的 20MB 内存中写, 互不影响</p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li><p>当溢写线程启动后, 需要<strong>对这 80MB 空间内的 Key 做排序 (Sort)</strong>. 排序是 MapReduce 模型默认的行为, 这里的排序也是对序列化的字节做的排序</p>
+<ul>
+<li><blockquote>
+<p>如果 Job 设置过 Combiner, 那么现在就是使用 Combiner 的时候了. 将有相同 Key 的 Key/Value 对的 Value 加起来, 减少溢写到磁盘的数据量. Combiner 会优化 MapReduce 的中间结果, 所以它在整个模型中会多次使用</p>
+</blockquote>
+</li>
+<li><blockquote>
+<p>那哪些场景才能使用 Combiner 呢? 从这里分析, Combiner 的输出是 Reducer 的输入, Combiner 绝不能改变最终的计算结果. Combiner 只应该用于那种 Reduce 的输入 Key/Value 与输出 Key/Value 类型完全一致, 且不影响最终结果的场景. 比如累加, 最大值等. Combiner 的使用一定得慎重, 如果用好, 它对 Job 执行效率有帮助, 反之会影响 Reducer 的最终结果</p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li><p><strong>合并溢写文件</strong>, 每次溢写会在磁盘上生成一个临时文件 (写之前判断是否有 Combiner), 如果 Mapper 的输出结果真的很大, 有多次这样的溢写发生, 磁盘上相应的就会有多个临时文件存在. 当整个数据处理结束之后开始对磁盘中的临时文件进行 Merge 合并, 因为最终的文件只有一个, 写入磁盘, 并且为这个文件提供了一个索引文件, 以记录每个reduce对应数据的偏移量</p>
+</li>
+</ol>
+<h5 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h5><table>
+<thead>
+<tr>
+<th>配置</th>
+<th>默认值</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mapreduce.task.io.sort.mb</code></td>
+<td>100</td>
+<td>设置环型缓冲区的内存值大小</td>
+</tr>
+<tr>
+<td><code>mapreduce.map.sort.spill.percent</code></td>
+<td>0.8</td>
+<td>设置溢写的比例</td>
+</tr>
+<tr>
+<td><code>mapreduce.cluster.local.dir</code></td>
+<td><code>${hadoop.tmp.dir}/mapred/local</code></td>
+<td>溢写数据目录</td>
+</tr>
+<tr>
+<td><code>mapreduce.task.io.sort.factor</code></td>
+<td>10</td>
+<td>设置一次合并多少个溢写文件</td>
+</tr>
+</tbody>
+</table>
+<h3 id="1-2-ReduceTask-工作机制"><a href="#1-2-ReduceTask-工作机制" class="headerlink" title="1.2 :ReduceTask 工作机制"></a>1.2 :ReduceTask 工作机制</h3><p>Reduce 大致分为 copy、sort、reduce 三个阶段，重点在前两个阶段。copy 阶段包含一个 eventFetcher 来获取已完成的 map 列表，由 Fetcher 线程去 copy 数据，在此过程中会启动两个 merge 线程，分别为 inMemoryMerger 和 onDiskMerger，分别将内存中的数据 merge 到磁盘和将磁盘中的数据进行 merge。待数据 copy 完成之后，copy 阶段就完成了，开始进行 sort 阶段，sort 阶段主要是执行 finalMerge 操作，纯粹的 sort 阶段，完成之后就是 reduce 阶段，调用用户定义的 reduce 函数进行处理</p>
+<h5 id="详细步骤-1"><a href="#详细步骤-1" class="headerlink" title="详细步骤"></a>详细步骤</h5><ol>
+<li><strong><code>Copy阶段</code></strong>，简单地拉取数据。Reduce进程启动一些数据copy线程(Fetcher)，通过HTTP方式请求maptask获取属于自己的文件。</li>
+<li><strong><code>Merge阶段</code></strong>。这里的merge如map端的merge动作，只是数组中存放的是不同map端copy来的数值。Copy过来的数据会先放入内存缓冲区中，这里的缓冲区大小要比map端的更为灵活。merge有三种形式：内存到内存；内存到磁盘；磁盘到磁盘。默认情况下第一种形式不启用。当内存中的数据量到达一定阈值，就启动内存到磁盘的merge。与map 端类似，这也是溢写的过程，这个过程中如果你设置有Combiner，也是会启用的，然后在磁盘中生成了众多的溢写文件。第二种merge方式一直在运行，直到没有map端的数据时才结束，然后启动第三种磁盘到磁盘的merge方式生成最终的文件。</li>
+<li><strong><code>合并排序</code></strong>。把分散的数据合并成一个大的数据后，还会再对合并后的数据排序。</li>
+<li><strong><code>对排序后的键值对调用reduce方法</code></strong>，键相等的键值对调用一次reduce方法，每次调用会产生零个或者多个键值对，最后把这些输出的键值对写入到HDFS文件中。</li>
+</ol>
+<h3 id="1-3-Shuffle-过程"><a href="#1-3-Shuffle-过程" class="headerlink" title="1.3:Shuffle 过程"></a>1.3:Shuffle 过程</h3><p>map 阶段处理的数据如何传递给 reduce 阶段，是 MapReduce 框架中最关键的一个流程，这个流程就叫 shuffle<br>shuffle: 洗牌、发牌 ——（核心机制：数据分区，排序，分组，规约，合并等过程）</p>
+<p>shuffle 是 Mapreduce 的核心，它分布在 Mapreduce 的 map 阶段和 reduce 阶段。一般把从 Map 产生输出开始到 Reduce 取得数据作为输入之前的过程称作 shuffle。</p>
+<ol>
+<li><strong><code>Collect阶段</code></strong>：将 MapTask 的结果输出到默认大小为 100M 的环形缓冲区，保存的是 key/value，Partition 分区信息等。</li>
+<li><strong><code>Spill阶段</code></strong>：当内存中的数据量达到一定的阀值的时候，就会将数据写入本地磁盘，在将数据写入磁盘之前需要对数据进行一次排序的操作，如果配置了 combiner，还会将有相同分区号和 key 的数据进行排序。</li>
+<li><strong><code>Merge阶段</code></strong>：把所有溢出的临时文件进行一次合并操作，以确保一个 MapTask 最终只产生一个中间数据文件。</li>
+<li><strong>Copy阶段</strong>：ReduceTask 启动 Fetcher 线程到已经完成 MapTask 的节点上复制一份属于自己的数据，这些数据默认会保存在内存的缓冲区中，当内存的缓冲区达到一定的阀值的时候，就会将数据写到磁盘之上。</li>
+<li><strong><code>Merge阶段</code></strong>：在 ReduceTask 远程复制数据的同时，会在后台开启两个线程对内存到本地的数据文件进行合并操作。</li>
+<li><strong><code>Sort阶段</code></strong>：在对数据进行合并的同时，会进行排序操作，由于 MapTask 阶段已经对数据进行了局部的排序，ReduceTask 只需保证 Copy 的数据的最终整体有效性即可。<br>Shuffle 中的缓冲区大小会影响到 mapreduce 程序的执行效率，原则上说，缓冲区越大，磁盘io的次数越少，执行速度就越快缓冲区的大小可以通过参数调整,  参数：mapreduce.task.io.sort.mb  默认100M</li>
+</ol>
+<h2 id="2-案例-Reduce-端实现-JOIN"><a href="#2-案例-Reduce-端实现-JOIN" class="headerlink" title="2. 案例: Reduce 端实现 JOIN"></a>2. 案例: Reduce 端实现 JOIN</h2><p><img src="/images/MapReduce/2-Reduce端join操作.bmp" alt="img"></p>
+<p><img src="/images/MapReduce/3-Reduce端join操作问题.bmp" alt="img"></p>
+<h3 id="2-1-需求"><a href="#2-1-需求" class="headerlink" title="2.1. 需求"></a>2.1. 需求</h3><blockquote>
+<p>假如数据量巨大，两表的数据是以文件的形式存储在 HDFS 中, 需要用 MapReduce 程序来实现以下 SQL 查询运算</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; select  a.id,a.date,b.name,b.category_id,b.price from t_order a left join t_product b on a.pid = b.id</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<h5 id="商品表"><a href="#商品表" class="headerlink" title="商品表"></a>商品表</h5><table>
+<thead>
+<tr>
+<th>id</th>
+<th>pname</th>
+<th>category_id</th>
+<th>price</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P0001</td>
+<td>小米5</td>
+<td>1000</td>
+<td>2000</td>
+</tr>
+<tr>
+<td>P0002</td>
+<td>锤子T1</td>
+<td>1000</td>
+<td>3000</td>
+</tr>
+</tbody>
+</table>
+<h5 id="订单数据表"><a href="#订单数据表" class="headerlink" title="订单数据表"></a>订单数据表</h5><table>
+<thead>
+<tr>
+<th>id</th>
+<th>date</th>
+<th>pid</th>
+<th>amount</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1001</td>
+<td>20150710</td>
+<td>P0001</td>
+<td>2</td>
+</tr>
+<tr>
+<td>1002</td>
+<td>20150710</td>
+<td>P0002</td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+<h3 id="2-2-实现步骤"><a href="#2-2-实现步骤" class="headerlink" title="2.2 实现步骤"></a>2.2 实现步骤</h3><p>通过将关联的条件作为map输出的key，将两表满足join条件的数据并携带数据所来源的文件信息，发往同一个reduce task，在reduce中进行数据的串联</p>
+<h4 id="Step-1-定义-Mapper"><a href="#Step-1-定义-Mapper" class="headerlink" title="Step 1: 定义 Mapper"></a>Step 1: 定义 Mapper</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ReduceJoinMapper</span> <span class="keyword">extends</span> <span class="title">Mapper</span>&lt;<span class="title">LongWritable</span>,<span class="title">Text</span>,<span class="title">Text</span>,<span class="title">Text</span>&gt; </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">map</span><span class="params">(LongWritable key, Text value, Context context)</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">        <span class="comment">//1:判断数据来自哪个文件</span></span><br><span class="line">        FileSplit fileSplit = (FileSplit) context.getInputSplit();</span><br><span class="line">        String fileName = fileSplit.getPath().getName();</span><br><span class="line">        <span class="keyword">if</span>(fileName.equals(<span class="string">"product.txt"</span>))&#123;</span><br><span class="line">            <span class="comment">//数据来自商品表</span></span><br><span class="line">            <span class="comment">//2:将K1和V1转为K2和V2,写入上下文中</span></span><br><span class="line">            String[] split = value.toString().split(<span class="string">","</span>);</span><br><span class="line">            String productId = split[<span class="number">0</span>];</span><br><span class="line"></span><br><span class="line">            context.write(<span class="keyword">new</span> Text(productId), value);</span><br><span class="line"></span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            <span class="comment">//数据来自订单表</span></span><br><span class="line">            <span class="comment">//2:将K1和V1转为K2和V2,写入上下文中</span></span><br><span class="line">            String[] split = value.toString().split(<span class="string">","</span>);</span><br><span class="line">            String productId = split[<span class="number">2</span>];</span><br><span class="line"></span><br><span class="line">            context.write(<span class="keyword">new</span> Text(productId), value);</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="Step-2-定义-Reducer"><a href="#Step-2-定义-Reducer" class="headerlink" title="Step 2: 定义 Reducer"></a>Step 2: 定义 Reducer</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ReduceJoinMapper</span> <span class="keyword">extends</span> <span class="title">Mapper</span>&lt;<span class="title">LongWritable</span>,<span class="title">Text</span>,<span class="title">Text</span>,<span class="title">Text</span>&gt; </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">map</span><span class="params">(LongWritable key, Text value, Context context)</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">        <span class="comment">//1:判断数据来自哪个文件</span></span><br><span class="line"></span><br><span class="line">        FileSplit fileSplit = (FileSplit) context.getInputSplit();</span><br><span class="line">        String fileName = fileSplit.getPath().getName();</span><br><span class="line">        <span class="keyword">if</span>(fileName.equals(<span class="string">"product.txt"</span>))&#123;</span><br><span class="line">            <span class="comment">//数据来自商品表</span></span><br><span class="line">            <span class="comment">//2:将K1和V1转为K2和V2,写入上下文中</span></span><br><span class="line">            String[] split = value.toString().split(<span class="string">","</span>);</span><br><span class="line">            String productId = split[<span class="number">0</span>];</span><br><span class="line"></span><br><span class="line">            context.write(<span class="keyword">new</span> Text(productId), value);</span><br><span class="line"></span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            <span class="comment">//数据来自订单表</span></span><br><span class="line">            <span class="comment">//2:将K1和V1转为K2和V2,写入上下文中</span></span><br><span class="line">            String[] split = value.toString().split(<span class="string">","</span>);</span><br><span class="line">            String productId = split[<span class="number">2</span>];</span><br><span class="line"></span><br><span class="line">            context.write(<span class="keyword">new</span> Text(productId), value);</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="Step-3-定义主类"><a href="#Step-3-定义主类" class="headerlink" title="Step 3: 定义主类"></a>Step 3: 定义主类</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ReduceJoinReducer</span> <span class="keyword">extends</span> <span class="title">Reducer</span>&lt;<span class="title">Text</span>,<span class="title">Text</span>,<span class="title">Text</span>,<span class="title">Text</span>&gt; </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">reduce</span><span class="params">(Text key, Iterable&lt;Text&gt; values, Context context)</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">       <span class="comment">//1:遍历集合,获取V3 (first +second)</span></span><br><span class="line">        String first = <span class="string">""</span>;</span><br><span class="line">        String second = <span class="string">""</span>;</span><br><span class="line">        <span class="keyword">for</span> (Text value : values) &#123;</span><br><span class="line">            <span class="keyword">if</span>(value.toString().startsWith(<span class="string">"p"</span>))&#123;</span><br><span class="line">                first = value.toString();</span><br><span class="line">            &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                second += value.toString();</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//2:将K3和V3写入上下文中</span></span><br><span class="line">        context.write(key, <span class="keyword">new</span> Text(first+<span class="string">"\t"</span>+second));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="3-案例-Map端实现-JOIN"><a href="#3-案例-Map端实现-JOIN" class="headerlink" title="3. 案例: Map端实现 JOIN"></a>3. 案例: Map端实现 JOIN</h2><p><img src="/images/MapReduce/4-Map端join操作.bmp" alt="img"></p>
+<h4 id="3-1-概述"><a href="#3-1-概述" class="headerlink" title="3.1 概述"></a>3.1 概述</h4><p>​    适用于关联表中有小表的情形.</p>
+<p>​    使用分布式缓存,可以将小表分发到所有的map节点，这样，map节点就可以在本地对自己所读到的大表数据进行join并输出最终结果，可以大大提高join操作的并发度，加快处理速度</p>
+<h4 id="3-2-实现步骤"><a href="#3-2-实现步骤" class="headerlink" title="3.2 实现步骤"></a>3.2 实现步骤</h4><p>  先在mapper类中预先定义好小表，进行join</p>
+<p> 引入实际场景中的解决方案：一次加载数据库或者用</p>
+<h5 id="Step-1：定义Mapper"><a href="#Step-1：定义Mapper" class="headerlink" title="Step 1：定义Mapper"></a>Step 1：定义Mapper</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MapJoinMapper</span> <span class="keyword">extends</span> <span class="title">Mapper</span>&lt;<span class="title">LongWritable</span>,<span class="title">Text</span>,<span class="title">Text</span>,<span class="title">Text</span>&gt;</span>&#123;</span><br><span class="line">    <span class="keyword">private</span> HashMap&lt;String, String&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="comment">//第一件事情:将分布式缓存的小表数据读取到本地Map集合(只需要做一次)</span></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">setup</span><span class="params">(Context context)</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">        <span class="comment">//1:获取分布式缓存文件列表</span></span><br><span class="line">        URI[] cacheFiles =  context.getCacheFiles();</span><br><span class="line"></span><br><span class="line">        <span class="comment">//2:获取指定的分布式缓存文件的文件系统(FileSystem)</span></span><br><span class="line">        FileSystem fileSystem = FileSystem.get(cacheFiles[<span class="number">0</span>], context.getConfiguration());</span><br><span class="line"></span><br><span class="line">        <span class="comment">//3:获取文件的输入流</span></span><br><span class="line">        FSDataInputStream inputStream = fileSystem.open(<span class="keyword">new</span> Path(cacheFiles[<span class="number">0</span>]));</span><br><span class="line"></span><br><span class="line">        <span class="comment">//4:读取文件内容, 并将数据存入Map集合</span></span><br><span class="line">           <span class="comment">//4.1 将字节输入流转为字符缓冲流FSDataInputStream ---&gt;BufferedReader</span></span><br><span class="line">        BufferedReader bufferedReader = <span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> InputStreamReader(inputStream));</span><br><span class="line">           <span class="comment">//4.2 读取小表文件内容,以行位单位,并将读取的数据存入map集合</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        String line = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">while</span>((line = bufferedReader.readLine()) != <span class="keyword">null</span>)&#123;</span><br><span class="line">            String[] split = line.split(<span class="string">","</span>);</span><br><span class="line"></span><br><span class="line">            map.put(split[<span class="number">0</span>], line);</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        <span class="comment">//5:关闭流</span></span><br><span class="line">        bufferedReader.close();</span><br><span class="line">        fileSystem.close();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//第二件事情:对大表的处理业务逻辑,而且要实现大表和小表的join操作</span></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">map</span><span class="params">(LongWritable key, Text value, Context context)</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">            <span class="comment">//1:从行文本数据中获取商品的id: p0001 , p0002  得到了K2</span></span><br><span class="line">            String[] split = value.toString().split(<span class="string">","</span>);</span><br><span class="line">            String productId = split[<span class="number">2</span>];  <span class="comment">//K2</span></span><br><span class="line"></span><br><span class="line">            <span class="comment">//2:在Map集合中,将商品的id作为键,获取值(商品的行文本数据) ,将value和值拼接,得到V2</span></span><br><span class="line">            String productLine = map.get(productId);</span><br><span class="line">            String valueLine = productLine+<span class="string">"\t"</span>+value.toString(); <span class="comment">//V2</span></span><br><span class="line">            <span class="comment">//3:将K2和V2写入上下文中</span></span><br><span class="line">            context.write(<span class="keyword">new</span> Text(productId), <span class="keyword">new</span> Text(valueLine));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="Step-2：定义主类"><a href="#Step-2：定义主类" class="headerlink" title="Step 2：定义主类"></a>Step 2：定义主类</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JobMain</span>  <span class="keyword">extends</span> <span class="title">Configured</span> <span class="keyword">implements</span> <span class="title">Tool</span></span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">run</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="comment">//1:获取job对象</span></span><br><span class="line">        Job job = Job.getInstance(<span class="keyword">super</span>.getConf(), <span class="string">"map_join_job"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//2:设置job对象(将小表放在分布式缓存中)</span></span><br><span class="line">            <span class="comment">//将小表放在分布式缓存中</span></span><br><span class="line">           <span class="comment">// DistributedCache.addCacheFile(new URI("hdfs://node01:8020/cache_file/product.txt"), super.getConf());</span></span><br><span class="line">           job.addCacheFile(<span class="keyword">new</span> URI(<span class="string">"hdfs://node01:8020/cache_file/product.txt"</span>));</span><br><span class="line"></span><br><span class="line">           <span class="comment">//第一步:设置输入类和输入的路径</span></span><br><span class="line">            job.setInputFormatClass(TextInputFormat.class);</span><br><span class="line">            TextInputFormat.addInputPath(job, <span class="keyword">new</span> Path(<span class="string">"file:///D:\\input\\map_join_input"</span>));</span><br><span class="line">            <span class="comment">//第二步:设置Mapper类和数据类型</span></span><br><span class="line">            job.setMapperClass(MapJoinMapper.class);</span><br><span class="line">            job.setMapOutputKeyClass(Text.class);</span><br><span class="line">            job.setMapOutputValueClass(Text.class);</span><br><span class="line"></span><br><span class="line">            <span class="comment">//第八步:设置输出类和输出路径</span></span><br><span class="line">            job.setOutputFormatClass(TextOutputFormat.class);</span><br><span class="line">            TextOutputFormat.setOutputPath(job, <span class="keyword">new</span> Path(<span class="string">"file:///D:\\out\\map_join_out"</span>));</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        <span class="comment">//3:等待任务结束</span></span><br><span class="line">        <span class="keyword">boolean</span> bl = job.waitForCompletion(<span class="keyword">true</span>);</span><br><span class="line">        <span class="keyword">return</span> bl ? <span class="number">0</span> :<span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        Configuration configuration = <span class="keyword">new</span> Configuration();</span><br><span class="line">        <span class="comment">//启动job任务</span></span><br><span class="line">        <span class="keyword">int</span> run = ToolRunner.run(configuration, <span class="keyword">new</span> JobMain(), args);</span><br><span class="line">        System.exit(run);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="4-案例-求共同好友"><a href="#4-案例-求共同好友" class="headerlink" title="4. 案例:求共同好友"></a>4. 案例:求共同好友</h2><p>分析图:</p>
+<p><img src="/images/MapReduce/5-求共同好友.bmp" alt="img"></p>
+<h3 id="4-1-需求分析"><a href="#4-1-需求分析" class="headerlink" title="4.1 需求分析"></a>4.1 需求分析</h3><p>以下是qq的好友列表数据，冒号前是一个用户，冒号后是该用户的所有好友（数据中的好友关系是单向的）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">A:B,C,D,F,E,O</span><br><span class="line">B:A,C,E,K</span><br><span class="line">C:A,B,D,E,I </span><br><span class="line">D:A,E,F,L</span><br><span class="line">E:B,C,D,M,L</span><br><span class="line">F:A,B,C,D,E,O,M</span><br><span class="line">G:A,C,D,E,F</span><br><span class="line">H:A,C,D,E,O</span><br><span class="line">I:A,O</span><br><span class="line">J:B,O</span><br><span class="line">K:A,C,D</span><br><span class="line">L:D,E,F</span><br><span class="line">M:E,F,G</span><br><span class="line">O:A,H,I,J</span><br></pre></td></tr></table></figure>
+<p>求出哪些人两两之间有共同好友，及他俩的共同好友都有谁？</p>
+<h3 id="4-2-实现步骤"><a href="#4-2-实现步骤" class="headerlink" title="4.2 实现步骤"></a>4.2 实现步骤</h3><h5 id="第一步：代码实现"><a href="#第一步：代码实现" class="headerlink" title="第一步：代码实现"></a>第一步：代码实现</h5><p><strong>Mapper类</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Step1Mapper</span> <span class="keyword">extends</span> <span class="title">Mapper</span>&lt;<span class="title">LongWritable</span>,<span class="title">Text</span>,<span class="title">Text</span>,<span class="title">Text</span>&gt; </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">map</span><span class="params">(LongWritable key, Text value, Context context)</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">         <span class="comment">//1:以冒号拆分行文本数据: 冒号左边就是V2</span></span><br><span class="line">        String[] split = value.toString().split(<span class="string">":"</span>);</span><br><span class="line">        String userStr = split[<span class="number">0</span>];</span><br><span class="line"></span><br><span class="line">        <span class="comment">//2:将冒号右边的字符串以逗号拆分,每个成员就是K2</span></span><br><span class="line">        String[] split1 = split[<span class="number">1</span>].split(<span class="string">","</span>);</span><br><span class="line">        <span class="keyword">for</span> (String s : split1) &#123;</span><br><span class="line">            <span class="comment">//3:将K2和v2写入上下文中</span></span><br><span class="line">            context.write(<span class="keyword">new</span> Text(s), <span class="keyword">new</span> Text(userStr));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>Reducer类:</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Step1Reducer</span> <span class="keyword">extends</span> <span class="title">Reducer</span>&lt;<span class="title">Text</span>,<span class="title">Text</span>,<span class="title">Text</span>,<span class="title">Text</span>&gt; </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">reduce</span><span class="params">(Text key, Iterable&lt;Text&gt; values, Context context)</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">        <span class="comment">//1:遍历集合,并将每一个元素拼接,得到K3</span></span><br><span class="line">        StringBuffer buffer = <span class="keyword">new</span> StringBuffer();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (Text value : values) &#123;</span><br><span class="line">            buffer.append(value.toString()).append(<span class="string">"-"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//2:K2就是V3</span></span><br><span class="line">        <span class="comment">//3:将K3和V3写入上下文中</span></span><br><span class="line">        context.write(<span class="keyword">new</span> Text(buffer.toString()), key);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>JobMain:</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JobMain</span> <span class="keyword">extends</span> <span class="title">Configured</span> <span class="keyword">implements</span> <span class="title">Tool</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">run</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="comment">//1:获取Job对象</span></span><br><span class="line">        Job job = Job.getInstance(<span class="keyword">super</span>.getConf(), <span class="string">"common_friends_step1_job"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//2:设置job任务</span></span><br><span class="line">            <span class="comment">//第一步:设置输入类和输入路径</span></span><br><span class="line">            job.setInputFormatClass(TextInputFormat.class);</span><br><span class="line">            TextInputFormat.addInputPath(job, <span class="keyword">new</span> Path(<span class="string">"file:///D:\\input\\common_friends_step1_input"</span>));</span><br><span class="line"></span><br><span class="line">            <span class="comment">//第二步:设置Mapper类和数据类型</span></span><br><span class="line">            job.setMapperClass(Step1Mapper.class);</span><br><span class="line">            job.setMapOutputKeyClass(Text.class);</span><br><span class="line">            job.setMapOutputValueClass(Text.class);</span><br><span class="line"></span><br><span class="line">            <span class="comment">//第三,四,五,六</span></span><br><span class="line"></span><br><span class="line">            <span class="comment">//第七步:设置Reducer类和数据类型</span></span><br><span class="line">            job.setReducerClass(Step1Reducer.class);</span><br><span class="line">            job.setOutputKeyClass(Text.class);</span><br><span class="line">            job.setOutputValueClass(Text.class);</span><br><span class="line"></span><br><span class="line">            <span class="comment">//第八步:设置输出类和输出的路径</span></span><br><span class="line">            job.setOutputFormatClass(TextOutputFormat.class);</span><br><span class="line">            TextOutputFormat.setOutputPath(job, <span class="keyword">new</span> Path(<span class="string">"file:///D:\\out\\common_friends_step1_out"</span>));</span><br><span class="line"></span><br><span class="line">        <span class="comment">//3:等待job任务结束</span></span><br><span class="line">        <span class="keyword">boolean</span> bl = job.waitForCompletion(<span class="keyword">true</span>);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> bl ? <span class="number">0</span>: <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        Configuration configuration = <span class="keyword">new</span> Configuration();</span><br><span class="line"></span><br><span class="line">        <span class="comment">//启动job任务</span></span><br><span class="line">        <span class="keyword">int</span> run = ToolRunner.run(configuration, <span class="keyword">new</span> JobMain(), args);</span><br><span class="line"></span><br><span class="line">        System.exit(run);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="第二步：代码实现"><a href="#第二步：代码实现" class="headerlink" title="第二步：代码实现"></a>第二步：代码实现</h5><p><strong>Mapper类</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Step2Mapper</span> <span class="keyword">extends</span> <span class="title">Mapper</span>&lt;<span class="title">LongWritable</span>,<span class="title">Text</span>,<span class="title">Text</span>,<span class="title">Text</span>&gt; </span>&#123;</span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     K1           V1</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">     0            A-F-C-J-E-	B</span></span><br><span class="line"><span class="comment">    ----------------------------------</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">     K2             V2</span></span><br><span class="line"><span class="comment">     A-C            B</span></span><br><span class="line"><span class="comment">     A-E            B</span></span><br><span class="line"><span class="comment">     A-F            B</span></span><br><span class="line"><span class="comment">     C-E            B</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">map</span><span class="params">(LongWritable key, Text value, Context context)</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">        <span class="comment">//1:拆分行文本数据,结果的第二部分可以得到V2</span></span><br><span class="line">        String[] split = value.toString().split(<span class="string">"\t"</span>);</span><br><span class="line">        String   friendStr =split[<span class="number">1</span>];</span><br><span class="line"></span><br><span class="line">        <span class="comment">//2:继续以'-'为分隔符拆分行文本数据第一部分,得到数组</span></span><br><span class="line">        String[] userArray = split[<span class="number">0</span>].split(<span class="string">"-"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//3:对数组做一个排序</span></span><br><span class="line">        Arrays.sort(userArray);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//4:对数组中的元素进行两两组合,得到K2</span></span><br><span class="line">        <span class="comment">/*</span></span><br><span class="line"><span class="comment">          A-E-C -----&gt;  A  C  E</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">          A  C  E</span></span><br><span class="line"><span class="comment">            A  C  E</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt;userArray.length -<span class="number">1</span> ; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = i+<span class="number">1</span>; j  &lt; userArray.length ; j++) &#123;</span><br><span class="line">                <span class="comment">//5:将K2和V2写入上下文中</span></span><br><span class="line">                context.write(<span class="keyword">new</span> Text(userArray[i] +<span class="string">"-"</span>+userArray[j]), <span class="keyword">new</span> Text(friendStr));</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>Reducer类:</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Step2Reducer</span> <span class="keyword">extends</span> <span class="title">Reducer</span>&lt;<span class="title">Text</span>,<span class="title">Text</span>,<span class="title">Text</span>,<span class="title">Text</span>&gt; </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">reduce</span><span class="params">(Text key, Iterable&lt;Text&gt; values, Context context)</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">        <span class="comment">//1:原来的K2就是K3</span></span><br><span class="line">        <span class="comment">//2:将集合进行遍历,将集合中的元素拼接,得到V3</span></span><br><span class="line">        StringBuffer buffer = <span class="keyword">new</span> StringBuffer();</span><br><span class="line">        <span class="keyword">for</span> (Text value : values) &#123;</span><br><span class="line">            buffer.append(value.toString()).append(<span class="string">"-"</span>);</span><br><span class="line">            </span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//3:将K3和V3写入上下文中</span></span><br><span class="line">        context.write(key, <span class="keyword">new</span> Text(buffer.toString()));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>JobMain:</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JobMain</span> <span class="keyword">extends</span> <span class="title">Configured</span> <span class="keyword">implements</span> <span class="title">Tool</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">run</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="comment">//1:获取Job对象</span></span><br><span class="line">        Job job = Job.getInstance(<span class="keyword">super</span>.getConf(), <span class="string">"common_friends_step2_job"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//2:设置job任务</span></span><br><span class="line">            <span class="comment">//第一步:设置输入类和输入路径</span></span><br><span class="line">            job.setInputFormatClass(TextInputFormat.class);</span><br><span class="line">            TextInputFormat.addInputPath(job, <span class="keyword">new</span> Path(<span class="string">"file:///D:\\out\\common_friends_step1_out"</span>));</span><br><span class="line"></span><br><span class="line">            <span class="comment">//第二步:设置Mapper类和数据类型</span></span><br><span class="line">            job.setMapperClass(Step2Mapper.class);</span><br><span class="line">            job.setMapOutputKeyClass(Text.class);</span><br><span class="line">            job.setMapOutputValueClass(Text.class);</span><br><span class="line"></span><br><span class="line">            <span class="comment">//第三,四,五,六</span></span><br><span class="line"></span><br><span class="line">            <span class="comment">//第七步:设置Reducer类和数据类型</span></span><br><span class="line">            job.setReducerClass(Step2Reducer.class);</span><br><span class="line">            job.setOutputKeyClass(Text.class);</span><br><span class="line">            job.setOutputValueClass(Text.class);</span><br><span class="line"></span><br><span class="line">            <span class="comment">//第八步:设置输出类和输出的路径</span></span><br><span class="line">            job.setOutputFormatClass(TextOutputFormat.class);</span><br><span class="line">            TextOutputFormat.setOutputPath(job, <span class="keyword">new</span> Path(<span class="string">"file:///D:\\out\\common_friends_step2_out"</span>));</span><br><span class="line"></span><br><span class="line">        <span class="comment">//3:等待job任务结束</span></span><br><span class="line">        <span class="keyword">boolean</span> bl = job.waitForCompletion(<span class="keyword">true</span>);</span><br><span class="line">        <span class="keyword">return</span> bl ? <span class="number">0</span>: <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        Configuration configuration = <span class="keyword">new</span> Configuration();</span><br><span class="line">        <span class="comment">//启动job任务</span></span><br><span class="line">        <span class="keyword">int</span> run = ToolRunner.run(configuration, <span class="keyword">new</span> JobMain(), args);</span><br><span class="line">        System.exit(run);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="1-自定义InputFormat合并小文件"><a href="#1-自定义InputFormat合并小文件" class="headerlink" title="1. 自定义InputFormat合并小文件"></a>1. 自定义InputFormat合并小文件</h2><p><img src="/images/MapReduce/1-自定义InputFormat.bmp" alt="img"></p>
+<h3 id="1-1-需求"><a href="#1-1-需求" class="headerlink" title="1.1 需求"></a><strong>1.1 需求</strong></h3><p>无论hdfs还是mapreduce，对于小文件都有损效率，实践中，又难免面临处理大量小文件的场景，此时，就需要有相应解决方案</p>
+<h3 id="1-2-分析"><a href="#1-2-分析" class="headerlink" title="1.2 分析"></a><strong>1.2 分析</strong></h3><p>小文件的优化无非以下几种方式：</p>
+<p>1、 在数据采集的时候，就将小文件或小批数据合成大文件再上传HDFS</p>
+<p>2、 在业务处理之前，在HDFS上使用mapreduce程序对小文件进行合并</p>
+<p>3、 在mapreduce处理时，可采用combineInputFormat提高效率</p>
+<h3 id="1-3-实现"><a href="#1-3-实现" class="headerlink" title="1.3 实现"></a><strong>1.3 实现</strong></h3><p>本节实现的是上述第二种方式</p>
+<p>程序的核心机制：</p>
+<p>自定义一个InputFormat</p>
+<p>改写RecordReader，实现一次读取一个完整文件封装为KV</p>
+<p>在输出时使用SequenceFileOutPutFormat输出合并文件</p>
+<p>代码如下：</p>
+<h4 id="自定义InputFromat"><a href="#自定义InputFromat" class="headerlink" title="自定义InputFromat"></a><strong>自定义InputFromat</strong></h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyInputFormat</span> <span class="keyword">extends</span> <span class="title">FileInputFormat</span>&lt;<span class="title">NullWritable</span>,<span class="title">BytesWritable</span>&gt; </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> RecordReader&lt;NullWritable, BytesWritable&gt; <span class="title">createRecordReader</span><span class="params">(InputSplit inputSplit, TaskAttemptContext taskAttemptContext)</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">        <span class="comment">//1:创建自定义RecordReader对象</span></span><br><span class="line">        MyRecordReader myRecordReader = <span class="keyword">new</span> MyRecordReader();</span><br><span class="line">        <span class="comment">//2:将inputSplit和context对象传给MyRecordReader</span></span><br><span class="line">        myRecordReader.initialize(inputSplit, taskAttemptContext);</span><br><span class="line">        <span class="keyword">return</span> myRecordReader;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     设置文件是否可以被切割</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">boolean</span> <span class="title">isSplitable</span><span class="params">(JobContext context, Path filename)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="自定义RecordReader"><a href="#自定义RecordReader" class="headerlink" title="自定义RecordReader"></a><strong>自定义</strong>RecordReader</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyRecordReader</span> <span class="keyword">extends</span> <span class="title">RecordReader</span>&lt;<span class="title">NullWritable</span>,<span class="title">BytesWritable</span>&gt;</span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Configuration configuration = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">private</span>  FileSplit fileSplit = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> processed = <span class="keyword">false</span>;</span><br><span class="line">    <span class="keyword">private</span> BytesWritable bytesWritable = <span class="keyword">new</span> BytesWritable();</span><br><span class="line">    <span class="keyword">private</span>  FileSystem fileSystem = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">private</span>  FSDataInputStream inputStream = <span class="keyword">null</span>;</span><br><span class="line">    <span class="comment">//进行初始化工作</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">initialize</span><span class="params">(InputSplit inputSplit, TaskAttemptContext taskAttemptContext)</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">        <span class="comment">//获取文件的切片</span></span><br><span class="line">          fileSplit= (FileSplit)inputSplit;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//获取Configuration对象</span></span><br><span class="line">         configuration = taskAttemptContext.getConfiguration();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//该方法用于获取K1和V1</span></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     K1: NullWritable</span></span><br><span class="line"><span class="comment">     V1: BytesWritable</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">nextKeyValue</span><span class="params">()</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(!processed)&#123;</span><br><span class="line">            <span class="comment">//1:获取源文件的字节输入流</span></span><br><span class="line">            <span class="comment">//1.1 获取源文件的文件系统 (FileSystem)</span></span><br><span class="line">             fileSystem = FileSystem.get(configuration);</span><br><span class="line">            <span class="comment">//1.2 通过FileSystem获取文件字节输入流</span></span><br><span class="line">             inputStream = fileSystem.open(fileSplit.getPath());</span><br><span class="line"></span><br><span class="line">            <span class="comment">//2:读取源文件数据到普通的字节数组(byte[])</span></span><br><span class="line">            <span class="keyword">byte</span>[] bytes = <span class="keyword">new</span> <span class="keyword">byte</span>[(<span class="keyword">int</span>) fileSplit.getLength()];</span><br><span class="line">            IOUtils.readFully(inputStream, bytes, <span class="number">0</span>, (<span class="keyword">int</span>)fileSplit.getLength());</span><br><span class="line"></span><br><span class="line">            <span class="comment">//3:将字节数组中数据封装到BytesWritable ,得到v1</span></span><br><span class="line"></span><br><span class="line">            bytesWritable.set(bytes, <span class="number">0</span>, (<span class="keyword">int</span>)fileSplit.getLength());</span><br><span class="line"></span><br><span class="line">            processed = <span class="keyword">true</span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//返回K1</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> NullWritable <span class="title">getCurrentKey</span><span class="params">()</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> NullWritable.get();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//返回V1</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> BytesWritable <span class="title">getCurrentValue</span><span class="params">()</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> bytesWritable;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//获取文件读取的进度</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">float</span> <span class="title">getProgress</span><span class="params">()</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//进行资源释放</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">close</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        inputStream.close();</span><br><span class="line">        fileSystem.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="Mapper类"><a href="#Mapper类" class="headerlink" title="Mapper类:"></a>Mapper类:</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SequenceFileMapper</span> <span class="keyword">extends</span> <span class="title">Mapper</span>&lt;<span class="title">NullWritable</span>,<span class="title">BytesWritable</span>,<span class="title">Text</span>,<span class="title">BytesWritable</span>&gt; </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">map</span><span class="params">(NullWritable key, BytesWritable value, Context context)</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">        <span class="comment">//1:获取文件的名字,作为K2</span></span><br><span class="line">        FileSplit fileSplit = (FileSplit) context.getInputSplit();</span><br><span class="line">        String fileName = fileSplit.getPath().getName();</span><br><span class="line"></span><br><span class="line">        <span class="comment">//2:将K2和V2写入上下文中</span></span><br><span class="line">        context.write(<span class="keyword">new</span> Text(fileName), value);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="主类"><a href="#主类" class="headerlink" title="主类:"></a>主类:</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JobMain</span> <span class="keyword">extends</span> <span class="title">Configured</span> <span class="keyword">implements</span> <span class="title">Tool</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">run</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="comment">//1:获取job对象</span></span><br><span class="line">        Job job = Job.getInstance(<span class="keyword">super</span>.getConf(), <span class="string">"sequence_file_job"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//2:设置job任务</span></span><br><span class="line">            <span class="comment">//第一步:设置输入类和输入的路径</span></span><br><span class="line">            job.setInputFormatClass(MyInputFormat.class);</span><br><span class="line">            MyInputFormat.addInputPath(job, <span class="keyword">new</span> Path(<span class="string">"file:///D:\\input\\myInputformat_input"</span>));</span><br><span class="line"></span><br><span class="line">            <span class="comment">//第二步:设置Mapper类和数据类型</span></span><br><span class="line">            job.setMapperClass(SequenceFileMapper.class);</span><br><span class="line">            job.setMapOutputKeyClass(Text.class);</span><br><span class="line">            job.setMapOutputValueClass(BytesWritable.class);</span><br><span class="line"></span><br><span class="line">            <span class="comment">//第七步: 不需要设置Reducer类,但是必须设置数据类型</span></span><br><span class="line">            job.setOutputKeyClass(Text.class);</span><br><span class="line">            job.setOutputValueClass(BytesWritable.class);</span><br><span class="line"></span><br><span class="line">            <span class="comment">//第八步:设置输出类和输出的路径</span></span><br><span class="line">            job.setOutputFormatClass(SequenceFileOutputFormat.class);</span><br><span class="line">            SequenceFileOutputFormat.setOutputPath(job, <span class="keyword">new</span> Path(<span class="string">"file:///D:\\out\\myinputformat_out"</span>));</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        <span class="comment">//3:等待job任务执行结束</span></span><br><span class="line">        <span class="keyword">boolean</span> bl = job.waitForCompletion(<span class="keyword">true</span>);</span><br><span class="line">        <span class="keyword">return</span> bl ? <span class="number">0</span> : <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        Configuration configuration = <span class="keyword">new</span> Configuration();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> run = ToolRunner.run(configuration, <span class="keyword">new</span> JobMain(), args);</span><br><span class="line"></span><br><span class="line">        System.exit(run);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="2-自定义outputFormat"><a href="#2-自定义outputFormat" class="headerlink" title="2. 自定义outputFormat"></a>2. 自定义outputFormat</h2><p><img src="/images/MapReduce/2-自定义OutputFormat.bmp" alt="img"></p>
+<h3 id="2-1-需求-1"><a href="#2-1-需求-1" class="headerlink" title="2.1 需求"></a><strong>2.1</strong> <strong>需求</strong></h3><p>现在有一些订单的评论数据，需求，将订单的好评与差评进行区分开来，将最终的数据分开到不同的文件夹下面去，数据内容参见资料文件夹，其中数据第九个字段表示好评，中评，差评。0：好评，1：中评，2：差评</p>
+<h3 id="2-2-分析"><a href="#2-2-分析" class="headerlink" title="2.2 分析"></a><strong>2.2 分析</strong></h3><p>程序的关键点是要在一个mapreduce程序中根据数据的不同输出两类结果到不同目录，这类灵活的输出需求可以通过自定义outputformat来实现</p>
+<h3 id="2-3-实现"><a href="#2-3-实现" class="headerlink" title="2.3 实现"></a><strong>2.3 实现</strong></h3><p>实现要点：</p>
+<p>1、 在mapreduce中访问外部资源</p>
+<p>2、 自定义outputformat，改写其中的recordwriter，改写具体输出数据的方法write()</p>
+<h4 id="第一步：自定义MyOutputFormat"><a href="#第一步：自定义MyOutputFormat" class="headerlink" title="第一步：自定义MyOutputFormat"></a><strong>第一步</strong>：自定义MyOutputFormat</h4><p><strong>MyOutputFormat类:</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyOutputFormat</span> <span class="keyword">extends</span> <span class="title">FileOutputFormat</span>&lt;<span class="title">Text</span>,<span class="title">NullWritable</span>&gt; </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> RecordWriter&lt;Text, NullWritable&gt; <span class="title">getRecordWriter</span><span class="params">(TaskAttemptContext taskAttemptContext)</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">        <span class="comment">//1:获取目标文件的输出流(两个)</span></span><br><span class="line">        FileSystem fileSystem = FileSystem.get(taskAttemptContext.getConfiguration());</span><br><span class="line">        FSDataOutputStream goodCommentsOutputStream = fileSystem.create(<span class="keyword">new</span> Path(<span class="string">"file:///D:\\out\\good_comments\\good_comments.txt"</span>));</span><br><span class="line">        FSDataOutputStream badCommentsOutputStream = fileSystem.create(<span class="keyword">new</span> Path(<span class="string">"file:///D:\\out\\bad_comments\\bad_comments.txt"</span>));</span><br><span class="line"></span><br><span class="line">        <span class="comment">//2:将输出流传给MyRecordWriter</span></span><br><span class="line">        MyRecordWriter myRecordWriter = <span class="keyword">new</span> MyRecordWriter(goodCommentsOutputStream,badCommentsOutputStream);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> myRecordWriter;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>MyRecordReader类:</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyRecordWriter</span> <span class="keyword">extends</span> <span class="title">RecordWriter</span>&lt;<span class="title">Text</span>,<span class="title">NullWritable</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> FSDataOutputStream goodCommentsOutputStream;</span><br><span class="line">    <span class="keyword">private</span> FSDataOutputStream badCommentsOutputStream;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MyRecordWriter</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MyRecordWriter</span><span class="params">(FSDataOutputStream goodCommentsOutputStream, FSDataOutputStream badCommentsOutputStream)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.goodCommentsOutputStream = goodCommentsOutputStream;</span><br><span class="line">        <span class="keyword">this</span>.badCommentsOutputStream = badCommentsOutputStream;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> text  行文本内容</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> nullWritable</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> IOException</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> InterruptedException</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">write</span><span class="params">(Text text, NullWritable nullWritable)</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">        <span class="comment">//1:从行文本数据中获取第9个字段</span></span><br><span class="line">        String[] split = text.toString().split(<span class="string">"\t"</span>);</span><br><span class="line">        String numStr = split[<span class="number">9</span>];</span><br><span class="line"></span><br><span class="line">        <span class="comment">//2:根据字段的值,判断评论的类型,然后将对应的数据写入不同的文件夹文件中</span></span><br><span class="line">        <span class="keyword">if</span>(Integer.parseInt(numStr) &lt;= <span class="number">1</span>)&#123;</span><br><span class="line">            <span class="comment">//好评或者中评</span></span><br><span class="line">            goodCommentsOutputStream.write(text.toString().getBytes());</span><br><span class="line">            goodCommentsOutputStream.write(<span class="string">"\r\n"</span>.getBytes());</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            <span class="comment">//差评</span></span><br><span class="line">            badCommentsOutputStream.write(text.toString().getBytes());</span><br><span class="line">            badCommentsOutputStream.write(<span class="string">"\r\n"</span>.getBytes());</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">close</span><span class="params">(TaskAttemptContext taskAttemptContext)</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">        IOUtils.closeStream(goodCommentsOutputStream);</span><br><span class="line">        IOUtils.closeStream(badCommentsOutputStream);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="第二步：自定义Mapper类"><a href="#第二步：自定义Mapper类" class="headerlink" title="第二步：自定义Mapper类"></a><strong>第二步</strong>：自定义Mapper类</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyOutputFormatMapper</span> <span class="keyword">extends</span> <span class="title">Mapper</span>&lt;<span class="title">LongWritable</span>,<span class="title">Text</span>,<span class="title">Text</span>,<span class="title">NullWritable</span>&gt; </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">map</span><span class="params">(LongWritable key, Text value, Context context)</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">        context.write(value, NullWritable.get());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="第三步-主类JobMain"><a href="#第三步-主类JobMain" class="headerlink" title="第三步:主类JobMain"></a>第三步:主类JobMain</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JobMain</span> <span class="keyword">extends</span> <span class="title">Configured</span> <span class="keyword">implements</span> <span class="title">Tool</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">run</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="comment">//1:获取job对象</span></span><br><span class="line">        Job job = Job.getInstance(<span class="keyword">super</span>.getConf(), <span class="string">"myoutputformat_job"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//2:设置job任务</span></span><br><span class="line">            <span class="comment">//第一步:设置输入类和输入的路径</span></span><br><span class="line">            job.setInputFormatClass(TextInputFormat.class);</span><br><span class="line">            TextInputFormat.addInputPath(job, <span class="keyword">new</span> Path(<span class="string">"file:///D:\\input\\myoutputformat_input"</span>));</span><br><span class="line"></span><br><span class="line">            <span class="comment">//第二步:设置Mapper类和数据类型</span></span><br><span class="line">            job.setMapperClass(MyOutputFormatMapper.class);</span><br><span class="line">            job.setMapOutputKeyClass(Text.class);</span><br><span class="line">            job.setMapOutputValueClass(NullWritable.class);</span><br><span class="line"></span><br><span class="line">            <span class="comment">//第八步:设置输出类和输出的路径</span></span><br><span class="line">            job.setOutputFormatClass(MyOutputFormat.class);</span><br><span class="line">            MyOutputFormat.setOutputPath(job, <span class="keyword">new</span> Path(<span class="string">"file:///D:\\out\\myoutputformat_out"</span>));</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        <span class="comment">//3:等待任务结束</span></span><br><span class="line">        <span class="keyword">boolean</span> bl = job.waitForCompletion(<span class="keyword">true</span>);</span><br><span class="line">        <span class="keyword">return</span> bl ? <span class="number">0</span> : <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        Configuration configuration = <span class="keyword">new</span> Configuration();</span><br><span class="line">        <span class="keyword">int</span> run = ToolRunner.run(configuration, <span class="keyword">new</span> JobMain(), args);</span><br><span class="line">        System.exit(run);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="3-自定义分组求取topN"><a href="#3-自定义分组求取topN" class="headerlink" title="3. 自定义分组求取topN"></a>3. 自定义分组求取topN</h2><p><img src="/images/MapReduce/3-自定义分组求TopN.bmp" alt="img"></p>
+<p>分组是mapreduce当中reduce端的一个功能组件，主要的作用是决定哪些数据作为一组，调用一次reduce的逻辑，默认是每个不同的key，作为多个不同的组，每个组调用一次reduce逻辑，我们可以自定义分组实现不同的key作为同一个组，调用一次reduce逻辑</p>
+<h3 id="3-1-需求"><a href="#3-1-需求" class="headerlink" title="3.1 需求"></a><strong>3.1 需求</strong></h3><p>有如下订单数据</p>
+<table>
+<thead>
+<tr>
+<th>订单id</th>
+<th>商品id</th>
+<th>成交金额</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Order_0000001</td>
+<td>Pdt_01</td>
+<td>222.8</td>
+</tr>
+<tr>
+<td>Order_0000001</td>
+<td>Pdt_05</td>
+<td>25.8</td>
+</tr>
+<tr>
+<td>Order_0000002</td>
+<td>Pdt_03</td>
+<td>522.8</td>
+</tr>
+<tr>
+<td>Order_0000002</td>
+<td>Pdt_04</td>
+<td>122.4</td>
+</tr>
+<tr>
+<td>Order_0000002</td>
+<td>Pdt_05</td>
+<td>722.4</td>
+</tr>
+<tr>
+<td>Order_0000003</td>
+<td>Pdt_01</td>
+<td>222.8</td>
+</tr>
+</tbody>
+</table>
+<p>现在需要求出每一个订单中成交金额最大的一笔交易 </p>
+<h3 id="3-2-分析"><a href="#3-2-分析" class="headerlink" title="3.2 分析"></a><strong>3.2 分析</strong></h3><p>1、利用“订单id和成交金额”作为key，可以将map阶段读取到的所有订单数据按照id分区，按照金额排序，发送到reduce</p>
+<p>2、在reduce端利用分组将订单id相同的kv聚合成组，然后取第一个即是最大值</p>
+<h3 id="3-3-实现"><a href="#3-3-实现" class="headerlink" title="3.3 实现"></a><strong>3.3 实现</strong></h3><h4 id="第一步-定义OrderBean"><a href="#第一步-定义OrderBean" class="headerlink" title="第一步:定义OrderBean"></a><strong>第一步:</strong>定义OrderBean</h4><p>定义一个OrderBean，里面定义两个字段，第一个字段是我们的orderId，第二个字段是我们的金额（注意金额一定要使用Double或者DoubleWritable类型，否则没法按照金额顺序排序）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OrderBean</span>  <span class="keyword">implements</span> <span class="title">WritableComparable</span>&lt;<span class="title">OrderBean</span>&gt;</span>&#123;</span><br><span class="line">    <span class="keyword">private</span>  String orderId;</span><br><span class="line">    <span class="keyword">private</span>  Double price;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getOrderId</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> orderId;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setOrderId</span><span class="params">(String orderId)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.orderId = orderId;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Double <span class="title">getPrice</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> price;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setPrice</span><span class="params">(Double price)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.price = price;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span>  orderId + <span class="string">"\t"</span> + price;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//指定排序规则</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">compareTo</span><span class="params">(OrderBean orderBean)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//先比较订单ID,如果订单ID一致,则排序订单金额(降序)</span></span><br><span class="line">        <span class="keyword">int</span> i = <span class="keyword">this</span>.orderId.compareTo(orderBean.orderId);</span><br><span class="line">        <span class="keyword">if</span>(i == <span class="number">0</span>)&#123;</span><br><span class="line">            i = <span class="keyword">this</span>.price.compareTo(orderBean.price) * -<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> i;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//实现对象的序列化</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">write</span><span class="params">(DataOutput out)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">         out.writeUTF(orderId);</span><br><span class="line">         out.writeDouble(price);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//实现对象反序列化</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">readFields</span><span class="params">(DataInput in)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.orderId = in.readUTF();</span><br><span class="line">        <span class="keyword">this</span>.price  = in.readDouble();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="第二步-定义Mapper类"><a href="#第二步-定义Mapper类" class="headerlink" title="第二步: 定义Mapper类"></a>第二步: 定义Mapper类</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GroupMapper</span> <span class="keyword">extends</span> <span class="title">Mapper</span>&lt;<span class="title">LongWritable</span>,<span class="title">Text</span>,<span class="title">OrderBean</span>,<span class="title">Text</span>&gt; </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">map</span><span class="params">(LongWritable key, Text value, Context context)</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">        <span class="comment">//1:拆分行文本数据,得到订单的ID,订单的金额</span></span><br><span class="line">        String[] split = value.toString().split(<span class="string">"\t"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//2:封装OrderBean,得到K2</span></span><br><span class="line">        OrderBean orderBean = <span class="keyword">new</span> OrderBean();</span><br><span class="line">        orderBean.setOrderId(split[<span class="number">0</span>]);</span><br><span class="line">        orderBean.setPrice(Double.valueOf(split[<span class="number">2</span>]));</span><br><span class="line"></span><br><span class="line">        <span class="comment">//3:将K2和V2写入上下文中</span></span><br><span class="line">        context.write(orderBean, value);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="第三步-自定义分区"><a href="#第三步-自定义分区" class="headerlink" title="第三步:自定义分区"></a><strong>第三步:</strong>自定义分区</h4><p>自定义分区，按照订单id进行分区，把所有订单id相同的数据，都发送到同一个reduce中去</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OrderPartition</span> <span class="keyword">extends</span> <span class="title">Partitioner</span>&lt;<span class="title">OrderBean</span>,<span class="title">Text</span>&gt; </span>&#123;</span><br><span class="line">    <span class="comment">//分区规则: 根据订单的ID实现分区</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> orderBean K2</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> text  V2</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> i  ReduceTask个数</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 返回分区的编号</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getPartition</span><span class="params">(OrderBean orderBean, Text text, <span class="keyword">int</span> i)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> (orderBean.getOrderId().hashCode() &amp; <span class="number">2147483647</span>) % i;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="第四步-自定义分组"><a href="#第四步-自定义分组" class="headerlink" title="第四步:自定义分组"></a><strong>第四步:</strong>自定义分组</h4><p>按照我们自己的逻辑进行分组，通过比较相同的订单id，将相同的订单id放到一个组里面去，进过分组之后当中的数据，已经全部是排好序的数据，我们只需要取前topN即可</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 1: 继承WriteableComparator</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OrderGroupComparator</span> <span class="keyword">extends</span> <span class="title">WritableComparator</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 2: 调用父类的有参构造</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">OrderGroupComparator</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(OrderBean.class,<span class="keyword">true</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//3: 指定分组的规则(重写方法)</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">compare</span><span class="params">(WritableComparable a, WritableComparable b)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//3.1 对形参做强制类型转换</span></span><br><span class="line">        OrderBean first = (OrderBean)a;</span><br><span class="line">        OrderBean second = (OrderBean)b;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//3.2 指定分组规则</span></span><br><span class="line">        <span class="keyword">return</span> first.getOrderId().compareTo(second.getOrderId());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="第五步-定义Reducer类"><a href="#第五步-定义Reducer类" class="headerlink" title="第五步:定义Reducer类"></a>第五步:定义Reducer类</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GroupReducer</span> <span class="keyword">extends</span> <span class="title">Reducer</span>&lt;<span class="title">OrderBean</span>,<span class="title">Text</span>,<span class="title">Text</span>,<span class="title">NullWritable</span>&gt; </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">reduce</span><span class="params">(OrderBean key, Iterable&lt;Text&gt; values, Context context)</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line">        <span class="comment">//获取集合中的前N条数据</span></span><br><span class="line">        <span class="keyword">for</span> (Text value : values) &#123;</span><br><span class="line">            context.write(value, NullWritable.get());</span><br><span class="line">            i++;</span><br><span class="line">            <span class="keyword">if</span>(i &gt;= <span class="number">1</span>)&#123;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="第六步-程序main函数入口"><a href="#第六步-程序main函数入口" class="headerlink" title="第六步:程序main函数入口"></a><strong>第六步:</strong>程序main函数入口</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JobMain</span> <span class="keyword">extends</span> <span class="title">Configured</span> <span class="keyword">implements</span> <span class="title">Tool</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">run</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="comment">//1:获取Job对象</span></span><br><span class="line">        Job job = Job.getInstance(<span class="keyword">super</span>.getConf(), <span class="string">"mygroup_job"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//2:设置job任务</span></span><br><span class="line">            <span class="comment">//第一步:设置输入类和输入路径</span></span><br><span class="line">            job.setInputFormatClass(TextInputFormat.class);</span><br><span class="line">            TextInputFormat.addInputPath(job, <span class="keyword">new</span> Path(<span class="string">"file:///D:\\input\\mygroup_input"</span>));</span><br><span class="line"></span><br><span class="line">            <span class="comment">//第二步:设置Mapper类和数据类型</span></span><br><span class="line">            job.setMapperClass(GroupMapper.class);</span><br><span class="line">            job.setMapOutputKeyClass(OrderBean.class);</span><br><span class="line">            job.setMapOutputValueClass(Text.class);</span><br><span class="line"></span><br><span class="line">            <span class="comment">//第三,四,五,六</span></span><br><span class="line">            <span class="comment">//设置分区</span></span><br><span class="line">            job.setPartitionerClass(OrderPartition.class);</span><br><span class="line">            <span class="comment">//设置分组</span></span><br><span class="line">            job.setGroupingComparatorClass(OrderGroupComparator.class);</span><br><span class="line"></span><br><span class="line">            <span class="comment">//第七步:设置Reducer类和数据类型</span></span><br><span class="line">            job.setReducerClass(GroupReducer.class);</span><br><span class="line">            job.setOutputKeyClass(Text.class);</span><br><span class="line">            job.setOutputValueClass(NullWritable.class);</span><br><span class="line"></span><br><span class="line">            <span class="comment">//第八步:设置输出类和输出的路径</span></span><br><span class="line">            job.setOutputFormatClass(TextOutputFormat.class);</span><br><span class="line">            TextOutputFormat.setOutputPath(job, <span class="keyword">new</span> Path(<span class="string">"file:///D:\\out\\mygroup_out"</span>));</span><br><span class="line"></span><br><span class="line">        <span class="comment">//3:等待job任务结束</span></span><br><span class="line">        <span class="keyword">boolean</span> bl = job.waitForCompletion(<span class="keyword">true</span>);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> bl ? <span class="number">0</span>: <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        Configuration configuration = <span class="keyword">new</span> Configuration();</span><br><span class="line"></span><br><span class="line">        <span class="comment">//启动job任务</span></span><br><span class="line">        <span class="keyword">int</span> run = ToolRunner.run(configuration, <span class="keyword">new</span> JobMain(), args);</span><br><span class="line"></span><br><span class="line">        System.exit(run);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+      <div>
+        <div id="reward-container">
+  <div>Thank you for your accept. mua！</div>
+  <button id="reward-button" disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/reward/wechatpay.jpg" alt="丨HF丨 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/reward/alipay.jpg" alt="丨HF丨 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        
+
+
+
+
+  
+
+
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>丨HF丨</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    
+    <a href="https://manzhong.github.io/2017/07/06/MapReduce2.html" title="MapReduce2">https://manzhong.github.io/2017/07/06/MapReduce2.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+    <div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:16px;">-------------本文结束<i class="fa fa-heart"></i>感谢您的阅读-------------</div>
+    
+</div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/BigData/" rel="tag"><i class="fa fa-tag"></i> BigData</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/07/06/MapReduce.html" rel="next" title="MapReduce">
+                <i class="fa fa-chevron-left"></i> MapReduce
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/06/Yarn资源调度.html" rel="prev" title="Yarn资源调度">
+                Yarn资源调度 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC81MDA2Mi8yNjU1Mw=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/hexo.jpg" alt="丨HF丨">
+            
+              <p class="site-author-name" itemprop="name">丨HF丨</p>
+              <div class="site-description motion-element" itemprop="description">第二名就是头号输家!!!</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">54</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/ipyker" title="GitHub &rarr; https://github.com/ipyker" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:pyker@qq.com" title="E-Mail &rarr; mailto:pyker@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://weibo.com/viszhang" title="Weibo &rarr; https://weibo.com/viszhang" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="tencent://message/?uin=123435796&Site=&menu=yes" title="QQ &rarr; tencent://message/?uin=123435796&Site=&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i>QQ</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-book"></i>
+                推荐阅读
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://www.54tianzhisheng.cn/tags/Flink/" title="http://www.54tianzhisheng.cn/tags/Flink/" rel="noopener" target="_blank">Flink</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://nginxconfig.io/" title="https://nginxconfig.io/" rel="noopener" target="_blank">Nginxconfig</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://linux.51yip.com/" title="http://linux.51yip.com/" rel="noopener" target="_blank">Linux命令手册</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://echarts.baidu.com/index.html" title="https://echarts.baidu.com/index.html" rel="noopener" target="_blank">echarts可视化库</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+        </div>
+      </div>
+
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" style=" text-align:center;">&copy; 2017 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HF</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"> 站点字数合计:</i>
+    </span>
+    
+    <span title="站点总字数">961k</span>
+  
+  
+  <span class="post-meta-divider">|</span>
+  <a href="http://www.beian.miit.gov.cn" rel="noopener" target="_blank">粤ICP备19028706号 </a>
+
+</div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+
+<div class="run_time" style=" text-align:center;">
+  <span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+  <script>
+    var now = new Date(); 
+    function createtime() { 
+        var grt= new Date("07/23/2017 10:00:00");//此处修改你的建站时间或者网站上线时间 
+        now.setTime(now.getTime()+250); 
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days); 
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours); 
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum); 
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;} 
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum); 
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;} 
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 "; 
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒"; 
+    } 
+    setInterval("createtime()",250);
+  </script>
+</div>
+        
+<div class="busuanzi-count" style=" text-align:center;">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      我的第 <span class="busuanzi-value" id="busuanzi_value_site_uv"></span> 位朋友，
+    </span>
+  
+
+
+
+  
+    <span class="site-pv">
+      历经 <span class="busuanzi-value" id="busuanzi_value_site_pv"></span> 次回眸才与你相遇
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+  
+    
+    
+      
+    
+  
+  <script color="255,0,255" opacity="0.7" zindex="-1" count="140" src="//cdn.jsdelivr.net/gh/theme-next/theme-next-canvas-nest@1.0.0/canvas-nest.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.1"></script>
+
+  <script src="/js/motion.js?v=7.1.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/schemes/muse.js?v=7.1.1"></script>
+
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.1"></script>
+<script src="/js/post-details.js?v=7.1.1"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.1"></script>
+
+
+  
+
+  
+
+  
+  
+  
+
+  
+
+  
+  
+  
+
+
+  
+
+
+  
+    <script>
+  window.livereOptions = {
+    refer: '2017/07/06/MapReduce2.html'
+  };
+  (function(d, s) {
+    var j, e = d.getElementsByTagName(s)[0];
+    if (typeof LivereTower === 'function') { return; }
+    j = d.createElement(s);
+    j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+    j.async = true;
+    e.parentNode.insertBefore(j, e);
+  })(document, 'script');
+</script>
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <script src="/lib/bookmark/bookmark.min.js?v=1.0"></script>
+  <script>
+  
+    bookmark.scrollToMark('auto', "#更多");
+  
+  </script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

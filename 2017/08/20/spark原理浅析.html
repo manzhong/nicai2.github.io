@@ -1,0 +1,1755 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="true">
+
+
+
+  
+  
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.1.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":true,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: true,
+    fastclick: true,
+    lazyload: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"shrinkIn","post_header":"slideLeftIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideDownIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="一spark特性1 rdd的分区和shuffle分区的作用 RDD 使用分区来分布式并行处理数据, 并且要做到尽量少的在不同的 Executor 之间使用网络交换数据, 所以当使用 RDD 读取数据的时候, 会尽量的在物理上靠近数据源, 比如说在读取 Cassandra 或者 HDFS 中数据的时候, 会尽量的保持 RDD 的分区和数据源的分区数, 分区模式等一一对应 分区和 Shuffle 的关">
+<meta name="keywords" content="BigData">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spark原理浅析">
+<meta property="og:url" content="https://manzhong.github.io/2017/08/20/spark原理浅析.html">
+<meta property="og:site_name" content="春雨里洗过的太阳">
+<meta property="og:description" content="一spark特性1 rdd的分区和shuffle分区的作用 RDD 使用分区来分布式并行处理数据, 并且要做到尽量少的在不同的 Executor 之间使用网络交换数据, 所以当使用 RDD 读取数据的时候, 会尽量的在物理上靠近数据源, 比如说在读取 Cassandra 或者 HDFS 中数据的时候, 会尽量的保持 RDD 的分区和数据源的分区数, 分区模式等一一对应 分区和 Shuffle 的关">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://manzhong.github.io/images/spark/fqd.png">
+<meta property="og:image" content="https://manzhong.github.io/images/spark/rbk.png">
+<meta property="og:image" content="https://manzhong.github.io/images/spark/hbs.png">
+<meta property="og:image" content="https://manzhong.github.io/images/spark/sbs.png">
+<meta property="og:image" content="https://manzhong.github.io/images/spark/rc2.png">
+<meta property="og:updated_time" content="2020-03-15T15:01:54.423Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="spark原理浅析">
+<meta name="twitter:description" content="一spark特性1 rdd的分区和shuffle分区的作用 RDD 使用分区来分布式并行处理数据, 并且要做到尽量少的在不同的 Executor 之间使用网络交换数据, 所以当使用 RDD 读取数据的时候, 会尽量的在物理上靠近数据源, 比如说在读取 Cassandra 或者 HDFS 中数据的时候, 会尽量的保持 RDD 的分区和数据源的分区数, 分区模式等一一对应 分区和 Shuffle 的关">
+<meta name="twitter:image" content="https://manzhong.github.io/images/spark/fqd.png">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="春雨里洗过的太阳" type="application/atom+xml">
+
+
+
+  
+  
+  <link rel="canonical" href="https://manzhong.github.io/2017/08/20/spark原理浅析">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>spark原理浅析 | 春雨里洗过的太阳</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+ 
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">春雨里洗过的太阳</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-bookmark"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-互动">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/guestbook/" rel="section"><i class="menu-item-icon fa fa-fw fa-comments"></i> <br>互动</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://manzhong.github.io/2017/08/20/spark原理浅析.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="丨HF丨">
+      <meta itemprop="description" content="第二名就是头号输家!!!">
+      <meta itemprop="image" content="/images/hexo.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="春雨里洗过的太阳">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">spark原理浅析
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2017-08-20 19:25:34" itemprop="dateCreated datePublished" datetime="2017-08-20T19:25:34+08:00">2017-08-20</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2020-03-15 23:01:54" itemprop="dateModified" datetime="2020-03-15T23:01:54+08:00">2020-03-15</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/BigData/" itemprop="url" rel="index"><span itemprop="name">BigData</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">13k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">12 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="一spark特性"><a href="#一spark特性" class="headerlink" title="一spark特性"></a>一spark特性</h1><h2 id="1-rdd的分区和shuffle"><a href="#1-rdd的分区和shuffle" class="headerlink" title="1 rdd的分区和shuffle"></a>1 rdd的分区和shuffle</h2><p>分区的作用</p>
+<p>RDD 使用分区来分布式并行处理数据, 并且要做到尽量少的在不同的 Executor 之间使用网络交换数据, 所以当使用 RDD 读取数据的时候, 会尽量的在物理上靠近数据源, 比如说在读取 Cassandra 或者 HDFS 中数据的时候, 会尽量的保持 RDD 的分区和数据源的分区数, 分区模式等一一对应</p>
+<p>分区和 Shuffle 的关系</p>
+<p>分区的主要作用是用来实现并行计算, 本质上和 Shuffle 没什么关系, 但是往往在进行数据处理的时候, 例如 <code>reduceByKey</code>, <code>groupByKey</code> 等聚合操作, 需要把 Key 相同的 Value 拉取到一起进行计算, 这个时候因为这些 Key 相同的 Value 可能会坐落于不同的分区, 于是理解分区才能理解 Shuffle 的根本原理</p>
+<p>Spark 中的 Shuffle 操作的特点</p>
+<ul>
+<li>只有 <code>Key-Value</code> 型的 RDD 才会有 Shuffle 操作, 例如 <code>RDD[(K, V)]</code>, 但是有一个特例, 就是 <code>repartition</code> 算子可以对任何数据类型 Shuffle</li>
+<li>早期版本 Spark 的 Shuffle 算法是 <code>Hash base shuffle</code>, 后来改为 <code>Sort base shuffle</code>, 更适合大吞吐量的场景</li>
+</ul>
+<h2 id="2分区操作"><a href="#2分区操作" class="headerlink" title="2分区操作"></a>2分区操作</h2><p>很多算子(支持shuffle的 )都可以指定分区数</p>
+<ul>
+<li>这些算子,可以在最后一个参数的位置传入新的分区数</li>
+<li>如没有重新指定分区数,默认从父rdd中继承分区数</li>
+</ul>
+<h3 id="1-查看分区数"><a href="#1-查看分区数" class="headerlink" title="1 查看分区数"></a>1 查看分区数</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">scala&gt; sc.parallelize(<span class="number">1</span> to <span class="number">100</span>).count</span><br><span class="line">res0: <span class="type">Long</span> = <span class="number">100</span></span><br></pre></td></tr></table></figure>
+<p><code>spark-shell --master local[8]</code>, 这样会生成 1 个 Executors, 这个 Executors 有 8 个 Cores, 所以默认会有 8 个 Tasks, 每个 Cores 对应一个分区, 每个分区对应一个 Tasks, 可以通过 <code>rdd.partitions.size</code> 来查看分区数量</p>
+<p>默认的分区数量是和 Cores 的数量有关的, 也可以通过如下三种方式修改或者重新指定分区数量</p>
+<ul>
+<li><h3 id="创建-RDD-时指定分区数"><a href="#创建-RDD-时指定分区数" class="headerlink" title="创建 RDD 时指定分区数"></a><strong>创建 RDD 时指定分区数</strong></h3></li>
+</ul>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">scala&gt; <span class="keyword">val</span> rdd1 = sc.parallelize(<span class="number">1</span> to <span class="number">100</span>, <span class="number">6</span>)</span><br><span class="line">rdd1: org.apache.spark.rdd.<span class="type">RDD</span>[<span class="type">Int</span>] = <span class="type">ParallelCollectionRDD</span>[<span class="number">1</span>] at parallelize at &lt;console&gt;:<span class="number">24</span></span><br><span class="line"></span><br><span class="line">scala&gt; rdd1.partitions.size</span><br><span class="line">res1: <span class="type">Int</span> = <span class="number">6</span></span><br><span class="line"></span><br><span class="line">scala&gt; <span class="keyword">val</span> rdd2 = sc.textFile(<span class="string">"hdfs:///dataset/wordcount.txt"</span>, <span class="number">6</span>)</span><br><span class="line">rdd2: org.apache.spark.rdd.<span class="type">RDD</span>[<span class="type">String</span>] = hdfs:<span class="comment">///dataset/wordcount.txt MapPartitionsRDD[3] at textFile at &lt;console&gt;:24</span></span><br><span class="line"></span><br><span class="line">scala&gt; rdd2.partitions.size</span><br><span class="line">res2: <span class="type">Int</span> = <span class="number">7</span></span><br></pre></td></tr></table></figure>
+<p>rdd1 是通过本地集合创建的, 创建的时候通过第二个参数指定了分区数量. rdd2 是通过读取 HDFS 中文件创建的, 同样通过第二个参数指定了分区数, 因为是从 HDFS 中读取文件, 所以最终的分区数是由 Hadoop 的 InputFormat 来指定的, 所以比指定的分区数大了一个.</p>
+<ul>
+<li><strong>通过</strong> <code>coalesce</code> <strong>算子指定</strong></li>
+</ul>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">coalesce(numPartitions: <span class="type">Int</span>, shuffle: <span class="type">Boolean</span> = <span class="literal">false</span>)(<span class="keyword">implicit</span> ord: <span class="type">Ordering</span>[<span class="type">T</span>] = <span class="literal">null</span>): <span class="type">RDD</span>[<span class="type">T</span>]</span><br></pre></td></tr></table></figure>
+<p>numPartitions        新生成的 RDD 的分区数</p>
+<p>shuffle            是否 Shuffle</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">scala&gt; <span class="keyword">val</span> source = sc.parallelize(<span class="number">1</span> to <span class="number">100</span>, <span class="number">6</span>)</span><br><span class="line">source: org.apache.spark.rdd.<span class="type">RDD</span>[<span class="type">Int</span>] = <span class="type">ParallelCollectionRDD</span>[<span class="number">0</span>] at parallelize at &lt;console&gt;:<span class="number">24</span></span><br><span class="line"></span><br><span class="line">scala&gt; source.partitions.size</span><br><span class="line">res0: <span class="type">Int</span> = <span class="number">6</span></span><br><span class="line"></span><br><span class="line">scala&gt; <span class="keyword">val</span> noShuffleRdd = source.coalesce(numPartitions=<span class="number">8</span>, shuffle=<span class="literal">false</span>)</span><br><span class="line">noShuffleRdd: org.apache.spark.rdd.<span class="type">RDD</span>[<span class="type">Int</span>] = <span class="type">CoalescedRDD</span>[<span class="number">1</span>] at coalesce at &lt;console&gt;:<span class="number">26</span></span><br><span class="line"></span><br><span class="line">scala&gt; noShuffleRdd.toDebugString </span><br><span class="line">res1: <span class="type">String</span> =</span><br><span class="line">(<span class="number">6</span>) <span class="type">CoalescedRDD</span>[<span class="number">1</span>] at coalesce at &lt;console&gt;:<span class="number">26</span> []</span><br><span class="line"> |  <span class="type">ParallelCollectionRDD</span>[<span class="number">0</span>] at parallelize at &lt;console&gt;:<span class="number">24</span> []</span><br><span class="line"></span><br><span class="line"> scala&gt; <span class="keyword">val</span> noShuffleRdd = source.coalesce(numPartitions=<span class="number">8</span>, shuffle=<span class="literal">false</span>)</span><br><span class="line"> noShuffleRdd: org.apache.spark.rdd.<span class="type">RDD</span>[<span class="type">Int</span>] = <span class="type">CoalescedRDD</span>[<span class="number">1</span>] at coalesce at &lt;console&gt;:<span class="number">26</span></span><br><span class="line"></span><br><span class="line">scala&gt; shuffleRdd.toDebugString </span><br><span class="line">res3: <span class="type">String</span> =</span><br><span class="line">(<span class="number">8</span>) <span class="type">MapPartitionsRDD</span>[<span class="number">5</span>] at coalesce at &lt;console&gt;:<span class="number">26</span> []</span><br><span class="line"> |  <span class="type">CoalescedRDD</span>[<span class="number">4</span>] at coalesce at &lt;console&gt;:<span class="number">26</span> []</span><br><span class="line"> |  <span class="type">ShuffledRDD</span>[<span class="number">3</span>] at coalesce at &lt;console&gt;:<span class="number">26</span> []</span><br><span class="line"> +-(<span class="number">6</span>) <span class="type">MapPartitionsRDD</span>[<span class="number">2</span>] at coalesce at &lt;console&gt;:<span class="number">26</span> []</span><br><span class="line">    |  <span class="type">ParallelCollectionRDD</span>[<span class="number">0</span>] at parallelize at &lt;console&gt;:<span class="number">24</span> []</span><br><span class="line"></span><br><span class="line">scala&gt; noShuffleRdd.partitions.size     </span><br><span class="line">res4: <span class="type">Int</span> = <span class="number">6</span></span><br><span class="line"></span><br><span class="line">scala&gt; shuffleRdd.partitions.size</span><br><span class="line">res5: <span class="type">Int</span> = <span class="number">8</span></span><br><span class="line"></span><br><span class="line">如果 shuffle 参数指定为 <span class="literal">false</span>, 运行计划中确实没有 <span class="type">ShuffledRDD</span>, 没有 shuffled 这个过程</span><br><span class="line">如果 shuffle 参数指定为 <span class="literal">true</span>, 运行计划中有一个 <span class="type">ShuffledRDD</span>, 有一个明确的显式的 shuffled 过程</span><br><span class="line">如果 shuffle 参数指定为 <span class="literal">false</span> 却增加了分区数, 分区数并不会发生改变, 这是因为增加分区是一个宽依赖, 没有 shuffled 过程无法做到, 后续会详细解释宽依赖的概念</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>通过</strong> <code>repartition</code> <strong>算子指定</strong></li>
+</ul>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">repartition(numPartitions: <span class="type">Int</span>)(<span class="keyword">implicit</span> ord: <span class="type">Ordering</span>[<span class="type">T</span>] = <span class="literal">null</span>): <span class="type">RDD</span>[<span class="type">T</span>]</span><br></pre></td></tr></table></figure>
+<p><code>repartition</code> 算子本质上就是 <code>coalesce(numPartitions, shuffle = true)</code></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">scala&gt; <span class="keyword">val</span> source = sc.parallelize(<span class="number">1</span> to <span class="number">100</span>, <span class="number">6</span>)</span><br><span class="line">source: org.apache.spark.rdd.<span class="type">RDD</span>[<span class="type">Int</span>] = <span class="type">ParallelCollectionRDD</span>[<span class="number">7</span>] at parallelize at &lt;console&gt;:<span class="number">24</span></span><br><span class="line"></span><br><span class="line">scala&gt; source.partitions.size</span><br><span class="line">res7: <span class="type">Int</span> = <span class="number">6</span></span><br><span class="line"></span><br><span class="line">scala&gt; source.repartition(<span class="number">100</span>).partitions.size </span><br><span class="line">res8: <span class="type">Int</span> = <span class="number">100</span></span><br><span class="line"></span><br><span class="line">scala&gt; source.repartition(<span class="number">1</span>).partitions.size </span><br><span class="line">res9: <span class="type">Int</span> = <span class="number">1</span></span><br><span class="line">增加分区有效</span><br><span class="line">减少分区有效</span><br></pre></td></tr></table></figure>
+<p><code>repartition</code> 算子无论是增加还是减少分区都是有效的, 因为本质上 <code>repartition</code> 会通过 <code>shuffle</code> 操作把数据分发给新的 RDD 的不同的分区, 只有 <code>shuffle</code> 操作才可能做到增大分区数, 默认情况下, 分区函数是 <code>RoundRobin</code>, 如果希望改变分区函数, 也就是数据分布的方式, 可以通过自定义分区函数来实现</p>
+<p><img src="/images/spark/fqd.png" alt="img"></p>
+<h2 id="2-RDD-的-Shuffle-是什么"><a href="#2-RDD-的-Shuffle-是什么" class="headerlink" title="2 RDD 的 Shuffle 是什么"></a>2 RDD 的 Shuffle 是什么</h2><p><strong>partitioner用于计算一个数据应该发往哪个机器上 (就是哪个分区)</strong></p>
+<ul>
+<li>HashPartitioner 函数  对key求hashcode和对应的reduce的数量取模 摸出来是几就发往哪个分区</li>
+<li>key .hashCode % reduce count 的值   取值范围在0 到 reduce count之间</li>
+</ul>
+<p><strong>hash base 和sort base 用于描述中间过程如何存放文件*</strong></p>
+<p>rdd2 =rdd1.reduceByKey(_+_)    这个reduceByKey() 是属于rdd2的</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> sourceRdd = sc.textFile(<span class="string">"hdfs://node01:9020/dataset/wordcount.txt"</span>)</span><br><span class="line"><span class="keyword">val</span> flattenCountRdd = sourceRdd.flatMap(_.split(<span class="string">" "</span>)).map((_, <span class="number">1</span>))</span><br><span class="line"><span class="keyword">val</span> aggCountRdd = flattenCountRdd.reduceByKey(_ + _)  <span class="comment">//这个reduceByKey() 是属于aggCountRdd</span></span><br><span class="line"><span class="keyword">val</span> result = aggCountRdd.collect</span><br></pre></td></tr></table></figure>
+<p><img src="/images/spark/rbk.png" alt="img"></p>
+<p><code>reduceByKey</code> 这个算子本质上就是先按照 Key 分组, 后对每一组数据进行 <code>reduce</code>, 所面临的挑战就是 Key 相同的所有数据可能分布在不同的 Partition 分区中, 甚至可能在不同的节点中, 但是它们必须被共同计算.</p>
+<p>为了让来自相同 Key 的所有数据都在 <code>reduceByKey</code> 的同一个 <code>reduce</code> 中处理, 需要执行一个 <code>all-to-all</code> 的操作, 需要在不同的节点(不同的分区)之间拷贝数据, 必须跨分区聚集相同 Key 的所有数据, 这个过程叫做 <code>Shuffle</code>.</p>
+<h2 id="3-RDD-的-Shuffle-原理"><a href="#3-RDD-的-Shuffle-原理" class="headerlink" title="3 RDD 的 Shuffle 原理"></a>3 RDD 的 Shuffle 原理</h2><p>Spark 的 Shuffle 发展大致有两个阶段: <code>Hash base shuffle</code> 和 <code>Sort base shuffle</code></p>
+<h3 id="3-1-Hash-base-shuffle"><a href="#3-1-Hash-base-shuffle" class="headerlink" title="3.1 Hash base shuffle"></a>3.1 <strong>Hash base shuffle</strong></h3><p><img src="/images/spark/hbs.png" alt="img"></p>
+<p>大致的原理是分桶, 假设 Reducer 的个数为 R, 那么每个 Mapper 有 R 个桶, 按照 Key 的 Hash 将数据映射到不同的桶中, Reduce 找到每一个 Mapper 中对应自己的桶拉取数据.</p>
+<p>假设 Mapper 的个数为 M, 整个集群的文件数量是 <code>M * R</code>, 如果有 1,000 个 Mapper 和 Reducer, 则会生成 1,000,000 个文件, 这个量非常大了.</p>
+<p>过多的文件会导致文件系统打开过多的文件描述符, 占用系统资源. 所以这种方式并不适合大规模数据的处理, 只适合中等规模和小规模的数据处理, 在 Spark 1.2 版本中废弃了这种方式.</p>
+<h3 id="3-2-Sort-base-shuffle"><a href="#3-2-Sort-base-shuffle" class="headerlink" title="3.2 Sort base shuffle"></a>3.2 <strong>Sort base shuffle</strong></h3><p><img src="/images/spark/sbs.png" alt="img"></p>
+<p>对于 Sort base shuffle 来说, 每个 Map 侧的分区只有一个输出文件, Reduce 侧的 Task 来拉取, 大致流程如下</p>
+<ol>
+<li>Map 侧将数据全部放入一个叫做 AppendOnlyMap 的组件中, 同时可以在这个特殊的数据结构中做聚合操作</li>
+<li>然后通过一个类似于 MergeSort 的排序算法 TimSort 对 AppendOnlyMap 底层的 Array 排序<ul>
+<li>先按照 Partition ID 排序, 后按照 Key 的 HashCode 排序</li>
+</ul>
+</li>
+<li>最终每个 Map Task 生成一个 输出文件, Reduce Task 来拉取自己对应的数据</li>
+</ol>
+<p>从上面可以得到结论, Sort base shuffle 确实可以大幅度减少所产生的中间文件, 从而能够更好的应对大吞吐量的场景, 在 Spark 1.2 以后, 已经默认采用这种方式.</p>
+<p>但是需要大家知道的是, Spark 的 Shuffle 算法并不只是这一种, 即使是在最新版本, 也有三种 Shuffle 算法, 这三种算法对每个 Map 都只产生一个临时文件, 但是产生文件的方式不同, 一种是类似 Hash 的方式, 一种是刚才所说的 Sort, 一种是对 Sort 的一种优化(使用 Unsafe API 直接申请堆外内存)</p>
+<h1 id="二-缓存"><a href="#二-缓存" class="headerlink" title="二 缓存"></a>二 缓存</h1><p>缓存是将数据缓存到blockMananger 中   导入隐式转换的意义 是可以获得ds和df的底层 row 和internelRow </p>
+<h2 id="1-缓存的意义"><a href="#1-缓存的意义" class="headerlink" title="1 缓存的意义"></a>1 缓存的意义</h2><p><strong>使用缓存的原因 - 多次使用 RDD</strong>  减少shuffle,减少其他算子执行,缓存算子生成结果</p>
+<p>需求:</p>
+<p>在日志文件中找到访问次数最少的 IP 和访问次数最多的 IP</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.nicai.demo</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.commons.lang3.<span class="type">StringUtils</span></span><br><span class="line"><span class="keyword">import</span> org.apache.spark.&#123;<span class="type">SparkConf</span>, <span class="type">SparkContext</span>&#125;</span><br><span class="line"><span class="keyword">import</span> org.junit.<span class="type">Test</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CacheDemo</span> </span>&#123;</span><br><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 1. 创建sc</span></span><br><span class="line"><span class="comment">    * 2. 读取文件</span></span><br><span class="line"><span class="comment">    * 3. 取出IP, 赋予初始频率</span></span><br><span class="line"><span class="comment">    * 4. 清洗</span></span><br><span class="line"><span class="comment">    * 5. 统计IP出现的次数</span></span><br><span class="line"><span class="comment">    * 6. 统计出现次数最少的IP</span></span><br><span class="line"><span class="comment">    * 7. 统计出现次数最多的IP</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">  <span class="meta">@Test</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">prepare</span></span>(): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="comment">// 1. 创建 SC</span></span><br><span class="line">    <span class="keyword">val</span> conf = <span class="keyword">new</span> <span class="type">SparkConf</span>().setAppName(<span class="string">"cache_prepare"</span>).setMaster(<span class="string">"local[6]"</span>)</span><br><span class="line">    <span class="keyword">val</span> sc = <span class="keyword">new</span> <span class="type">SparkContext</span>(conf)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 2. 读取文件</span></span><br><span class="line">    <span class="keyword">val</span> source = sc.textFile(<span class="string">"G:\\develop\\data\\access_log_sample.txt"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 3. 取出IP, 赋予初始频率</span></span><br><span class="line">    <span class="keyword">val</span> countRDD = source.map( item =&gt; (item.split(<span class="string">" "</span>)(<span class="number">0</span>), <span class="number">1</span>) )</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 4. 数据清洗</span></span><br><span class="line">    <span class="keyword">val</span> cleanRDD = countRDD.filter( item =&gt; <span class="type">StringUtils</span>.isNotEmpty(item._1) )</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 5. 统计IP出现的次数(聚合)</span></span><br><span class="line">    <span class="keyword">val</span> aggRDD = cleanRDD.reduceByKey( (curr, agg) =&gt; curr + agg )</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 6. 统计出现次数最少的IP(得出结论)  </span></span><br><span class="line">    <span class="keyword">val</span> lessIp = aggRDD.sortBy(item =&gt; item._2, ascending = <span class="literal">true</span>).first()</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 7. 统计出现次数最多的IP(得出结论) 降序</span></span><br><span class="line">    <span class="keyword">val</span> moreIp = aggRDD.sortBy(item =&gt; item._2, ascending = <span class="literal">false</span>).first()</span><br><span class="line"></span><br><span class="line">    println((lessIp, moreIp))</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="number">5</span>是一个 <span class="type">Shuffle</span> 操作, <span class="type">Shuffle</span> 操作会在集群内进行数据拷贝</span><br><span class="line">在上述代码中, 多次使用到了 aggRDD并执行了action操作, 导致文件读取两次,<span class="number">6</span>之前的代码(执行)计算两次, 性能有损耗</span><br></pre></td></tr></table></figure>
+<p><strong>使用缓存的原因 - 容错</strong></p>
+<p><img src="/images/spark/rc2.png" alt="img"></p>
+<p>当在计算 RDD3 的时候如果出错了, 会怎么进行容错?</p>
+<p>会再次计算 RDD1 和 RDD2 的整个链条, 假设 RDD1 和 RDD2 是通过比较昂贵的操作得来的, 有没有什么办法减少这种开销?</p>
+<p>上述两个问题的解决方案其实都是 <code>缓存</code>, 除此之外, 使用缓存的理由还有很多, 但是总结一句, 就是缓存能够帮助开发者在进行一些昂贵操作后, 将其结果保存下来, 以便下次使用无需再次执行, 缓存能够显著的提升性能.</p>
+<p>所以, 缓存适合在一个 RDD 需要重复多次利用, 并且还不是特别大的情况下使用, 例如迭代计算等场景.</p>
+<h2 id="2-缓存相关的-API"><a href="#2-缓存相关的-API" class="headerlink" title="2 缓存相关的 API"></a>2 缓存相关的 API</h2><h3 id="2-1-可以使用-cache-方法进行缓存"><a href="#2-1-可以使用-cache-方法进行缓存" class="headerlink" title="2.1 可以使用 cache 方法进行缓存"></a>2.1 <strong>可以使用</strong> <code>cache</code> <strong>方法进行缓存</strong></h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//使用cache缓存</span></span><br><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cacheDemo</span></span>(): <span class="type">Unit</span> = &#123;</span><br><span class="line">  <span class="keyword">val</span> conf = <span class="keyword">new</span> <span class="type">SparkConf</span>().setMaster(<span class="string">"local[3]"</span>).setAppName(<span class="string">"cache"</span>)</span><br><span class="line">  <span class="keyword">val</span> context =<span class="keyword">new</span>  <span class="type">SparkContext</span>(conf)</span><br><span class="line">  <span class="comment">//读取文件</span></span><br><span class="line">  <span class="keyword">val</span> file = context.textFile(<span class="string">"G:\\develop\\bigdatas\\BigData\\day26sparkActions\\data\\access_log_sample.txt"</span>)</span><br><span class="line">  <span class="keyword">val</span> rdd1 = file.map(it =&gt; ((it.split(<span class="string">" "</span>)) (<span class="number">0</span>), <span class="number">1</span>))</span><br><span class="line">    .reduceByKey((curr, agg) =&gt; curr + agg)</span><br><span class="line">    .cache()                <span class="comment">//缓存结果</span></span><br><span class="line">  <span class="keyword">val</span> rddMax = rdd1</span><br><span class="line">    .sortBy(item =&gt; item._2, <span class="literal">true</span>)</span><br><span class="line">    .first()</span><br><span class="line">  <span class="keyword">val</span> rddMin = rdd1.sortBy(item2 =&gt; item2._2,<span class="literal">false</span>).first()</span><br><span class="line">  println(rddMax,rddMin)</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//其实 cache 方法底层就是persist()方法  这个persist()  底层有调用了persist(StorageLevel.MEMORY_ONLY)方法   StorageLevel.MEMORY_ONLY为其默认</span></span><br></pre></td></tr></table></figure>
+<h3 id="2-2-也可以使用-persist-方法进行缓存"><a href="#2-2-也可以使用-persist-方法进行缓存" class="headerlink" title="2.2 也可以使用 persist 方法进行缓存"></a>2.2 <strong>也可以使用 persist 方法进行缓存</strong></h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//使用persist缓存</span></span><br><span class="line"> <span class="meta">@Test</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">persistDemo</span></span>(): <span class="type">Unit</span> = &#123;</span><br><span class="line">   <span class="keyword">val</span> conf = <span class="keyword">new</span> <span class="type">SparkConf</span>().setMaster(<span class="string">"local[3]"</span>).setAppName(<span class="string">"cache"</span>)</span><br><span class="line">   <span class="keyword">val</span> context =<span class="keyword">new</span>  <span class="type">SparkContext</span>(conf)</span><br><span class="line">   <span class="comment">//读取文件</span></span><br><span class="line">   <span class="keyword">val</span> file = context.textFile(<span class="string">"G:\\develop\\bigdatas\\BigData\\day26sparkActions\\data\\access_log_sample.txt"</span>)</span><br><span class="line">   <span class="keyword">val</span> rdd1 = file.map(it =&gt; ((it.split(<span class="string">" "</span>)) (<span class="number">0</span>), <span class="number">1</span>))</span><br><span class="line">     .reduceByKey((curr, agg) =&gt; curr + agg)</span><br><span class="line">     .persist(<span class="type">StorageLevel</span>.<span class="type">MEMORY_ONLY</span>)              <span class="comment">//缓存结果  与cache, persist()一样</span></span><br><span class="line">   <span class="comment">//.persist(参数)    //缓存级别</span></span><br><span class="line">   <span class="keyword">val</span> rddMax = rdd1</span><br><span class="line">     .sortBy(item =&gt; item._2, <span class="literal">true</span>)</span><br><span class="line">     .first()</span><br><span class="line">   <span class="keyword">val</span> rddMin = rdd1.sortBy(item2 =&gt; item2._2,<span class="literal">false</span>).first()</span><br><span class="line">   println(rddMax,rddMin)</span><br><span class="line"> &#125;</span><br><span class="line"> <span class="comment">//其实 cache 方法底层就是persist()方法  这个persist()  底层有调用了persist(StorageLevel.MEMORY_ONLY)方法   StorageLevel.MEMORY_ONLY为其默认</span></span><br></pre></td></tr></table></figure>
+<h3 id="2-3-清理缓存"><a href="#2-3-清理缓存" class="headerlink" title="2.3 清理缓存"></a>2.3 清理缓存</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">cacheDemo</span></span>(): <span class="type">Unit</span> = &#123;</span><br><span class="line">   <span class="keyword">val</span> conf = <span class="keyword">new</span> <span class="type">SparkConf</span>().setMaster(<span class="string">"local[3]"</span>).setAppName(<span class="string">"cache"</span>)</span><br><span class="line">   <span class="keyword">val</span> context =<span class="keyword">new</span>  <span class="type">SparkContext</span>(conf)</span><br><span class="line">   <span class="comment">//读取文件</span></span><br><span class="line">   <span class="keyword">val</span> file = context.textFile(<span class="string">"G:\\develop\\bigdatas\\BigData\\day26sparkActions\\data\\access_log_sample.txt"</span>)</span><br><span class="line">   <span class="keyword">val</span> rdd1 = file.map(it =&gt; ((it.split(<span class="string">" "</span>)) (<span class="number">0</span>), <span class="number">1</span>))</span><br><span class="line">     .reduceByKey((curr, agg) =&gt; curr + agg)</span><br><span class="line">     .cache()                <span class="comment">//缓存结果</span></span><br><span class="line">     </span><br><span class="line">     <span class="comment">//清除缓存</span></span><br><span class="line">     rdd.unpersist()  </span><br><span class="line">   <span class="keyword">val</span> rddMax = rdd1</span><br><span class="line">     .sortBy(item =&gt; item._2, <span class="literal">true</span>)</span><br><span class="line">     .first()</span><br><span class="line">   <span class="keyword">val</span> rddMin = rdd1.sortBy(item2 =&gt; item2._2,<span class="literal">false</span>).first()</span><br><span class="line">   println(rddMax,rddMin)</span><br><span class="line">   context.close()</span><br><span class="line"> &#125;</span><br><span class="line"> 根据缓存级别的不同, 缓存存储的位置也不同, 但是使用 unpersist 可以指定删除 <span class="type">RDD</span> 对应的缓存信息, 并指定缓存级别为 <span class="type">NONE</span></span><br></pre></td></tr></table></figure>
+<h2 id="3-缓存级别"><a href="#3-缓存级别" class="headerlink" title="3 缓存级别"></a>3 缓存级别</h2><p>缓存是一个技术活,  要考虑很多</p>
+<ul>
+<li>是否使用磁盘缓存?</li>
+<li>是否使用内存缓存?</li>
+<li>是否使用堆外内存?</li>
+<li>缓存前是否先序列化?</li>
+<li>是否需要有副本?</li>
+</ul>
+<h3 id="3-1-查看缓存级别对象"><a href="#3-1-查看缓存级别对象" class="headerlink" title="3.1 查看缓存级别对象"></a>3.1 查看缓存级别对象</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">persistDemo</span></span>(): <span class="type">Unit</span> = &#123;</span><br><span class="line">   <span class="keyword">val</span> conf = <span class="keyword">new</span> <span class="type">SparkConf</span>().setMaster(<span class="string">"local[3]"</span>).setAppName(<span class="string">"cache"</span>)</span><br><span class="line">   <span class="keyword">val</span> context =<span class="keyword">new</span>  <span class="type">SparkContext</span>(conf)</span><br><span class="line">   <span class="comment">//读取文件</span></span><br><span class="line">   <span class="keyword">val</span> file = context.textFile(<span class="string">"G:\\develop\\bigdatas\\BigData\\day26sparkActions\\data\\access_log_sample.txt"</span>)</span><br><span class="line">   <span class="keyword">val</span> rdd1 = file.map(it =&gt; ((it.split(<span class="string">" "</span>)) (<span class="number">0</span>), <span class="number">1</span>))</span><br><span class="line">     .reduceByKey((curr, agg) =&gt; curr + agg)</span><br><span class="line">     .persist(<span class="type">StorageLevel</span>.<span class="type">MEMORY_ONLY</span>)              <span class="comment">//缓存结果  与cache, persist()一样</span></span><br><span class="line">   <span class="comment">//.persist(参数)    //缓存级别</span></span><br><span class="line">   <span class="comment">//查看缓存级别</span></span><br><span class="line">   println(rdd1.getStorageLevel)</span><br><span class="line">   <span class="keyword">val</span> rddMax = rdd1</span><br><span class="line">     .sortBy(item =&gt; item._2, <span class="literal">true</span>)</span><br><span class="line">     .first()</span><br><span class="line">   <span class="keyword">val</span> rddMin = rdd1.sortBy(item2 =&gt; item2._2,<span class="literal">false</span>).first()</span><br><span class="line">   println(rddMax,rddMin)</span><br><span class="line">   context.close()</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>deserialized是否以反序列化形式存储   若是true 则不序列化 ,若是false 则存储序列化后的值</p>
+<p>其值为true 存储的是对象   若是false 则存储的是二进制文件</p>
+<p>带2的为副本数</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">缓存级别</th>
+<th style="text-align:left"><code>userDisk</code> 是否使用磁盘</th>
+<th style="text-align:left"><code>useMemory</code> 是否使用内存</th>
+<th style="text-align:left"><code>useOffHeap</code> 是否使用堆外内存</th>
+<th style="text-align:left"><code>deserialized</code>是否以反序列化形式存储</th>
+<th style="text-align:left"><code>replication</code> 副本数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>NONE</code> 就是不存</td>
+<td style="text-align:left">false</td>
+<td style="text-align:left">false</td>
+<td style="text-align:left">false</td>
+<td style="text-align:left">false</td>
+<td style="text-align:left">1</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>DISK_ONLY</code>  存到磁盘里</td>
+<td style="text-align:left">true</td>
+<td style="text-align:left">false</td>
+<td style="text-align:left">false</td>
+<td style="text-align:left">false</td>
+<td style="text-align:left">1</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>DISK_ONLY_2</code></td>
+<td style="text-align:left">true</td>
+<td style="text-align:left">false</td>
+<td style="text-align:left">false</td>
+<td style="text-align:left">false</td>
+<td style="text-align:left">2</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>MEMORY_ONLY</code>  存到内存</td>
+<td style="text-align:left">false</td>
+<td style="text-align:left">true</td>
+<td style="text-align:left">false</td>
+<td style="text-align:left">true</td>
+<td style="text-align:left">1</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>MEMORY_ONLY_2</code></td>
+<td style="text-align:left">false</td>
+<td style="text-align:left">true</td>
+<td style="text-align:left">false</td>
+<td style="text-align:left">true</td>
+<td style="text-align:left">2</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>MEMORY_ONLY_SER</code>存到内存以二进制文件的形式</td>
+<td style="text-align:left">false</td>
+<td style="text-align:left">true</td>
+<td style="text-align:left">false</td>
+<td style="text-align:left">false</td>
+<td style="text-align:left">1</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>MEMORY_ONLY_SER_2</code></td>
+<td style="text-align:left">false</td>
+<td style="text-align:left">true</td>
+<td style="text-align:left">false</td>
+<td style="text-align:left">false</td>
+<td style="text-align:left">2</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>MEMORY_AND_DISK</code>内存和磁盘都有</td>
+<td style="text-align:left">true</td>
+<td style="text-align:left">true</td>
+<td style="text-align:left">false</td>
+<td style="text-align:left">true</td>
+<td style="text-align:left">1</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>MEMORY_AND_DISK</code></td>
+<td style="text-align:left">true</td>
+<td style="text-align:left">true</td>
+<td style="text-align:left">false</td>
+<td style="text-align:left">true</td>
+<td style="text-align:left">2</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>MEMORY_AND_DISK_SER</code>内存和磁盘都有以二进制形式存储</td>
+<td style="text-align:left">true</td>
+<td style="text-align:left">true</td>
+<td style="text-align:left">false</td>
+<td style="text-align:left">false</td>
+<td style="text-align:left">1</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>MEMORY_AND_DISK_SER_2</code></td>
+<td style="text-align:left">true</td>
+<td style="text-align:left">true</td>
+<td style="text-align:left">false</td>
+<td style="text-align:left">false</td>
+<td style="text-align:left">2</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>OFF_HEAP</code></td>
+<td style="text-align:left">true</td>
+<td style="text-align:left">true</td>
+<td style="text-align:left">true</td>
+<td style="text-align:left">false</td>
+<td style="text-align:left">1</td>
+</tr>
+</tbody>
+</table>
+<h3 id="3-2如何选择分区级别"><a href="#3-2如何选择分区级别" class="headerlink" title="3.2如何选择分区级别"></a>3.2如何选择分区级别</h3><p>Spark 的存储级别的选择，核心问题是在 memory 内存使用率和 CPU 效率之间进行权衡。建议按下面的过程进行存储级别的选择:</p>
+<p>如果您的 RDD 适合于默认存储级别（MEMORY_ONLY），leave them that way。这是 CPU 效率最高的选项，允许 RDD 上的操作尽可能快地运行.</p>
+<p>如果不是，试着使用 MEMORY_ONLY_SER 和 selecting a fast serialization library 以使对象更加节省空间，但仍然能够快速访问。(Java和Scala)</p>
+<p>不要溢出到磁盘，除非计算您的数据集的函数是昂贵的，或者它们过滤大量的数据。否则，重新计算分区可能与从磁盘读取分区一样快.</p>
+<p>如果需要快速故障恢复，请使用复制的存储级别（例如，如果使用 Spark 来服务 来自网络应用程序的请求）。All 存储级别通过重新计算丢失的数据来提供完整的容错能力，但复制的数据可让您继续在 RDD 上运行任务，而无需等待重新计算一个丢失的分区.</p>
+<h1 id="三-Checkpoint"><a href="#三-Checkpoint" class="headerlink" title="三 Checkpoint"></a>三 Checkpoint</h1><h2 id="1-Checkpoint-的作用"><a href="#1-Checkpoint-的作用" class="headerlink" title="1 Checkpoint 的作用"></a>1 Checkpoint 的作用</h2><p>​    Checkpoint 的主要作用是斩断 RDD 的依赖链, 并且将数据存储在可靠的存储引擎中, 例如支持分布式存储和副本机制的 HDFS.</p>
+<p><strong>Checkpoint 的方式</strong></p>
+<ul>
+<li><strong>可靠的</strong> 将数据存储在可靠的存储引擎中, 例如 HDFS</li>
+<li><strong>本地的</strong> 将数据存储在本地</li>
+</ul>
+<p><strong>什么是斩断依赖链</strong></p>
+<p>斩断依赖链是一个非常重要的操作, 接下来以 HDFS 的 NameNode 的原理来举例说明</p>
+<p>HDFS 的 NameNode 中主要职责就是维护两个文件, 一个叫做 <code>edits</code>, 另外一个叫做 <code>fsimage</code>. <code>edits</code> 中主要存放 <code>EditLog</code>, <code>FsImage</code> 保存了当前系统中所有目录和文件的信息. 这个 <code>FsImage</code> 其实就是一个 <code>Checkpoint</code>.</p>
+<p>HDFS 的 NameNode 维护这两个文件的主要过程是, 首先, 会由 <code>fsimage</code> 文件记录当前系统某个时间点的完整数据, 自此之后的数据并不是时刻写入 <code>fsimage</code>, 而是将操作记录存储在 <code>edits</code> 文件中. 其次, 在一定的触发条件下, <code>edits</code> 会将自身合并进入 <code>fsimage</code>. 最后生成新的 <code>fsimage</code> 文件, <code>edits</code> 重置, 从新记录这次 <code>fsimage</code> 以后的操作日志.</p>
+<p>如果不合并 <code>edits</code> 进入 <code>fsimage</code> 会怎样? 会导致 <code>edits</code> 中记录的日志过长, 容易出错.</p>
+<p>所以当 Spark 的一个 Job 执行流程过长的时候, 也需要这样的一个斩断依赖链的过程, 使得接下来的计算轻装上阵.</p>
+<p><strong>Checkpoint 和 Cache 的区别</strong></p>
+<p>Cache 可以把 RDD 计算出来然后放在内存中, 但是 RDD 的依赖链(相当于 NameNode 中的 Edits 日志)是不能丢掉的, 因为这种缓存是不可靠的, 如果出现了一些错误(例如 Executor 宕机), 这个 RDD 的容错就只能通过回溯依赖链, 重放计算出来.</p>
+<p>但是 Checkpoint 把结果保存在 HDFS 这类存储中, 就是可靠的了, 所以可以斩断依赖, 如果出错了, 则通过复制 HDFS 中的文件来实现容错.</p>
+<p>所以他们的区别主要在以下两点</p>
+<ul>
+<li>Checkpoint 可以保存数据到 HDFS 这类可靠的存储上, Persist 和 Cache 只能保存在本地的磁盘和内存中</li>
+<li>Checkpoint 可以斩断 RDD 的依赖链, 而 Persist 和 Cache 不行</li>
+<li>因为 CheckpointRDD 没有向上的依赖链, 所以程序结束后依然存在, 不会被删除. 而 Cache 和 Persist 会在程序结束后立刻被清除.</li>
+</ul>
+<h2 id="2-使用-Checkpoint"><a href="#2-使用-Checkpoint" class="headerlink" title="2  使用 Checkpoint"></a>2  使用 Checkpoint</h2><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//checkpoint</span></span><br><span class="line">  <span class="meta">@Test</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">checkPointDemo</span></span>(): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> conf = <span class="keyword">new</span> <span class="type">SparkConf</span>().setMaster(<span class="string">"local[3]"</span>).setAppName(<span class="string">"cache"</span>)</span><br><span class="line">    <span class="keyword">val</span> context =<span class="keyword">new</span>  <span class="type">SparkContext</span>(conf)</span><br><span class="line">    <span class="comment">//设置保存checkpoint的目录 也可以在hdfs上</span></span><br><span class="line">    context.setCheckpointDir(<span class="string">"checkpoint"</span>)</span><br><span class="line">    <span class="comment">//读取文件</span></span><br><span class="line">    <span class="keyword">val</span> file = context.textFile(<span class="string">"G:\\develop\\bigdatas\\BigData\\day26sparkActions\\data\\access_log_sample.txt"</span>)</span><br><span class="line">    <span class="keyword">val</span> rdd1 = file.map(it =&gt; ((it.split(<span class="string">" "</span>)) (<span class="number">0</span>), <span class="number">1</span>))</span><br><span class="line">      .reduceByKey((curr, agg) =&gt; curr + agg)</span><br><span class="line">      <span class="comment">/*</span></span><br><span class="line"><span class="comment">      checkpoint的返回值为unit空</span></span><br><span class="line"><span class="comment">       1 不准确的说checkpoint是一个action操作,</span></span><br><span class="line"><span class="comment">       2 如果调用 checkpoint则会重新计算rdd,然后把结果存在hdfs或本地目录</span></span><br><span class="line"><span class="comment">       所以在checkpoint之前应该先缓存一下 </span></span><br><span class="line"><span class="comment">       */</span></span><br><span class="line">      .persist(<span class="type">StorageLevel</span>.<span class="type">MEMORY_ONLY</span>)</span><br><span class="line">      rdd1.checkpoint()</span><br><span class="line">    <span class="keyword">val</span> rddMax = rdd1</span><br><span class="line">      .sortBy(item =&gt; item._2, <span class="literal">true</span>)</span><br><span class="line">      .first()</span><br><span class="line">    <span class="keyword">val</span> rddMin = rdd1.sortBy(item2 =&gt;item2._2,<span class="literal">false</span>).first()</span><br><span class="line">    println(rddMax,rddMin)</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+      <div>
+        <div id="reward-container">
+  <div>Thank you for your accept. mua！</div>
+  <button id="reward-button" disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/reward/wechatpay.jpg" alt="丨HF丨 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/reward/alipay.jpg" alt="丨HF丨 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        
+
+
+
+
+  
+
+
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>丨HF丨</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    
+    <a href="https://manzhong.github.io/2017/08/20/spark原理浅析.html" title="spark原理浅析">https://manzhong.github.io/2017/08/20/spark原理浅析.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+    <div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:16px;">-------------本文结束<i class="fa fa-heart"></i>感谢您的阅读-------------</div>
+    
+</div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/BigData/" rel="tag"><i class="fa fa-tag"></i> BigData</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/08/16/SparkRDD.html" rel="next" title="SparkRDD">
+                <i class="fa fa-chevron-left"></i> SparkRDD
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/08/22/spark原理浅析2.html" rel="prev" title="spark原理浅析2">
+                spark原理浅析2 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC81MDA2Mi8yNjU1Mw=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/hexo.jpg" alt="丨HF丨">
+            
+              <p class="site-author-name" itemprop="name">丨HF丨</p>
+              <div class="site-description motion-element" itemprop="description">第二名就是头号输家!!!</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">54</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/ipyker" title="GitHub &rarr; https://github.com/ipyker" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:pyker@qq.com" title="E-Mail &rarr; mailto:pyker@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://weibo.com/viszhang" title="Weibo &rarr; https://weibo.com/viszhang" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="tencent://message/?uin=123435796&Site=&menu=yes" title="QQ &rarr; tencent://message/?uin=123435796&Site=&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i>QQ</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-book"></i>
+                推荐阅读
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://www.54tianzhisheng.cn/tags/Flink/" title="http://www.54tianzhisheng.cn/tags/Flink/" rel="noopener" target="_blank">Flink</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://nginxconfig.io/" title="https://nginxconfig.io/" rel="noopener" target="_blank">Nginxconfig</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://linux.51yip.com/" title="http://linux.51yip.com/" rel="noopener" target="_blank">Linux命令手册</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://echarts.baidu.com/index.html" title="https://echarts.baidu.com/index.html" rel="noopener" target="_blank">echarts可视化库</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+        </div>
+      </div>
+
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" style=" text-align:center;">&copy; 2017 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HF</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"> 站点字数合计:</i>
+    </span>
+    
+    <span title="站点总字数">961k</span>
+  
+  
+  <span class="post-meta-divider">|</span>
+  <a href="http://www.beian.miit.gov.cn" rel="noopener" target="_blank">粤ICP备19028706号 </a>
+
+</div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+
+<div class="run_time" style=" text-align:center;">
+  <span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+  <script>
+    var now = new Date(); 
+    function createtime() { 
+        var grt= new Date("07/23/2017 10:00:00");//此处修改你的建站时间或者网站上线时间 
+        now.setTime(now.getTime()+250); 
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days); 
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours); 
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum); 
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;} 
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum); 
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;} 
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 "; 
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒"; 
+    } 
+    setInterval("createtime()",250);
+  </script>
+</div>
+        
+<div class="busuanzi-count" style=" text-align:center;">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      我的第 <span class="busuanzi-value" id="busuanzi_value_site_uv"></span> 位朋友，
+    </span>
+  
+
+
+
+  
+    <span class="site-pv">
+      历经 <span class="busuanzi-value" id="busuanzi_value_site_pv"></span> 次回眸才与你相遇
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+  
+    
+    
+      
+    
+  
+  <script color="255,0,255" opacity="0.7" zindex="-1" count="140" src="//cdn.jsdelivr.net/gh/theme-next/theme-next-canvas-nest@1.0.0/canvas-nest.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.1"></script>
+
+  <script src="/js/motion.js?v=7.1.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/schemes/muse.js?v=7.1.1"></script>
+
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.1"></script>
+<script src="/js/post-details.js?v=7.1.1"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.1"></script>
+
+
+  
+
+  
+
+  
+  
+  
+
+  
+
+  
+  
+  
+
+
+  
+
+
+  
+    <script>
+  window.livereOptions = {
+    refer: '2017/08/20/spark原理浅析.html'
+  };
+  (function(d, s) {
+    var j, e = d.getElementsByTagName(s)[0];
+    if (typeof LivereTower === 'function') { return; }
+    j = d.createElement(s);
+    j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+    j.async = true;
+    e.parentNode.insertBefore(j, e);
+  })(document, 'script');
+</script>
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <script src="/lib/bookmark/bookmark.min.js?v=1.0"></script>
+  <script>
+  
+    bookmark.scrollToMark('auto', "#更多");
+  
+  </script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

@@ -1,0 +1,2416 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="true">
+
+
+
+  
+  
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.1.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":true,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: true,
+    fastclick: true,
+    lazyload: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"shrinkIn","post_header":"slideLeftIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideDownIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="一 概述Structured Streaming 是 Spark Streaming 的进化版, 如果了解了 Spark 的各方面的进化过程, 有助于理解 Structured Streaming 的使命和作用 1 Spark 编程模型的进化过程过程  编程模型 RDD 的优点和缺陷   2011 编程模型 DataFrame 的优点和缺陷   2013 编程模型 Dataset 的优点和缺陷">
+<meta name="keywords" content="BigData">
+<meta property="og:type" content="article">
+<meta property="og:title" content="StructuredStreaming">
+<meta property="og:url" content="https://manzhong.github.io/2018/05/10/StructuredStreaming.html">
+<meta property="og:site_name" content="春雨里洗过的太阳">
+<meta property="og:description" content="一 概述Structured Streaming 是 Spark Streaming 的进化版, 如果了解了 Spark 的各方面的进化过程, 有助于理解 Structured Streaming 的使命和作用 1 Spark 编程模型的进化过程过程  编程模型 RDD 的优点和缺陷   2011 编程模型 DataFrame 的优点和缺陷   2013 编程模型 Dataset 的优点和缺陷">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkstreaming/ss5.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkstreaming/ss6.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkstreaming/ss7.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkstreaming/ss8.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkstreaming/ss9.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkstreaming/ss10.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkstreaming/ss11.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkstreaming/ss12.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkstreaming/ss13.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkstreaming/ss14.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkstreaming/ss15.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkstreaming/ss16.png">
+<meta property="og:image" content="https://manzhong.github.io/images/sparkstreaming/ss17.png">
+<meta property="og:updated_time" content="2020-03-15T15:04:21.803Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="StructuredStreaming">
+<meta name="twitter:description" content="一 概述Structured Streaming 是 Spark Streaming 的进化版, 如果了解了 Spark 的各方面的进化过程, 有助于理解 Structured Streaming 的使命和作用 1 Spark 编程模型的进化过程过程  编程模型 RDD 的优点和缺陷   2011 编程模型 DataFrame 的优点和缺陷   2013 编程模型 Dataset 的优点和缺陷">
+<meta name="twitter:image" content="https://manzhong.github.io/images/sparkstreaming/ss5.png">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="春雨里洗过的太阳" type="application/atom+xml">
+
+
+
+  
+  
+  <link rel="canonical" href="https://manzhong.github.io/2018/05/10/StructuredStreaming">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>StructuredStreaming | 春雨里洗过的太阳</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+ 
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">春雨里洗过的太阳</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-bookmark"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-互动">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/guestbook/" rel="section"><i class="menu-item-icon fa fa-fw fa-comments"></i> <br>互动</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://manzhong.github.io/2018/05/10/StructuredStreaming.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="丨HF丨">
+      <meta itemprop="description" content="第二名就是头号输家!!!">
+      <meta itemprop="image" content="/images/hexo.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="春雨里洗过的太阳">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">StructuredStreaming
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-05-10 15:48:09" itemprop="dateCreated datePublished" datetime="2018-05-10T15:48:09+08:00">2018-05-10</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2020-03-15 23:04:21" itemprop="dateModified" datetime="2020-03-15T23:04:21+08:00">2020-03-15</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/BigData/" itemprop="url" rel="index"><span itemprop="name">BigData</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">43k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">39 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="一-概述"><a href="#一-概述" class="headerlink" title="一 概述"></a>一 概述</h1><p><code>Structured Streaming</code> 是 <code>Spark Streaming</code> 的进化版, 如果了解了 <code>Spark</code> 的各方面的进化过程, 有助于理解 <code>Structured Streaming</code> 的使命和作用</p>
+<h2 id="1-Spark-编程模型的进化过程"><a href="#1-Spark-编程模型的进化过程" class="headerlink" title="1 Spark 编程模型的进化过程"></a>1 Spark 编程模型的进化过程</h2><p>过程</p>
+<ol>
+<li>编程模型 <code>RDD</code> 的优点和缺陷   2011</li>
+<li>编程模型 <code>DataFrame</code> 的优点和缺陷   2013</li>
+<li>编程模型 <code>Dataset</code> 的优点和缺陷   2015</li>
+</ol>
+<p><code>RDD</code> 的优点</p>
+<ol>
+<li>面向对象的操作方式</li>
+<li>可以处理任何类型的数据</li>
+</ol>
+<p><code>RDD</code> 的缺点</p>
+<ol>
+<li>运行速度比较慢, 执行过程没有优化</li>
+<li><code>API</code> 比较僵硬, 对结构化数据的访问和操作没有优化</li>
+</ol>
+<p><code>DataFrame</code> 的优点</p>
+<ol>
+<li>针对结构化数据高度优化, 可以通过列名访问和转换数据</li>
+<li>增加 <code>Catalyst</code> 优化器, 执行过程是优化的, 避免了因为开发者的原因影响效率</li>
+</ol>
+<p><code>DataFrame</code> 的缺点</p>
+<ol>
+<li>只能操作结构化数据</li>
+<li>只有无类型的 <code>API</code>, 也就是只能针对列和 <code>SQL</code> 操作数据, <code>API</code> 依然僵硬</li>
+</ol>
+<p><code>Dataset</code> 的优点</p>
+<ol>
+<li>结合了 <code>RDD</code> 和 <code>DataFrame</code> 的 <code>API</code>, 既可以操作结构化数据, 也可以操作非结构化数据</li>
+<li>既有有类型的 <code>API</code> 也有无类型的 <code>API</code>, 灵活选择</li>
+</ol>
+<h2 id="2-Spark-的-序列化-的进化过程"><a href="#2-Spark-的-序列化-的进化过程" class="headerlink" title="2 Spark 的 序列化 的进化过程"></a>2 Spark 的 序列化 的进化过程</h2><p><code>Spark</code> 中的序列化过程决定了数据如何存储, 是性能优化一个非常重要的着眼点, <code>Spark</code> 的进化并不只是针对编程模型提供的 <code>API</code>, 在大数据处理中, 也必须要考虑性能</p>
+<p>过程</p>
+<ol>
+<li>序列化和反序列化是什么</li>
+<li><code>Spark</code> 中什么地方用到序列化和反序列化</li>
+<li><code>RDD</code> 的序列化和反序列化如何实现</li>
+<li><code>Dataset</code> 的序列化和反序列化如何实现</li>
+</ol>
+<h3 id="1在java中序列化"><a href="#1在java中序列化" class="headerlink" title="1在java中序列化"></a>1在java中序列化</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JavaSerializable</span> <span class="keyword">implements</span> <span class="title">Serializable</span> </span>&#123;</span><br><span class="line">  NonSerializable ns = <span class="keyword">new</span> NonSerializable();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NonSerializable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">  <span class="comment">// 序列化</span></span><br><span class="line">  JavaSerializable serializable = <span class="keyword">new</span> JavaSerializable();</span><br><span class="line">  ObjectOutputStream objectOutputStream = <span class="keyword">new</span> ObjectOutputStream(<span class="keyword">new</span> FileOutputStream(<span class="string">"/tmp/obj.ser"</span>));</span><br><span class="line">  <span class="comment">// 这里会抛出一个 "java.io.NotSerializableException: cn.itcast.NonSerializable" 异常</span></span><br><span class="line">  objectOutputStream.writeObject(serializable);</span><br><span class="line">  objectOutputStream.flush();</span><br><span class="line">  objectOutputStream.close();</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 反序列化</span></span><br><span class="line">  FileInputStream fileInputStream = <span class="keyword">new</span> FileInputStream(<span class="string">"/tmp/obj.ser"</span>);</span><br><span class="line">  ObjectInputStream objectOutputStream = <span class="keyword">new</span> ObjectInputStream(fileInputStream);</span><br><span class="line">  JavaSerializable serializable1 = objectOutputStream.readObject();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>序列化是什么</p>
+<ul>
+<li>序列化的作用就是可以将对象的内容变成二进制, 存入文件中保存</li>
+<li>反序列化指的是将保存下来的二进制对象数据恢复成对象</li>
+</ul>
+<p>序列化对对象的要求</p>
+<ul>
+<li>对象必须实现 <code>Serializable</code> 接口</li>
+<li>对象中的所有属性必须都要可以被序列化, 如果出现无法被序列化的属性, 则序列化失败</li>
+</ul>
+<p>限制</p>
+<ul>
+<li>对象被序列化后, 生成的二进制文件中, 包含了很多环境信息, 如对象头, 对象中的属性字段等, 所以内容相对较大</li>
+<li>因为数据量大, 所以序列化和反序列化的过程比较慢</li>
+</ul>
+<p>序列化的应用场景</p>
+<ul>
+<li>持久化对象数据</li>
+<li>网络中不能传输 <code>Java</code> 对象, 只能将其序列化后传输二进制数据</li>
+</ul>
+<h3 id="2-在-Spark-中的序列化和反序列化的应用场景"><a href="#2-在-Spark-中的序列化和反序列化的应用场景" class="headerlink" title="2 在 Spark 中的序列化和反序列化的应用场景"></a>2 <strong>在</strong> <code>Spark</code> <strong>中的序列化和反序列化的应用场景</strong></h3><p><strong>1<code>Task</code> 分发</strong>   <code>Task</code> 是一个对象, 想在网络中传输对象就必须要先序列化</p>
+<p><strong>2<code>RDD</code> 缓存</strong>  </p>
+<ul>
+<li><code>RDD</code> 中处理的是对象, 例如说字符串, <code>Person</code> 对象等</li>
+<li>如果缓存 <code>RDD</code> 中的数据, 就需要缓存这些对象</li>
+<li>对象是不能存在文件中的, 必须要将对象序列化后, 将二进制数据存入文件</li>
+</ul>
+<p><strong>3广播变量</strong></p>
+<p>广播变量会分发到不同的机器上, 这个过程中需要使用网络, 对象在网络中传输就必须先被序列化</p>
+<p><strong>4<code>Shuffle</code> 过程</strong></p>
+<p><code>Shuffle</code> 过程是由 <code>Reducer</code> 从 <code>Mapper</code> 中拉取数据, 这里面涉及到两个需要序列化对象的原因</p>
+<ul>
+<li><code>RDD</code> 中的数据对象需要在 <code>Mapper</code> 端落盘缓存, 等待拉取</li>
+<li><code>Mapper</code> 和 <code>Reducer</code> 要传输数据对象</li>
+</ul>
+<p><strong>5<code>Spark Streaming</code> 的 Receiver</strong></p>
+<p><code>Spark Streaming</code> 中获取数据的组件叫做 <code>Receiver</code>, 获取到的数据也是对象形式, 在获取到以后需要落盘暂存, 就需要对数据对象进行序列化</p>
+<p><strong>6算子引用外部对象</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Unserializable</span>(<span class="params">i: <span class="type">Int</span></span>)</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">rdd</span>.<span class="title">map</span>(<span class="params">i =&gt; new <span class="type">Unserializable</span>(i</span>))</span></span><br><span class="line"><span class="class">   .<span class="title">collect</span></span></span><br><span class="line"><span class="class">   .<span class="title">foreach</span>(<span class="params">println</span>)</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>在 <code>Map</code> 算子的函数中, 传入了一个 <code>Unserializable</code> 的对象</li>
+<li><code>Map</code> 算子的函数是会在整个集群中运行的, 那 <code>Unserializable</code> 对象就需要跟随 <code>Map</code> 算子的函数被传输到不同的节点上</li>
+<li>如果 <code>Unserializable</code> 不能被序列化, 则会报错</li>
+</ul>
+<h3 id="3-rdd的序列化"><a href="#3-rdd的序列化" class="headerlink" title="3 rdd的序列化"></a>3 rdd的序列化</h3><p><code>RDD</code> 的序列化</p>
+<p>RDD 的序列化只能使用 Java 序列化器, 或者 Kryo 序列化器</p>
+<p>为什么?</p>
+<ul>
+<li>RDD 中存放的是数据对象, 要保留所有的数据就必须要对对象的元信息进行保存, 例如对象头之类的</li>
+<li>保存一整个对象, 内存占用和效率会比较低一些</li>
+</ul>
+<p><code>Kryo</code> 是什么</p>
+<ul>
+<li><code>Kryo</code> 是 <code>Spark</code> 引入的一个外部的序列化工具, 可以增快 <code>RDD</code> 的运行速度</li>
+<li>因为 <code>Kryo</code> 序列化后的对象更小, 序列化和反序列化的速度非常快</li>
+<li>在 <code>RDD</code> 中使用 <code>Kryo</code> 的过程如下</li>
+</ul>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> conf = <span class="keyword">new</span> <span class="type">SparkConf</span>()</span><br><span class="line">  .setMaster(<span class="string">"local[2]"</span>)</span><br><span class="line">  .setAppName(<span class="string">"KyroTest"</span>)</span><br><span class="line"></span><br><span class="line">conf.set(<span class="string">"spark.serializer"</span>, <span class="string">"org.apache.spark.serializer.KryoSerializer"</span>)</span><br><span class="line">conf.registerKryoClasses(<span class="type">Array</span>(classOf[<span class="type">Person</span>]))</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> sc = <span class="keyword">new</span> <span class="type">SparkContext</span>(conf)</span><br><span class="line"></span><br><span class="line">rdd.map(arr =&gt; <span class="type">Person</span>(arr(<span class="number">0</span>), arr(<span class="number">1</span>), arr(<span class="number">2</span>)))</span><br></pre></td></tr></table></figure>
+<h3 id="4-DataFrame-和-Dataset-中的序列化"><a href="#4-DataFrame-和-Dataset-中的序列化" class="headerlink" title="4 DataFrame 和 Dataset 中的序列化"></a>4 <code>DataFrame</code> <strong>和</strong> <code>Dataset</code> <strong>中的序列化</strong></h3><p><code>RDD</code> 中无法感知数据的组成, 无法感知数据结构, 只能以对象的形式处理数据</p>
+<h4 id="1DataFrame-和-Dataset-的特点"><a href="#1DataFrame-和-Dataset-的特点" class="headerlink" title="1DataFrame 和 Dataset 的特点"></a>1<code>DataFrame</code> <strong>和</strong> <code>Dataset</code> <strong>的特点</strong></h4><ul>
+<li><code>DataFrame</code> 和 <code>Dataset</code> 是为结构化数据优化的</li>
+<li>在 <code>DataFrame</code> 和 <code>Dataset</code> 中, 数据和数据的 <code>Schema</code> 是分开存储的</li>
+</ul>
+<p><code>DataFrame</code> 中没有数据对象这个概念, 所有的数据都以行的形式存在于 <code>Row</code> 对象中, <code>Row</code> 中记录了每行数据的结构, 包括列名, 类型等</p>
+<p><code>Dataset</code> 中上层可以提供有类型的 <code>API</code>, 用以操作数据, 但是在内部, 无论是什么类型的数据对象 <code>Dataset</code> 都使用一个叫做 <code>InternalRow</code> 的类型的对象存储数据</p>
+<h3 id="5-优化"><a href="#5-优化" class="headerlink" title="5 优化"></a>5 优化</h3><h4 id="1-元信息独立"><a href="#1-元信息独立" class="headerlink" title="1 元信息独立"></a>1 <strong>元信息独立</strong></h4><p><img src="/images/sparkstreaming/ss5.png" alt="img"></p>
+<ol>
+<li><code>RDD</code> 不保存数据的元信息, 所以只能使用 <code>Java Serializer</code> 或者 <code>Kyro Serializer</code> 保存 <strong>整个对象</strong></li>
+<li><code>DataFrame</code> 和 <code>Dataset</code> 中保存了数据的元信息, 所以可以把元信息独立出来分开保存</li>
+</ol>
+<p>3  一个 <code>DataFrame</code> 或者一个 <code>Dataset</code> 中, 元信息只需要保存一份, 序列化的时候, 元信息不需要参与</p>
+<p>4在反序列化 ( <code>InternalRow → Object</code> ) 时加入 <code>Schema</code> 信息即可</p>
+<p>元信息不再参与序列化, 意味着数据存储量的减少, 和效率的增加</p>
+<h4 id="2-使用堆外内存"><a href="#2-使用堆外内存" class="headerlink" title="2 使用堆外内存"></a>2 <strong>使用堆外内存</strong></h4><ul>
+<li><code>DataFrame</code> 和 <code>Dataset</code> 不再序列化元信息, 所以内存使用大大减少. 同时新的序列化方式还将数据存入堆外内存中, 从而避免 <code>GC</code> 的开销.</li>
+<li>堆外内存又叫做 <code>Unsafe</code>, 之所以叫不安全的, 因为不能使用 <code>Java</code> 的垃圾回收机制, 需要自己负责对象的创建和回收, 性能很好, 但是不建议普通开发者使用, 毕竟不安全</li>
+</ul>
+<h3 id="6总结"><a href="#6总结" class="headerlink" title="6总结"></a>6总结</h3><ol>
+<li>当需要将对象缓存下来的时候, 或者在网络中传输的时候, 要把对象转成二进制, 在使用的时候再将二进制转为对象, 这个过程叫做序列化和反序列化</li>
+<li>在 <code>Spark</code> 中有很多场景需要存储对象, 或者在网络中传输对象<ol>
+<li><code>Task</code> 分发的时候, 需要将任务序列化, 分发到不同的 <code>Executor</code> 中执行</li>
+<li>缓存 <code>RDD</code> 的时候, 需要保存 <code>RDD</code> 中的数据</li>
+<li>广播变量的时候, 需要将变量序列化, 在集群中广播</li>
+<li><code>RDD</code> 的 <code>Shuffle</code> 过程中 <code>Map</code> 和 <code>Reducer</code> 之间需要交换数据</li>
+<li>算子中如果引入了外部的变量, 这个外部的变量也需要被序列化</li>
+</ol>
+</li>
+<li><code>RDD</code> 因为不保留数据的元信息, 所以必须要序列化整个对象, 常见的方式是 <code>Java</code> 的序列化器, 和 <code>Kyro</code> 序列化器</li>
+<li><code>Dataset</code> 和 <code>DataFrame</code> 中保留数据的元信息, 所以可以不再使用 <code>Java</code> 的序列化器和 <code>Kyro</code> 序列化器, 使用 <code>Spark</code> 特有的序列化协议, 生成 <code>UnsafeInternalRow</code> 用以保存数据, 这样不仅能减少数据量, 也能减少序列化和反序列化的开销, 其速度大概能达到 <code>RDD</code> 的序列化的 <code>20</code> 倍左右</li>
+</ol>
+<h2 id="3-Spark-Streaming-和-Structured-Streaming"><a href="#3-Spark-Streaming-和-Structured-Streaming" class="headerlink" title="3  Spark Streaming 和 Structured Streaming"></a>3  Spark Streaming 和 Structured Streaming</h2><h3 id="1-Spark-Streaming-时代"><a href="#1-Spark-Streaming-时代" class="headerlink" title="1 Spark Streaming 时代"></a>1 <code>Spark Streaming</code> <strong>时代</strong></h3><p><code>Spark Streaming</code> 其实就是 <code>RDD</code> 的 <code>API</code> 的流式工具, 其本质还是 <code>RDD</code>, 存储和执行过程依然类似 <code>RDD</code></p>
+<h3 id="2-Structured-Streaming-时代"><a href="#2-Structured-Streaming-时代" class="headerlink" title="2 Structured Streaming 时代"></a>2 <code>Structured Streaming</code> <strong>时代</strong></h3><p><code>Structured Streaming</code> 其实就是 <code>Dataset</code> 的 <code>API</code> 的流式工具, <code>API</code> 和 <code>Dataset</code> 保持高度一致</p>
+<h3 id="3-Spark-Streaming-和-Structured-Streaming-1"><a href="#3-Spark-Streaming-和-Structured-Streaming-1" class="headerlink" title="3 Spark Streaming 和 Structured Streaming"></a>3 <code>Spark Streaming</code> <strong>和</strong> <code>Structured Streaming</code></h3><ul>
+<li><code>Structured Streaming</code> 相比于 <code>Spark Streaming</code> 的进步就类似于 <code>Dataset</code> 相比于 <code>RDD</code> 的进步</li>
+<li>另外还有一点, <code>Structured Streaming</code> 已经支持了连续流模型, 也就是类似于 <code>Flink</code> 那样的实时流, 而不是小批量, 但在使用的时候仍然有限制, 大部分情况还是应该采用小批量模式</li>
+</ul>
+<p>在 <code>2.2.0</code> 以后 <code>Structured Streaming</code> 被标注为稳定版本, 意味着以后的 <code>Spark</code> 流式开发不应该在采用 <code>Spark Streaming</code>了</p>
+<h1 id="二-小试牛刀"><a href="#二-小试牛刀" class="headerlink" title="二 小试牛刀"></a>二 小试牛刀</h1><p>需求</p>
+<ul>
+<li>编写一个流式计算的应用, 不断的接收外部系统的消息</li>
+<li>对消息中的单词进行词频统计</li>
+<li>统计全局的结果</li>
+</ul>
+<ol>
+<li><code>Socket Server</code>(Netcat nc) 等待 <code>Structured Streaming</code> 程序连接</li>
+<li><code>Structured Streaming</code> 程序启动, 连接 <code>Socket Server</code>, 等待 <code>Socket Server</code> 发送数据</li>
+<li><code>Socket Server</code> 发送数据, <code>Structured Streaming</code> 程序接收数据</li>
+<li><code>Structured Streaming</code> 程序接收到数据后处理数据</li>
+<li>数据处理后, 生成对应的结果集, 在控制台打印</li>
+</ol>
+<p>pom 文件</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">properties</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">scala.version</span>&gt;</span>2.11.8<span class="tag">&lt;/<span class="name">scala.version</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">spark.version</span>&gt;</span>2.2.0<span class="tag">&lt;/<span class="name">spark.version</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">slf4j.version</span>&gt;</span>1.7.16<span class="tag">&lt;/<span class="name">slf4j.version</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">log4j.version</span>&gt;</span>1.2.17<span class="tag">&lt;/<span class="name">log4j.version</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;/<span class="name">properties</span>&gt;</span></span><br><span class="line"></span><br><span class="line">   <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.scala-lang<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>scala-library<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;scala.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.spark<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spark-core_2.11<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;spark.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>mysql<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>mysql-connector-java<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">version</span>&gt;</span>5.1.47<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line">       <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.spark<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spark-streaming_2.11<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.2.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line">       <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.spark<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spark-sql-kafka-0-10_2.11<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.2.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.spark<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spark-sql_2.11<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;spark.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.spark<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spark-hive_2.11<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;spark.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.hadoop<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>hadoop-client<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.6.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line">       <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.slf4j<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>jcl-over-slf4j<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;slf4j.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.slf4j<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>slf4j-api<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;slf4j.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.slf4j<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>slf4j-log4j12<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;slf4j.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>log4j<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>log4j<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;log4j.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>junit<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>junit<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">version</span>&gt;</span>4.10<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">scope</span>&gt;</span>provided<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br><span class="line"></span><br><span class="line">   <span class="tag">&lt;<span class="name">build</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">sourceDirectory</span>&gt;</span>src/main/scala<span class="tag">&lt;/<span class="name">sourceDirectory</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">testSourceDirectory</span>&gt;</span>src/test/scala<span class="tag">&lt;/<span class="name">testSourceDirectory</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">plugins</span>&gt;</span></span><br><span class="line"></span><br><span class="line">           <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-compiler-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">                   <span class="tag">&lt;<span class="name">source</span>&gt;</span>1.8<span class="tag">&lt;/<span class="name">source</span>&gt;</span></span><br><span class="line">                   <span class="tag">&lt;<span class="name">target</span>&gt;</span>1.8<span class="tag">&lt;/<span class="name">target</span>&gt;</span></span><br><span class="line">                   <span class="tag">&lt;<span class="name">encoding</span>&gt;</span>UTF-8<span class="tag">&lt;/<span class="name">encoding</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line"></span><br><span class="line">           <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>net.alchim31.maven<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>scala-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.2.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">executions</span>&gt;</span></span><br><span class="line">                   <span class="tag">&lt;<span class="name">execution</span>&gt;</span></span><br><span class="line">                       <span class="tag">&lt;<span class="name">goals</span>&gt;</span></span><br><span class="line">                           <span class="tag">&lt;<span class="name">goal</span>&gt;</span>compile<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></span><br><span class="line">                           <span class="tag">&lt;<span class="name">goal</span>&gt;</span>testCompile<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></span><br><span class="line">                       <span class="tag">&lt;/<span class="name">goals</span>&gt;</span></span><br><span class="line">                       <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">                           <span class="tag">&lt;<span class="name">args</span>&gt;</span></span><br><span class="line">                               <span class="tag">&lt;<span class="name">arg</span>&gt;</span>-dependencyfile<span class="tag">&lt;/<span class="name">arg</span>&gt;</span></span><br><span class="line">                               <span class="tag">&lt;<span class="name">arg</span>&gt;</span>$&#123;project.build.directory&#125;/.scala_dependencies<span class="tag">&lt;/<span class="name">arg</span>&gt;</span></span><br><span class="line">                           <span class="tag">&lt;/<span class="name">args</span>&gt;</span></span><br><span class="line">                       <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">                   <span class="tag">&lt;/<span class="name">execution</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;/<span class="name">executions</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">           <span class="comment">&lt;!--打包插件  因为默认的打包不包含maven的依赖--&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-shade-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.1.1<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">executions</span>&gt;</span></span><br><span class="line">                   <span class="tag">&lt;<span class="name">execution</span>&gt;</span></span><br><span class="line">                       <span class="tag">&lt;<span class="name">phase</span>&gt;</span>package<span class="tag">&lt;/<span class="name">phase</span>&gt;</span></span><br><span class="line">                       <span class="tag">&lt;<span class="name">goals</span>&gt;</span></span><br><span class="line">                           <span class="tag">&lt;<span class="name">goal</span>&gt;</span>shade<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></span><br><span class="line">                       <span class="tag">&lt;/<span class="name">goals</span>&gt;</span></span><br><span class="line">                       <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">                           <span class="tag">&lt;<span class="name">filters</span>&gt;</span></span><br><span class="line">                               <span class="tag">&lt;<span class="name">filter</span>&gt;</span></span><br><span class="line">                                   <span class="tag">&lt;<span class="name">artifact</span>&gt;</span>*:*<span class="tag">&lt;/<span class="name">artifact</span>&gt;</span></span><br><span class="line">                                   <span class="tag">&lt;<span class="name">excludes</span>&gt;</span></span><br><span class="line">                                       <span class="tag">&lt;<span class="name">exclude</span>&gt;</span>META-INF/*.SF<span class="tag">&lt;/<span class="name">exclude</span>&gt;</span></span><br><span class="line">                                       <span class="tag">&lt;<span class="name">exclude</span>&gt;</span>META-INF/*.DSA<span class="tag">&lt;/<span class="name">exclude</span>&gt;</span></span><br><span class="line">                                       <span class="tag">&lt;<span class="name">exclude</span>&gt;</span>META-INF/*.RSA<span class="tag">&lt;/<span class="name">exclude</span>&gt;</span></span><br><span class="line">                                   <span class="tag">&lt;/<span class="name">excludes</span>&gt;</span></span><br><span class="line">                               <span class="tag">&lt;/<span class="name">filter</span>&gt;</span></span><br><span class="line">                           <span class="tag">&lt;/<span class="name">filters</span>&gt;</span></span><br><span class="line">                           <span class="tag">&lt;<span class="name">transformers</span>&gt;</span></span><br><span class="line">                               <span class="tag">&lt;<span class="name">transformer</span> <span class="attr">implementation</span>=<span class="string">"org.apache.maven.plugins.shade.resource.ManifestResourceTransformer"</span>&gt;</span></span><br><span class="line">                                   <span class="tag">&lt;<span class="name">mainClass</span>&gt;</span><span class="tag">&lt;/<span class="name">mainClass</span>&gt;</span></span><br><span class="line">                               <span class="tag">&lt;/<span class="name">transformer</span>&gt;</span></span><br><span class="line">                           <span class="tag">&lt;/<span class="name">transformers</span>&gt;</span></span><br><span class="line">                       <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">                   <span class="tag">&lt;/<span class="name">execution</span>&gt;</span></span><br><span class="line">               <span class="tag">&lt;/<span class="name">executions</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">plugins</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;/<span class="name">build</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">rmDemo</span></span>(): <span class="type">Unit</span> = &#123;</span><br><span class="line">  <span class="comment">//创建SparkSession</span></span><br><span class="line">  <span class="keyword">val</span> session: <span class="type">SparkSession</span> = <span class="type">SparkSession</span>.builder()</span><br><span class="line">    .master(<span class="string">"local[3]"</span>)</span><br><span class="line">    .appName(<span class="string">"demo"</span>)</span><br><span class="line">    .getOrCreate()</span><br><span class="line">    <span class="comment">//调整 Log 级别, 避免过多的 Log 影响视线</span></span><br><span class="line">  session.sparkContext.setLogLevel(<span class="string">"error"</span>)</span><br><span class="line">  <span class="keyword">import</span> session.implicits._</span><br><span class="line">  <span class="comment">//读取外部数据源 转为dataset</span></span><br><span class="line">  <span class="keyword">val</span> source: <span class="type">Dataset</span>[<span class="type">String</span>] = session.readStream</span><br><span class="line">    .format(<span class="string">"socket"</span>)</span><br><span class="line">    .option(<span class="string">"host"</span>, <span class="string">"node03"</span>)</span><br><span class="line">    .option(<span class="string">"port"</span>, <span class="number">9999</span>)</span><br><span class="line">    .load()</span><br><span class="line">    .as[<span class="type">String</span>] <span class="comment">//默认 readStream 会返回 DataFrame, 但是词频统计更适合使用 Dataset 的有类型 API</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  <span class="comment">//统计词频</span></span><br><span class="line">  <span class="keyword">val</span> wc: <span class="type">Dataset</span>[(<span class="type">String</span>, <span class="type">Long</span>)] = source.flatMap(_.split(<span class="string">" "</span>))</span><br><span class="line">    .map((_, <span class="number">1</span>))</span><br><span class="line">    .groupByKey(_._1)</span><br><span class="line">    .count()</span><br><span class="line"></span><br><span class="line">  <span class="comment">//输出结果</span></span><br><span class="line">  wc.writeStream</span><br><span class="line">    .outputMode(<span class="type">OutputMode</span>.<span class="type">Complete</span>()) <span class="comment">//	统计全局结果, 而不是一个批次</span></span><br><span class="line">    .format(<span class="string">"console"</span>) <span class="comment">//	将结果输出到控制台</span></span><br><span class="line">    .start() <span class="comment">//	开始运行流式应用</span></span><br><span class="line">    .awaitTermination() <span class="comment">// 阻塞主线程, 在子线程中不断获取数据</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>总结</strong></p>
+<ul>
+<li><code>Structured Streaming</code> 中的编程步骤依然是先读, 后处理, 最后落地</li>
+<li><code>Structured Streaming</code> 中的编程模型依然是 <code>DataFrame</code> 和 <code>Dataset</code></li>
+<li><code>Structured Streaming</code> 中依然是有外部数据源读写框架的, 叫做 <code>readStream</code> 和 <code>writeStream</code></li>
+<li><code>Structured Streaming</code> 和 <code>SparkSQL</code> 几乎没有区别, 唯一的区别是, <code>readStream</code> 读出来的是流, <code>writeStream</code> 是将流输出, 而 <code>SparkSQL</code> 中的批处理使用 <code>read</code> 和 <code>write</code></li>
+</ul>
+<p><strong>运行</strong></p>
+<p>在虚拟机 中运行 <code>nc -lk 9999</code>  程序本地运行</p>
+<p>从结果集中可以观察到以下内容</p>
+<ul>
+<li><code>Structured Streaming</code> 依然是小批量的流处理</li>
+<li><code>Structured Streaming</code> 的输出是类似 <code>DataFrame</code> 的, 也具有 <code>Schema</code>, 所以也是针对结构化数据进行优化的</li>
+<li>从输出的时间特点上来看, 是一个批次先开始, 然后收集数据, 再进行展示, 这一点和 <code>Spark Streaming</code> 不太一样</li>
+<li><code>Structured Streaming</code> 的 API 和运行也是针对结构化数据进行优化过的</li>
+</ul>
+<h1 id="三Stuctured-Streaming-的体系和结构"><a href="#三Stuctured-Streaming-的体系和结构" class="headerlink" title="三Stuctured Streaming 的体系和结构"></a>三Stuctured Streaming 的体系和结构</h1><h2 id="1-无限扩展的表格"><a href="#1-无限扩展的表格" class="headerlink" title="1 无限扩展的表格"></a>1 无限扩展的表格</h2><p><code>Structured Streaming</code> 是一个复杂的体系, 由很多组件组成, 这些组件之间也会进行交互, 如果无法站在整体视角去观察这些组件之间的关系, 也无法理解 <code>Structured Streaming</code> 的全局</p>
+<h3 id="1Dataset-和流式计算"><a href="#1Dataset-和流式计算" class="headerlink" title="1Dataset 和流式计算"></a>1<code>Dataset</code> <strong>和流式计算</strong></h3><p>可以理解为 <code>Spark</code> 中的 <code>Dataset</code> 有两种, 一种是处理静态批量数据的 <code>Dataset</code>, 一种是处理动态实时流的 <code>Dataset</code>, 这两种 <code>Dataset</code> 之间的区别如下</p>
+<ul>
+<li>流式的 <code>Dataset</code> 使用 <code>readStream</code> 读取外部数据源创建, 使用 <code>writeStream</code> 写入外部存储</li>
+<li>批式的 <code>Dataset</code> 使用 <code>read</code> 读取外部数据源创建, 使用 <code>write</code> 写入外部存储</li>
+</ul>
+<h3 id="2如何使用-Dataset-这个编程模型表示流式计算"><a href="#2如何使用-Dataset-这个编程模型表示流式计算" class="headerlink" title="2如何使用 Dataset 这个编程模型表示流式计算?"></a>2<strong>如何使用</strong> <code>Dataset</code> <strong>这个编程模型表示流式计算?</strong></h3><ul>
+<li>可以把流式的数据想象成一个不断增长, 无限无界的表</li>
+<li>无论是否有界, 全都使用 <code>Dataset</code> 这一套 <code>API</code></li>
+<li>通过这样的做法, 就能完全保证流和批的处理使用完全相同的代码, 减少这两种处理方式的差异</li>
+</ul>
+<h3 id="3WordCount-的原理"><a href="#3WordCount-的原理" class="headerlink" title="3WordCount 的原理"></a>3<code>WordCount</code> <strong>的原理</strong></h3><p><img src="/images/sparkstreaming/ss6.png" alt="img"></p>
+<ul>
+<li>整个计算过程大致上分为如下三个部分<ol>
+<li><code>Source</code>, 读取数据源</li>
+<li><code>Query</code>, 在流式数据上的查询</li>
+<li><code>Result</code>, 结果集生成</li>
+</ol>
+</li>
+<li>整个的过程如下<ol>
+<li>随着时间段的流动, 对外部数据进行批次的划分</li>
+<li>在逻辑上, 将缓存所有的数据, 生成一张无限扩展的表, 在这张表上进行查询</li>
+<li>根据要生成的结果类型, 来选择是否生成基于整个数据集的结果</li>
+</ol>
+</li>
+</ul>
+<h3 id="4总结"><a href="#4总结" class="headerlink" title="4总结"></a>4总结</h3><ul>
+<li><code>Dataset</code> 不仅可以表达流式数据的处理, 也可以表达批量数据的处理</li>
+<li><code>Dataset</code> 之所以可以表达流式数据的处理, 因为 <code>Dataset</code> 可以模拟一张无限扩展的表, 外部的数据会不断的流入到其中</li>
+</ul>
+<h2 id="2-体系结构"><a href="#2-体系结构" class="headerlink" title="2 体系结构"></a>2 体系结构</h2><h3 id="1-体系结构"><a href="#1-体系结构" class="headerlink" title="1 体系结构"></a>1 <strong>体系结构</strong></h3><p>在 <code>Structured Streaming</code> 中负责整体流程和执行的驱动引擎叫做 <code>StreamExecution</code></p>
+<p><code>StreamExecution</code> 在流上进行基于 <code>Dataset</code> 的查询, 也就是说, <code>Dataset</code> 之所以能够在流上进行查询, 是因为 <code>StreamExecution</code> 的调度和管理</p>
+<p><strong><code>StreamExecution</code> 如何工作?</strong></p>
+<p><code>StreamExecution</code> 分为三个重要的部分</p>
+<p><img src="/images/sparkstreaming/ss7.png" alt="img"></p>
+<ul>
+<li><code>Source</code>, 从外部数据源读取数据</li>
+<li><code>LogicalPlan</code>, 逻辑计划, 在流上的查询计划</li>
+<li><code>Sink</code>, 对接外部系统, 写入结果</li>
+</ul>
+<h3 id="2-StreamExecution-的执行顺序"><a href="#2-StreamExecution-的执行顺序" class="headerlink" title="2  StreamExecution 的执行顺序"></a>2  <code>StreamExecution</code> <strong>的执行顺序</strong></h3><p><img src="/images/sparkstreaming/ss8.png" alt="img"></p>
+<p><strong>1</strong>   根据进度标记, 从 <code>Source</code> 获取到一个由 <code>DataFrame</code> 表示的批次, 这个 <code>DataFrame</code> 表示数据的源头</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> source = spark.readStream</span><br><span class="line">  .format(<span class="string">"socket"</span>)</span><br><span class="line">  .option(<span class="string">"host"</span>, <span class="string">"127.0.0.1"</span>)</span><br><span class="line">  .option(<span class="string">"port"</span>, <span class="number">9999</span>)</span><br><span class="line">  .load()</span><br><span class="line">  .as[<span class="type">String</span>]</span><br></pre></td></tr></table></figure>
+<p>这一点非常类似 <code>val df = spark.read.csv()</code> 所生成的 <code>DataFrame</code>, 同样都是表示源头</p>
+<p><strong>2</strong>   根据源头 <code>DataFrame</code> 生成逻辑计划</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> words = source.flatMap(_.split(<span class="string">" "</span>))</span><br><span class="line">  .map((_, <span class="number">1</span>))</span><br><span class="line">  .groupByKey(_._1)</span><br><span class="line">  .count()</span><br></pre></td></tr></table></figure>
+<p>述代码表示的就是数据的查询, 这一个步骤将这样的查询步骤生成为逻辑执行计划</p>
+<p><strong>3</strong>  优化逻辑计划最终生成物理计划</p>
+<p>这一步其实就是使用 <code>Catalyst</code> 对执行计划进行优化, 经历基于规则的优化和基于成本模型的优化</p>
+<p><strong>4</strong>  执行物理计划将表示执行结果的 <code>DataFrame / Dataset</code> 交给 <code>Sink</code></p>
+<p>整个物理执行计划会针对每一个批次的数据进行处理, 处理后每一个批次都会生成一个表示结果的 <code>Dataset</code></p>
+<p><code>Sink</code> 可以将每一个批次的结果 <code>Dataset</code> 落地到外部数据源</p>
+<p><strong>5</strong>  执行完毕后, 汇报 <code>Source</code> 这个批次已经处理结束, <code>Source</code> 提交并记录最新的进度</p>
+<h3 id="3-增量查询"><a href="#3-增量查询" class="headerlink" title="3 增量查询"></a>3 <strong>增量查询</strong></h3><p><img src="/images/sparkstreaming/ss9.png" alt="img"></p>
+<p>上图中清晰的展示了最终的结果生成是全局的结果, 而不是一个批次的结果, 但是从 <code>StreamExecution</code> 中可以看到, 针对流的处理是按照一个批次一个批次来处理的</p>
+<p>那么, 最终是如何生成全局的结果集呢?</p>
+<p><strong>状态记录</strong></p>
+<p><img src="/images/sparkstreaming/ss10.png" alt="img"></p>
+<p>在 <code>Structured Streaming</code> 中有一个全局范围的高可用 <code>StateStore</code>, 这个时候针对增量的查询变为如下步骤</p>
+<ol>
+<li>从 <code>StateStore</code> 中取出上次执行完成后的状态</li>
+<li>把上次执行的结果加入本批次, 再进行计算, 得出全局结果</li>
+<li>将当前批次的结果放入 <code>StateStore</code> 中, 留待下次使用</li>
+</ol>
+<p><img src="/images/sparkstreaming/ss11.png" alt="img"></p>
+<p><strong>总结</strong></p>
+<ul>
+<li><code>StreamExecution</code> 是整个 <code>Structured Streaming</code> 的核心, 负责在流上的查询</li>
+<li><code>StreamExecution</code> 中三个重要的组成部分, 分别是 <code>Source</code> 负责读取每个批量的数据, <code>Sink</code> 负责将结果写入外部数据源, <code>Logical Plan</code> 负责针对每个小批量生成执行计划</li>
+<li><code>StreamExecution</code> 中使用 <code>StateStore</code> 来进行状态的维护</li>
+</ul>
+<h1 id="四-Source"><a href="#四-Source" class="headerlink" title="四 Source"></a>四 Source</h1><ol>
+<li>从 <code>HDFS</code> 中读取数据</li>
+<li>从 <code>Kafka</code> 中读取数据</li>
+</ol>
+<h2 id="1-从-HDFS-中读取数据"><a href="#1-从-HDFS-中读取数据" class="headerlink" title="1 从 HDFS 中读取数据"></a>1 从 <code>HDFS</code> 中读取数据</h2><p>读取小文件</p>
+<p>1编写小文件</p>
+<ol>
+<li>编写 <code>Python</code> 小程序, 在某个目录生成大量小文件<ul>
+<li><code>Python</code> 是解释型语言, 其程序可以直接使用命令运行无需编译, 所以适合编写快速使用的程序, 很多时候也使用 <code>Python</code> 代替 <code>Shell</code></li>
+<li>使用 <code>Python</code> 程序创建新的文件, 并且固定的生成一段 <code>JSON</code> 文本写入文件</li>
+<li>在真实的环境中, 数据也是一样的不断产生并且被放入 <code>HDFS</code> 中, 但是在真实场景下, 可能是 <code>Flume</code> 把小文件不断上传到 <code>HDFS</code> 中, 也可能是 <code>Sqoop</code> 增量更新不断在某个目录中上传小文件</li>
+</ul>
+</li>
+<li>使用 <code>Structured Streaming</code> 汇总数据<ul>
+<li><code>HDFS</code> 中的数据是不断的产生的, 所以也是流式的数据</li>
+<li>数据集是 <code>JSON</code> 格式, 要有解析 <code>JSON</code> 的能力</li>
+<li>因为数据是重复的, 要对全局的流数据进行汇总和去重, 其实真实场景下的数据清洗大部分情况下也是要去重的</li>
+</ul>
+</li>
+<li>使用控制台展示数据<ul>
+<li>最终的数据结果以表的形式呈现</li>
+<li>使用控制台展示数据意味着不需要在修改展示数据的代码, 将 <code>Sink</code> 部分的内容放在下一个大章节去说明</li>
+<li>真实的工作中, 可能数据是要落地到 <code>MySQL</code>, <code>HBase</code>, <code>HDFS</code> 这样的存储系统中</li>
+</ul>
+</li>
+</ol>
+<p><strong>步骤</strong></p>
+<ul>
+<li>Step 1: 编写 <code>Python</code> 脚本不断的产生数据<ol>
+<li>使用 <code>Python</code> 创建字符串保存文件中要保存的数据</li>
+<li>创建文件并写入文件内容</li>
+<li>使用 <code>Python</code> 调用系统 <code>HDFS</code> 命令上传文件</li>
+</ol>
+</li>
+<li>Step 2: 编写 <code>Structured Streaming</code> 程序处理数据<ol>
+<li>创建 <code>SparkSession</code></li>
+<li>使用 <code>SparkSession</code> 的 <code>readStream</code> 读取数据源</li>
+<li>使用 <code>Dataset</code> 操作数据, 只需要去重</li>
+<li>使用 <code>Dataset</code> 的 <code>writeStream</code> 设置 <code>Sink</code> 将数据展示在控制台中</li>
+</ol>
+</li>
+<li>Step 3: 部署程序, 验证结果<ol>
+<li>上传脚本到服务器中, 使用 <code>python</code> 命令运行脚本</li>
+<li>开启流计算应用, 读取 HDFS 中对应目录的数据</li>
+<li>查看运行结果</li>
+</ol>
+</li>
+</ul>
+<p><strong>注意点</strong></p>
+<ol>
+<li><p>在读取 <code>HDFS</code> 的文件时, <code>Source</code> 不仅对接数据源, 也负责反序列化数据源中传过来的数据</p>
+<ul>
+<li><code>Source</code> 可以从不同的数据源中读取数据, 如 <code>Kafka</code>, <code>HDFS</code></li>
+<li>数据源可能会传过来不同的数据格式, 如 <code>JSON</code>, <code>Parquet</code></li>
+</ul>
+</li>
+<li><p>读取 <code>HDFS</code> 文件的这个 <code>Source</code> 叫做 <code>FileStreamSource</code></p>
+<p>从命名就可以看出来这个 <code>Source</code> 不仅支持 <code>HDFS</code>, 还支持本地文件读取, 亚马逊云, 阿里云 等文件系统的读取, 例如: <code>file://</code>, <code>s3://</code>, <code>oss://</code></p>
+</li>
+<li><p>基于流的 <code>Dataset</code> 操作和基于静态数据集的 <code>Dataset</code> 操作是一致的</p>
+</li>
+</ol>
+<p><strong>整体流程</strong></p>
+<ol>
+<li><code>Python</code> 程序产生数据到 <code>HDFS</code> 中</li>
+<li><code>Structured Streaming</code> 从 <code>HDFS</code> 中获取数据</li>
+<li><code>Structured Streaming</code> 处理数据</li>
+<li>将数据展示在控制台</li>
+</ol>
+<p><strong>1编写Python文件</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> index <span class="keyword">in</span> range(<span class="number">100</span>):</span><br><span class="line">    content = <span class="string">"""</span></span><br><span class="line"><span class="string">    &#123;"name":"Michael"&#125;</span></span><br><span class="line"><span class="string">    &#123;"name":"Andy", "age":30&#125;</span></span><br><span class="line"><span class="string">    &#123;"name":"Justin", "age":19&#125;</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line"></span><br><span class="line">    file_name = <span class="string">"/export/dataset/text&#123;0&#125;.json"</span>.format(index)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">with</span> open(file_name, <span class="string">"w"</span>) <span class="keyword">as</span> file:  </span><br><span class="line">        file.write(content)</span><br><span class="line"></span><br><span class="line">    os.system(<span class="string">"/export/servers/hadoop/bin/hdfs dfs -mkdir -p /dataset/dataset/"</span>)</span><br><span class="line">    os.system(<span class="string">"/export/servers/hadoop/bin/hdfs dfs -put &#123;0&#125; /dataset/dataset/"</span>.format(file_name))</span><br></pre></td></tr></table></figure>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//读取hdfs上的文件</span></span><br><span class="line"> <span class="meta">@Test</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">hdfsSource</span></span>(): <span class="type">Unit</span> = &#123;</span><br><span class="line">   <span class="keyword">val</span> spark = <span class="type">SparkSession</span>.builder()</span><br><span class="line">     .appName(<span class="string">"hdfs_source"</span>)</span><br><span class="line">     .master(<span class="string">"local[3]"</span>)</span><br><span class="line">     .getOrCreate()</span><br><span class="line">   <span class="type">System</span>.setProperty(<span class="string">"path"</span>, <span class="string">"C:\\winutils"</span>)</span><br><span class="line">   spark.sparkContext.setLogLevel(<span class="string">"WARN"</span>)</span><br><span class="line"></span><br><span class="line">   <span class="keyword">val</span> userSchema = <span class="keyword">new</span> <span class="type">StructType</span>()</span><br><span class="line">     .add(<span class="string">"name"</span>, <span class="string">"string"</span>)</span><br><span class="line">     .add(<span class="string">"age"</span>, <span class="string">"integer"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">   <span class="keyword">val</span> source = spark</span><br><span class="line">     .readStream <span class="comment">//	指明读取的是一个流式的 Dataset</span></span><br><span class="line">     .schema(userSchema) <span class="comment">//指定读取到的数据的 Schema</span></span><br><span class="line">     .json(<span class="string">"hdfs://node03:8020/dataset/dataset"</span>) <span class="comment">//指定目录位置, 以及数据格式</span></span><br><span class="line"></span><br><span class="line">   <span class="keyword">val</span> result = source.distinct() <span class="comment">//去重</span></span><br><span class="line"></span><br><span class="line">   result.writeStream</span><br><span class="line">     .outputMode(<span class="type">OutputMode</span>.<span class="type">Update</span>())</span><br><span class="line">     .format(<span class="string">"console"</span>)</span><br><span class="line">     .start()</span><br><span class="line">     .awaitTermination()</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>运行</p>
+<p>运行 <code>Python</code> 脚本</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 进入 Python 文件被上传的位置</span></span><br><span class="line">cd ~</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建放置生成文件的目录</span></span><br><span class="line">mkdir -p /export/dataset</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 运行程序</span></span><br><span class="line">python gen_files.py</span><br></pre></td></tr></table></figure>
+<p>运行spark 程序</p>
+<p>1本地运行</p>
+<p>2上传运行</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">spark-submit --class cn.itcast.structured.HDFSSource ./original-streaming-0.0.1.jar</span><br></pre></td></tr></table></figure>
+<p>总结:</p>
+<ol>
+<li><code>Python</code> 生成文件到 <code>HDFS</code>, 这一步在真实环境下, 可能是由 <code>Flume</code> 和 <code>Sqoop</code> 收集并上传至 <code>HDFS</code></li>
+<li><code>Structured Streaming</code> 从 <code>HDFS</code> 中读取数据并处理</li>
+<li><code>Structured Streaming</code> 讲结果表展示在控制台</li>
+</ol>
+<h2 id="2-从-Kafka-中读取数据"><a href="#2-从-Kafka-中读取数据" class="headerlink" title="2 从 Kafka 中读取数据"></a>2 从 Kafka 中读取数据</h2><p>kafka 回顾</p>
+<p><strong>Kafka 是一个 Pub / Sub 系统</strong></p>
+<p>1 一个pub   一个 sub</p>
+<p>2多个 pub  一个sub</p>
+<p>3 一个 pub  多个 sub</p>
+<p>4  多个 pub 多个sub</p>
+<p><code>Kafka</code> 有一个非常重要的应用场景就是对接业务系统和数据系统, 作为一个数据管道, 其需要流通的数据量惊人, 所以 <code>Kafka</code> 如果要满足这种场景的话, 就一定具有以下两个特点</p>
+<ul>
+<li>高吞吐量</li>
+<li>高可靠性</li>
+</ul>
+<p><strong>topic 与partition</strong></p>
+<p>消息和事件经常是不同类型的, 例如用户注册是一种消息, 订单创建也是一种消息</p>
+<p><code>Kafka</code> 中使用 <code>Topic</code> 来组织不同类型的消息</p>
+<p><code>Kafka</code> 中的 <code>Topic</code> 要承受非常大的吞吐量, 所以 <code>Topic</code> 应该是可以分片的, 应该是分布式的</p>
+<ul>
+<li><code>Kafka</code> 的应用场景<ul>
+<li>一般的系统中, 业务系统会不止一个, 数据系统也会比较复杂</li>
+<li>为了减少业务系统和数据系统之间的耦合, 要将其分开, 使用一个中间件来流转数据</li>
+<li>Kafka 因为其吞吐量超高, 所以适用于这种场景</li>
+</ul>
+</li>
+<li><code>Kafka</code> 如何保证高吞吐量<ul>
+<li>因为消息会有很多种类, <code>Kafka</code> 中可以创建多个队列, 每一个队列就是一个 <code>Topic</code>, 可以理解为是一个主题, 存放相关的消息</li>
+<li>因为 <code>Topic</code> 直接存放消息, 所以 <code>Topic</code> 必须要能够承受非常大的通量, 所以 <code>Topic</code> 是分布式的, 是可以分片的, 使用分布式的并行处理能力来解决高通量的问题</li>
+</ul>
+</li>
+</ul>
+<h3 id="1-Kafka-和-Structured-Streaming-整合的结构"><a href="#1-Kafka-和-Structured-Streaming-整合的结构" class="headerlink" title="1   Kafka 和 Structured Streaming 整合的结构"></a>1   Kafka 和 Structured Streaming 整合的结构</h3><p><strong>Topic 的 Offset</strong></p>
+<p><code>Topic</code> 是分区的, 每一个 <code>Topic</code> 的分区分布在不同的 <code>Broker</code> 上</p>
+<p><img src="/images/sparkstreaming/ss12.png" alt="img"></p>
+<p>每个分区都对应一系列的 <code>Log</code> 文件, 消息存在于 <code>Log</code> 中, 消息的 <code>ID</code> 就是这条消息在本分区的 <code>Offset</code> 偏移量</p>
+<p><code>Offset</code> 又称作为偏移量, 其实就是一个东西距离另外一个东西的距离</p>
+<p><code>Kafka</code> 中使用 <code>Offset</code> 命名消息, 而不是指定 <code>ID</code> 的原因是想表示永远自增, <code>ID</code> 是可以指定的, 但是 <code>Offset</code>只能是一个距离值, 它只会越来越大, 所以, 叫做 <code>Offset</code> 而不叫 <code>ID</code> 也是这个考虑, 消息只能追加到 <code>Log</code> 末尾, 只能增长不能减少</p>
+<p>分析</p>
+<ul>
+<li><code>Structured Streaming</code> 中使用 <code>Source</code> 对接外部系统, 对接 <code>Kafka</code> 的 <code>Source</code> 叫做 <code>KafkaSource</code></li>
+<li><code>KafkaSource</code> 中会使用 <code>KafkaSourceRDD</code> 来映射外部 <code>Kafka</code> 的 <code>Topic</code>, 两者的 <code>Partition</code> 一一对应</li>
+</ul>
+<p>结论</p>
+<p><code>Structured Streaming</code> 会并行的从 <code>Kafka</code> 中获取数据</p>
+<p><strong>Structured Streaming 读取 Kafka 消息的三种方式</strong></p>
+<p><img src="/images/sparkstreaming/ss13.png" alt="img"></p>
+<ul>
+<li><code>Earliest</code> 从每个 <code>Kafka</code> 分区最开始处开始获取</li>
+<li><code>Assign</code> 手动指定每个 <code>Kafka</code> 分区中的 <code>Offset</code></li>
+<li><code>Latest</code> 不再处理之前的消息, 只获取流计算启动后新产生的数据</li>
+</ul>
+<p><strong>总结</strong></p>
+<ul>
+<li><code>Kafka</code> 中的消息存放在某个 <code>Topic</code> 的某个 <code>Partition</code> 中, 消息是不可变的, 只会在消息过期的时候从最早的消息开始删除, 消息的 <code>ID</code> 也叫做 <code>Offset</code>, 并且只能正增长</li>
+<li><code>Structured Streaming</code> 整合 <code>Kafka</code> 的时候, 会并行的通过 <code>Offset</code> 从所有 <code>Topic</code> 的 <code>Partition</code> 中获取数据</li>
+<li><code>Structured Streaming</code> 在从 <code>Kafka</code> 读取数据的时候, 可以选择从最早的地方开始读取, 也可以选择从任意位置读取, 也可以选择只读取最新的</li>
+</ul>
+<p>1  使用生产者在 Kafka 的 Topic : streaming-test 中输入 JSON 数据  <strong>发送数据时 必须把json转换为一行发送</strong></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"devices"</span>: &#123;</span><br><span class="line">    <span class="attr">"cameras"</span>: &#123;</span><br><span class="line">      <span class="attr">"device_id"</span>: <span class="string">"awJo6rH"</span>,</span><br><span class="line">      <span class="attr">"last_event"</span>: &#123;</span><br><span class="line">        <span class="attr">"has_sound"</span>: <span class="literal">true</span>,</span><br><span class="line">        <span class="attr">"has_motion"</span>: <span class="literal">true</span>,</span><br><span class="line">        <span class="attr">"has_person"</span>: <span class="literal">true</span>,</span><br><span class="line">        <span class="attr">"start_time"</span>: <span class="string">"2016-12-29T00:00:00.000Z"</span>,</span><br><span class="line">        <span class="attr">"end_time"</span>: <span class="string">"2016-12-29T18:42:00.000Z"</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>JSON</code> 数据本质上就是字符串, 只不过这个字符串是有结构的, 虽然有结构, 但是很难直接从字符串中取出某个值</p>
+<p>而反序列化, 就是指把 <code>JSON</code> 数据转为对象, 或者转为 <code>DataFrame</code>, 可以直接使用某一个列或者某一个字段获取数据, 更加方便</p>
+<p>而想要做到这件事, 必须要先根据数据格式, 编写 <code>Schema</code> 对象, 从而通过一些方式转为 <code>DataFrame</code></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line"> <span class="meta">@Test</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">kafakaSource</span></span>(): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="comment">// 1. 创建 SparkSession</span></span><br><span class="line">    <span class="keyword">val</span> spark = <span class="type">SparkSession</span>.builder()</span><br><span class="line">      .appName(<span class="string">"hdfs_source"</span>)</span><br><span class="line">      .master(<span class="string">"local[6]"</span>)</span><br><span class="line">      .getOrCreate()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">import</span> spark.implicits._</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 2. 读取 Kafka 数据</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> source: <span class="type">DataFrame</span> = spark.readStream</span><br><span class="line">      <span class="comment">//设置为 Kafka 指定使用 KafkaSource 读取数据</span></span><br><span class="line">      .format(<span class="string">"kafka"</span>)</span><br><span class="line">      <span class="comment">//指定 Kafka 的 Server 地址</span></span><br><span class="line">      .option(<span class="string">"kafka.bootstrap.servers"</span>, <span class="string">"node01:9092,node02:9092,node03:9092"</span>)</span><br><span class="line">      <span class="comment">//要监听的 Topic, 可以传入多个, 传入多个 Topic 则监听多个 Topic, 也可以使用 topic-* 这样的通配符写法</span></span><br><span class="line">      .option(<span class="string">"subscribe"</span>, <span class="string">"streaming_test_1"</span>)</span><br><span class="line">      <span class="comment">//从什么位置开始获取数据, 可选值有 earliest, assign, latest</span></span><br><span class="line">      .option(<span class="string">"startingOffsets"</span>, <span class="string">"earliest"</span>) <span class="comment">//从头开始读</span></span><br><span class="line">      .load()</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 3. 定义 JSON 中的类型</span></span><br><span class="line">    <span class="comment">/*&#123;</span></span><br><span class="line"><span class="comment"> "devices": &#123;</span></span><br><span class="line"><span class="comment">   "cameras": &#123;</span></span><br><span class="line"><span class="comment">     "device_id": "awJo6rH",</span></span><br><span class="line"><span class="comment">     "last_event": &#123;</span></span><br><span class="line"><span class="comment">       "has_sound": true,</span></span><br><span class="line"><span class="comment">       "has_motion": true,</span></span><br><span class="line"><span class="comment">       "has_person": true,</span></span><br><span class="line"><span class="comment">       "start_time": "2016-12-29T00:00:00.000Z",</span></span><br><span class="line"><span class="comment">       "end_time": "2016-12-29T18:42:00.000Z"</span></span><br><span class="line"><span class="comment">     &#125;</span></span><br><span class="line"><span class="comment">   &#125;</span></span><br><span class="line"><span class="comment"> &#125;</span></span><br><span class="line"><span class="comment">&#125;*/</span></span><br><span class="line">    <span class="keyword">val</span> eventType = <span class="keyword">new</span> <span class="type">StructType</span>() <span class="comment">//   里层3</span></span><br><span class="line">      .add(<span class="string">"has_sound"</span>, <span class="type">BooleanType</span>)</span><br><span class="line">      .add(<span class="string">"has_motion"</span>, <span class="type">BooleanType</span>)</span><br><span class="line">      .add(<span class="string">"has_person"</span>, <span class="type">BooleanType</span>)</span><br><span class="line">      .add(<span class="string">"start_time"</span>, <span class="type">DateType</span>)</span><br><span class="line">      .add(<span class="string">"end_time"</span>, <span class="type">DateType</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> cameraType = <span class="keyword">new</span> <span class="type">StructType</span>() <span class="comment">//里层2</span></span><br><span class="line">      .add(<span class="string">"device_id"</span>, <span class="type">StringType</span>)</span><br><span class="line">      .add(<span class="string">"last_event"</span>, eventType)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> deviceType = <span class="keyword">new</span> <span class="type">StructType</span>()</span><br><span class="line">      .add(<span class="string">"cameras"</span>, cameraType) <span class="comment">//里层1</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> schema = <span class="keyword">new</span> <span class="type">StructType</span>()</span><br><span class="line">      .add(<span class="string">"devices"</span>, deviceType) <span class="comment">//最外层</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 4. 解析 JSON</span></span><br><span class="line">    <span class="comment">// 需求: DataFrame(time, has_person)</span></span><br><span class="line">    <span class="keyword">import</span> org.apache.spark.sql.functions._</span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> jsonOptions = <span class="type">Map</span>(<span class="string">"timestampFormat"</span> -&gt; <span class="string">"yyyy-MM-dd'T'HH:mm:ss.sss'Z'"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> result = source.selectExpr(<span class="string">"CAST(key AS STRING) as key"</span>, <span class="string">"CAST(value AS STRING) as value"</span>)</span><br><span class="line">      .select(from_json(<span class="symbol">'value</span>, schema, jsonOptions).alias(<span class="string">"parsed_value"</span>))</span><br><span class="line">      .selectExpr(<span class="string">"parsed_value.devices.cameras.last_event.start_time"</span>, <span class="string">"parsed_value.devices.cameras.last_event.has_person"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 5. 打印数据</span></span><br><span class="line">    result.writeStream</span><br><span class="line">      .format(<span class="string">"console"</span>)</span><br><span class="line">      .outputMode(<span class="type">OutputMode</span>.<span class="type">Append</span>())</span><br><span class="line">      .start()</span><br><span class="line">      .awaitTermination()</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>使用 <code>Structured Streaming</code> 来对接 <code>Kafka</code> 并反序列化 <code>Kafka</code> 中的 <code>JSON</code> 格式的消息, 是一个非常重要的技能</p>
+<p>无论使用什么方式, 如果想反序列化 <code>JSON</code> 数据, 就必须要先追踪 <code>JSON</code> 数据的结构</p>
+<p><strong>注意点</strong></p>
+<p>1   业务系统如何把数据给 <code>Kafka</code> ?</p>
+<p>可以主动或者被动的把数据交给 <code>Kafka</code>, 但是无论使用什么方式, 都在使用 <code>Kafka</code> 的 <code>Client</code> 类库来完成这件事, <code>Kafka</code> 的类库调用方式如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Producer&lt;String, String&gt; producer = <span class="keyword">new</span> KafkaProducer&lt;String, String&gt;(properties);</span><br><span class="line">producer.send(<span class="keyword">new</span> ProducerRecord&lt;String, String&gt;(<span class="string">"HelloWorld"</span>, msg));</span><br></pre></td></tr></table></figure>
+<p>其中发给 <code>Kafka</code> 的消息是 <code>KV</code> 类型的</p>
+<p>2   使用 <code>Structured Streaming</code> 访问 <code>Kafka</code> 获取数据的时候, 需要什么东西呢?</p>
+<ul>
+<li>存储当前处理过的 <code>Kafka</code> 的 <code>Offset</code></li>
+<li>对接多个 <code>Kafka Topic</code> 的时候, 要知道这条数据属于哪个 <code>Topi</code></li>
+</ul>
+<p>总结</p>
+<ul>
+<li><code>Kafka</code> 中收到的消息是 <code>KV</code> 类型的, 有 <code>Key</code>, 有 <code>Value</code></li>
+<li><code>Structured Streaming</code> 对接 <code>Kafka</code> 的时候, 每一条 <code>Kafka</code> 消息不能只是 <code>KV</code>, 必须要有 <code>Topic</code>, <code>Partition</code>之类的信息</li>
+</ul>
+<p><strong>从 <code>Kafka</code> 获取的 <code>DataFrame</code> 格式</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">source.printSchema()</span><br></pre></td></tr></table></figure>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">结果</span></span><br><span class="line"><span class="string">root</span></span><br><span class="line"> <span class="string">|--</span> <span class="attr">key:</span> <span class="string">binary</span> <span class="string">(nullable</span> <span class="string">=</span> <span class="literal">true</span><span class="string">)</span></span><br><span class="line"> <span class="string">|--</span> <span class="attr">value:</span> <span class="string">binary</span> <span class="string">(nullable</span> <span class="string">=</span> <span class="literal">true</span><span class="string">)</span></span><br><span class="line"> <span class="string">|--</span> <span class="attr">topic:</span> <span class="string">string</span> <span class="string">(nullable</span> <span class="string">=</span> <span class="literal">true</span><span class="string">)</span></span><br><span class="line"> <span class="string">|--</span> <span class="attr">partition:</span> <span class="string">integer</span> <span class="string">(nullable</span> <span class="string">=</span> <span class="literal">true</span><span class="string">)</span></span><br><span class="line"> <span class="string">|--</span> <span class="attr">offset:</span> <span class="string">long</span> <span class="string">(nullable</span> <span class="string">=</span> <span class="literal">true</span><span class="string">)</span></span><br><span class="line"> <span class="string">|--</span> <span class="attr">timestamp:</span> <span class="string">timestamp</span> <span class="string">(nullable</span> <span class="string">=</span> <span class="literal">true</span><span class="string">)</span></span><br><span class="line"> <span class="string">|--</span> <span class="attr">timestampType:</span> <span class="string">integer</span> <span class="string">(nullable</span> <span class="string">=</span> <span class="literal">true</span><span class="string">)</span></span><br></pre></td></tr></table></figure>
+<p>从 <code>Kafka</code> 中读取到的并不是直接是数据, 而是一个包含各种信息的表格, 其中每个字段的含义如下</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Key</th>
+<th style="text-align:left">类型</th>
+<th style="text-align:left">解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>key</code></td>
+<td style="text-align:left"><code>binary</code></td>
+<td style="text-align:left"><code>Kafka</code> 消息的 <code>Key</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>value</code></td>
+<td style="text-align:left"><code>binary</code></td>
+<td style="text-align:left"><code>Kafka</code> 消息的 <code>Value</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>topic</code></td>
+<td style="text-align:left"><code>string</code></td>
+<td style="text-align:left">本条消息所在的 <code>Topic</code>, 因为整合的时候一个 <code>Dataset</code> 可以对接多个 <code>Topic</code>, 所以有这样一个信息</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>partition</code></td>
+<td style="text-align:left"><code>integer</code></td>
+<td style="text-align:left">消息的分区号</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>offset</code></td>
+<td style="text-align:left"><code>long</code></td>
+<td style="text-align:left">消息在其分区的偏移量</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>timestamp</code></td>
+<td style="text-align:left"><code>timestamp</code></td>
+<td style="text-align:left">消息进入 <code>Kafka</code> 的时间戳</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>timestampType</code></td>
+<td style="text-align:left"><code>integer</code></td>
+<td style="text-align:left">时间戳类型</td>
+</tr>
+</tbody>
+</table>
+<h3 id="2-总结"><a href="#2-总结" class="headerlink" title="2  总结"></a>2  总结</h3><ol>
+<li><p>一定要把 <code>JSON</code> 转为一行, 再使用 <code>Producer</code> 发送, 不然会出现获取多行的情况</p>
+</li>
+<li><p>使用 Structured Streaming 连接 Kafka 的时候, 需要配置如下三个参数</p>
+<ul>
+<li><code>kafka.bootstrap.servers</code> : 指定 <code>Kafka</code> 的 <code>Server</code> 地址</li>
+<li><code>subscribe</code> : 要监听的 <code>Topic</code>, 可以传入多个, 传入多个 Topic 则监听多个 Topic, 也可以使用 <code>topic-*</code> 这样的通配符写法</li>
+<li><code>startingOffsets</code> : 从什么位置开始获取数据, 可选值有 <code>earliest</code>, <code>assign</code>, <code>latest</code></li>
+</ul>
+</li>
+<li><p>从 Kafka 获取到的 DataFrame 的 Schema 如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">root</span><br><span class="line"> |-- key: binary (nullable = true)</span><br><span class="line"> |-- value: binary (nullable = true)</span><br><span class="line"> |-- topic: string (nullable = true)</span><br><span class="line"> |-- partition: integer (nullable = true)</span><br><span class="line"> |-- offset: long (nullable = true)</span><br><span class="line"> |-- timestamp: timestamp (nullable = true)</span><br><span class="line"> |-- timestampType: integer (nullable = true)</span><br></pre></td></tr></table></figure>
+<h3 id="3-JSON-解析"><a href="#3-JSON-解析" class="headerlink" title="3  JSON 解析"></a>3  JSON 解析</h3><ol>
+<li><p>准备好 <code>JSON</code> 所在的列</p>
+<ul>
+<li><p>问题</p>
+<p>由 <code>Dataset</code> 的结构可以知道 <code>key</code> 和 <code>value</code> 列的类型都是 <code>binary</code> 二进制, 所以要将其转为字符串, 才可进行 <code>JSON</code> 解析</p>
+</li>
+<li><p>解决方式</p>
+<p><code>source.selectExpr(&quot;CAST(key AS STRING) as key&quot;, &quot;CAST(value AS STRING) as value&quot;)</code></p>
+</li>
+</ul>
+</li>
+<li><p>编写 <code>Schema</code> 对照 <code>JSON</code> 的格式</p>
+<ul>
+<li><code>Key</code> 要对应 <code>JSON</code> 中的 <code>Key</code></li>
+<li><code>Value</code> 的类型也要对应 <code>JSON</code> 中的 <code>Value</code> 类型</li>
+</ul>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> eventType = <span class="keyword">new</span> <span class="type">StructType</span>()</span><br><span class="line">  .add(<span class="string">"has_sound"</span>, <span class="type">BooleanType</span>, nullable = <span class="literal">true</span>)</span><br><span class="line">  .add(<span class="string">"has_motion"</span>, <span class="type">BooleanType</span>, nullable = <span class="literal">true</span>)</span><br><span class="line">  .add(<span class="string">"has_person"</span>, <span class="type">BooleanType</span>, nullable = <span class="literal">true</span>)</span><br><span class="line">  .add(<span class="string">"start_time"</span>, <span class="type">DateType</span>, nullable = <span class="literal">true</span>)</span><br><span class="line">  .add(<span class="string">"end_time"</span>, <span class="type">DateType</span>, nullable = <span class="literal">true</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> camerasType = <span class="keyword">new</span> <span class="type">StructType</span>()</span><br><span class="line">  .add(<span class="string">"device_id"</span>, <span class="type">StringType</span>, nullable = <span class="literal">true</span>)</span><br><span class="line">  .add(<span class="string">"last_event"</span>, eventType, nullable = <span class="literal">true</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> devicesType = <span class="keyword">new</span> <span class="type">StructType</span>()</span><br><span class="line">  .add(<span class="string">"cameras"</span>, camerasType, nullable = <span class="literal">true</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> schema = <span class="keyword">new</span> <span class="type">StructType</span>()</span><br><span class="line">  .add(<span class="string">"devices"</span>, devicesType, nullable = <span class="literal">true</span>)</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+</li>
+<li><p>因为 <code>JSON</code> 中包含 <code>Date</code> 类型的数据, 所以要指定时间格式化方式</p>
+</li>
+</ol>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> jsonOptions = <span class="type">Map</span>(<span class="string">"timestampFormat"</span> -&gt; <span class="string">"yyyy-MM-dd'T'HH:mm:ss.sss'Z'"</span>)</span><br></pre></td></tr></table></figure>
+<ol start="4">
+<li>使用 <code>from_json</code> 这个 <code>UDF</code> 格式化 <code>JSON</code></li>
+</ol>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.select(from_json(<span class="symbol">'value</span>, schema, jsonOptions).alias(<span class="string">"parsed_value"</span>))</span><br></pre></td></tr></table></figure>
+<ol start="5">
+<li>选择格式化过后的 <code>JSON</code> 中的字段</li>
+</ol>
+<p>因为 <code>JSON</code> 被格式化过后, 已经变为了 <code>StructType</code>, 所以可以直接获取其中某些字段的值</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">.selectExpr(<span class="string">"parsed_value.devices.cameras.last_event.has_person as has_person"</span>,</span><br><span class="line">          <span class="string">"parsed_value.devices.cameras.last_event.start_time as start_time"</span>)</span><br></pre></td></tr></table></figure>
+<p><strong>数据处理</strong></p>
+<ol>
+<li><p>统计各个时段有人的数据</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">.filter(<span class="symbol">'has_person</span> === <span class="literal">true</span>)</span><br><span class="line">.groupBy(<span class="symbol">'has_person</span>, <span class="symbol">'start_time</span>)</span><br><span class="line">.count()</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>将数据落地到控制台</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">result.writeStream</span><br><span class="line">  .outputMode(<span class="type">OutputMode</span>.<span class="type">Complete</span>())</span><br><span class="line">  .format(<span class="string">"console"</span>)</span><br><span class="line">  .start()</span><br><span class="line">  .awaitTermination()</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p><strong>全部代码</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.spark.sql.<span class="type">SparkSession</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> spark = <span class="type">SparkSession</span>.builder()</span><br><span class="line">  .master(<span class="string">"local[6]"</span>)</span><br><span class="line">  .appName(<span class="string">"kafka integration"</span>)</span><br><span class="line">  .getOrCreate()</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.spark.sql.streaming.<span class="type">OutputMode</span></span><br><span class="line"><span class="keyword">import</span> org.apache.spark.sql.types._</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> source = spark</span><br><span class="line">  .readStream</span><br><span class="line">  .format(<span class="string">"kafka"</span>)</span><br><span class="line">  .option(<span class="string">"kafka.bootstrap.servers"</span>, <span class="string">"node01:9092,node02:9092,node03:9092"</span>)</span><br><span class="line">  .option(<span class="string">"subscribe"</span>, <span class="string">"streaming-test"</span>)</span><br><span class="line">  .option(<span class="string">"startingOffsets"</span>, <span class="string">"earliest"</span>)</span><br><span class="line">  .load()</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> eventType = <span class="keyword">new</span> <span class="type">StructType</span>()</span><br><span class="line">  .add(<span class="string">"has_sound"</span>, <span class="type">BooleanType</span>, nullable = <span class="literal">true</span>)</span><br><span class="line">  .add(<span class="string">"has_motion"</span>, <span class="type">BooleanType</span>, nullable = <span class="literal">true</span>)</span><br><span class="line">  .add(<span class="string">"has_person"</span>, <span class="type">BooleanType</span>, nullable = <span class="literal">true</span>)</span><br><span class="line">  .add(<span class="string">"start_time"</span>, <span class="type">DateType</span>, nullable = <span class="literal">true</span>)</span><br><span class="line">  .add(<span class="string">"end_time"</span>, <span class="type">DateType</span>, nullable = <span class="literal">true</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> camerasType = <span class="keyword">new</span> <span class="type">StructType</span>()</span><br><span class="line">  .add(<span class="string">"device_id"</span>, <span class="type">StringType</span>, nullable = <span class="literal">true</span>)</span><br><span class="line">  .add(<span class="string">"last_event"</span>, eventType, nullable = <span class="literal">true</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> devicesType = <span class="keyword">new</span> <span class="type">StructType</span>()</span><br><span class="line">  .add(<span class="string">"cameras"</span>, camerasType, nullable = <span class="literal">true</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> schema = <span class="keyword">new</span> <span class="type">StructType</span>()</span><br><span class="line">  .add(<span class="string">"devices"</span>, devicesType, nullable = <span class="literal">true</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> jsonOptions = <span class="type">Map</span>(<span class="string">"timestampFormat"</span> -&gt; <span class="string">"yyyy-MM-dd'T'HH:mm:ss.sss'Z'"</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.spark.sql.functions._</span><br><span class="line"><span class="keyword">import</span> spark.implicits._</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> result = source.selectExpr(<span class="string">"CAST(key AS STRING) as key"</span>, <span class="string">"CAST(value AS STRING) as value"</span>)</span><br><span class="line">    .select(from_json(<span class="symbol">'value</span>, schema, jsonOptions).alias(<span class="string">"parsed_value"</span>))</span><br><span class="line">    .selectExpr(<span class="string">"parsed_value.devices.cameras.last_event.has_person as has_person"</span>,</span><br><span class="line">      <span class="string">"parsed_value.devices.cameras.last_event.start_time as start_time"</span>)</span><br><span class="line">    .filter(<span class="symbol">'has_person</span> === <span class="literal">true</span>)</span><br><span class="line">    .groupBy(<span class="symbol">'has_person</span>, <span class="symbol">'start_time</span>)</span><br><span class="line">    .count()</span><br><span class="line"></span><br><span class="line">result.writeStream</span><br><span class="line">  .outputMode(<span class="type">OutputMode</span>.<span class="type">Complete</span>())</span><br><span class="line">  .format(<span class="string">"console"</span>)</span><br><span class="line">  .start()</span><br><span class="line">  .awaitTermination()</span><br></pre></td></tr></table></figure>
+<p><strong>运行测试</strong></p>
+<ol>
+<li><p>进入服务器中, 启动 <code>Kafka</code></p>
+</li>
+<li><p>启动 <code>Kafka</code> 的 <code>Producer</code></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bin/kafka-console-producer.sh --broker-list node01:9092,node02:9092,node03:9092 --topic streaming-test</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>启动 <code>Spark shell</code> 并拷贝代码进行测试</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./bin/spark-shell --packages org.apache.spark:spark-sql-kafka-0-10_2.11:2.2.0</span><br></pre></td></tr></table></figure>
+<ul>
+<li>因为需要和 <code>Kafka</code> 整合, 所以在启动的时候需要加载和 <code>Kafka</code> 整合的包 <code>spark-sql-kafka-0-10</code></li>
+</ul>
+</li>
+</ol>
+<h1 id="五-sink"><a href="#五-sink" class="headerlink" title="五 sink"></a>五 sink</h1><h2 id="1-HDFS-Sink"><a href="#1-HDFS-Sink" class="headerlink" title="1  HDFS Sink"></a>1  HDFS Sink</h2><p>场景</p>
+<ul>
+<li><code>Kafka</code> 往往作为数据系统和业务系统之间的桥梁</li>
+<li>数据系统一般由批量处理和流式处理两个部分组成</li>
+<li>在 <code>Kafka</code> 作为整个数据平台入口的场景下, 需要使用 <code>StructuredStreaming</code> 接收 <code>Kafka</code> 的数据并放置于 <code>HDFS</code>上, 后续才可以进行批量处理</li>
+</ul>
+<p>需求</p>
+<p>从 <code>Kafka</code> 接收数据, 从给定的数据集中, 裁剪部分列, 落地于 <code>HDFS</code></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">hdfsSink</span></span>(): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="type">System</span>.setProperty(<span class="string">"hadoop.home.dir"</span>, <span class="string">"C:\\winutil"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 1. 创建 SparkSession</span></span><br><span class="line">    <span class="keyword">val</span> spark = <span class="type">SparkSession</span>.builder()</span><br><span class="line">      .appName(<span class="string">"hdfs_sink"</span>)</span><br><span class="line">      .master(<span class="string">"local[6]"</span>)</span><br><span class="line">      .getOrCreate()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">import</span> spark.implicits._</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 2. 读取 Kafka 数据</span></span><br><span class="line">    <span class="keyword">val</span> source: <span class="type">Dataset</span>[<span class="type">String</span>] = spark.readStream</span><br><span class="line">      .format(<span class="string">"kafka"</span>)</span><br><span class="line">      .option(<span class="string">"kafka.bootstrap.servers"</span>, <span class="string">"node01:9092,node02:9092,node03:9092"</span>)</span><br><span class="line">      .option(<span class="string">"subscribe"</span>, <span class="string">"streaming_test_2"</span>)</span><br><span class="line">      .option(<span class="string">"startingOffsets"</span>, <span class="string">"earliest"</span>)</span><br><span class="line">      .load()</span><br><span class="line">      .selectExpr(<span class="string">"CAST(value AS STRING) as value"</span>)</span><br><span class="line">      .as[<span class="type">String</span>]</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 1::Toy Story (1995)::Animation|Children's|Comedy</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 3. 处理 CSV, Dataset(String), Dataset(id, name, category)</span></span><br><span class="line">    <span class="keyword">val</span> result = source.map(item =&gt; &#123;</span><br><span class="line">      <span class="keyword">val</span> arr = item.split(<span class="string">"::"</span>)</span><br><span class="line">      (arr(<span class="number">0</span>).toInt, arr(<span class="number">1</span>).toString, arr(<span class="number">2</span>).toString)</span><br><span class="line">    &#125;).as[(<span class="type">Int</span>, <span class="type">String</span>, <span class="type">String</span>)].toDF(<span class="string">"id"</span>, <span class="string">"name"</span>, <span class="string">"category"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 4. 落地到 HDFS 中</span></span><br><span class="line">    result.writeStream</span><br><span class="line">      .format(<span class="string">"parquet"</span>)</span><br><span class="line">      .option(<span class="string">"path"</span>, <span class="string">"dataset/streaming/moives/"</span>)</span><br><span class="line">      .option(<span class="string">"checkpointLocation"</span>, <span class="string">"checkpoint"</span>)</span><br><span class="line">      .start()</span><br><span class="line">      .awaitTermination()</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="2-Kafka-Sink"><a href="#2-Kafka-Sink" class="headerlink" title="2 Kafka Sink"></a>2 Kafka Sink</h2><p>场景</p>
+<ul>
+<li>有很多时候, <code>ETL</code> 过后的数据, 需要再次放入 <code>Kafka</code></li>
+<li>在 <code>Kafka</code> 后, 可能会有流式程序统一将数据落地到 <code>HDFS</code> 或者 <code>HBase</code></li>
+</ul>
+<p>需求</p>
+<p>从 <code>Kafka</code> 中获取数据, 简单处理, 再次放入 <code>Kafka</code></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"> <span class="function"><span class="keyword">def</span> <span class="title">kafkaSink</span></span>(): <span class="type">Unit</span> = &#123;</span><br><span class="line">   <span class="type">System</span>.setProperty(<span class="string">"hadoop.home.dir"</span>, <span class="string">"C:\\winutil"</span>)</span><br><span class="line"></span><br><span class="line">   <span class="comment">// 1. 创建 SparkSession</span></span><br><span class="line">   <span class="keyword">val</span> spark = <span class="type">SparkSession</span>.builder()</span><br><span class="line">     .appName(<span class="string">"hdfs_sink"</span>)</span><br><span class="line">     .master(<span class="string">"local[6]"</span>)</span><br><span class="line">     .getOrCreate()</span><br><span class="line"></span><br><span class="line">   <span class="keyword">import</span> spark.implicits._</span><br><span class="line"></span><br><span class="line">   <span class="comment">// 2. 读取 Kafka 数据</span></span><br><span class="line">   <span class="keyword">val</span> source: <span class="type">Dataset</span>[<span class="type">String</span>] = spark.readStream</span><br><span class="line">     .format(<span class="string">"kafka"</span>)</span><br><span class="line">     .option(<span class="string">"kafka.bootstrap.servers"</span>, <span class="string">"node01:9092,node02:9092,node03:9092"</span>)</span><br><span class="line">     .option(<span class="string">"subscribe"</span>, <span class="string">"streaming_test_2"</span>)</span><br><span class="line">     .option(<span class="string">"startingOffsets"</span>, <span class="string">"earliest"</span>)</span><br><span class="line">     .load()</span><br><span class="line">     .selectExpr(<span class="string">"CAST(value AS STRING) as value"</span>)</span><br><span class="line">     .as[<span class="type">String</span>]</span><br><span class="line"></span><br><span class="line">   <span class="comment">// 1::Toy Story (1995)::Animation|Children's|Comedy</span></span><br><span class="line"></span><br><span class="line">   <span class="comment">// 3. 处理 CSV, Dataset(String), Dataset(id, name, category)</span></span><br><span class="line">   <span class="keyword">val</span> result = source.map(item =&gt; &#123;</span><br><span class="line">     <span class="keyword">val</span> arr = item.split(<span class="string">"::"</span>)</span><br><span class="line">     (arr(<span class="number">0</span>).toInt, arr(<span class="number">1</span>).toString, arr(<span class="number">2</span>).toString)</span><br><span class="line">   &#125;).as[(<span class="type">Int</span>, <span class="type">String</span>, <span class="type">String</span>)].toDF(<span class="string">"id"</span>, <span class="string">"name"</span>, <span class="string">"category"</span>)</span><br><span class="line"></span><br><span class="line">   <span class="comment">// 4. 落地到 kafka 中</span></span><br><span class="line">   result.writeStream</span><br><span class="line">     .format(<span class="string">"kafka"</span>)</span><br><span class="line">     .outputMode(<span class="type">OutputMode</span>.<span class="type">Append</span>())</span><br><span class="line">     .option(<span class="string">"checkpointLocation"</span>, <span class="string">"checkpoint"</span>)</span><br><span class="line">     .option(<span class="string">"kafka.bootstrap.servers"</span>, <span class="string">"node01:9092,node02:9092,node03:9092"</span>)</span><br><span class="line">     .option(<span class="string">"topic"</span>, <span class="string">"streaming_test_3"</span>)</span><br><span class="line">     .start()</span><br><span class="line">     .awaitTermination()</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="3-Foreach-Writer"><a href="#3-Foreach-Writer" class="headerlink" title="3  Foreach Writer"></a>3  Foreach Writer</h2><p>掌握 <code>Foreach</code> 模式理解如何扩展 <code>Structured Streaming</code> 的 <code>Sink</code>, 同时能够将数据落地到 <code>MySQL</code></p>
+<p><strong>场景</strong></p>
+<ul>
+<li><ol>
+<li>收集业务系统数据</li>
+<li>数据处理</li>
+<li>放入 <code>OLTP</code> 数据</li>
+<li>外部通过 <code>ECharts</code> 获取并处理数据</li>
+</ol>
+</li>
+<li>这个场景下, <code>StructuredStreaming</code> 就需要处理数据并放入 <code>MySQL</code> 或者 <code>MongoDB</code>, <code>HBase</code> 中以供 <code>Web</code> 程序可以获取数据, 图表的形式展示在前端</li>
+</ul>
+<p>Foreach 模式::</p>
+<ul>
+<li>在 <code>Structured Streaming</code> 中, 并未提供完整的 <code>MySQL/JDBC</code> 整合工具</li>
+<li>不止 <code>MySQL</code> 和 <code>JDBC</code>, 可能会有其它的目标端需要写入</li>
+<li><p>很多时候 <code>Structured Streaming</code> 需要对接一些第三方的系统, 例如阿里云的云存储, 亚马逊云的云存储等, 但是 <code>Spark</code> 无法对所有第三方都提供支持, 有时候需要自己编写</p>
+</li>
+<li><p>既然无法满足所有的整合需求, <code>StructuredStreaming</code> 提供了 <code>Foreach</code>, 可以拿到每一个批次的数据</p>
+</li>
+<li>通过 <code>Foreach</code> 拿到数据后, 可以通过自定义写入方式, 从而将数据落地到其它的系统</li>
+</ul>
+<p><strong>需求</strong></p>
+<p>从 <code>Kafka</code> 中获取数据, 处理后放入 <code>MySQL</code></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">mysqlSink</span></span>(): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="type">System</span>.setProperty(<span class="string">"hadoop.home.dir"</span>, <span class="string">"C:\\winutil"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 1. 创建 SparkSession</span></span><br><span class="line">    <span class="keyword">val</span> spark = <span class="type">SparkSession</span>.builder()</span><br><span class="line">      .appName(<span class="string">"hdfs_sink"</span>)</span><br><span class="line">      .master(<span class="string">"local[6]"</span>)</span><br><span class="line">      .getOrCreate()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">import</span> spark.implicits._</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 2. 读取 Kafka 数据</span></span><br><span class="line">    <span class="keyword">val</span> source: <span class="type">Dataset</span>[<span class="type">String</span>] = spark.readStream</span><br><span class="line">      .format(<span class="string">"kafka"</span>)</span><br><span class="line">      .option(<span class="string">"kafka.bootstrap.servers"</span>, <span class="string">"node01:9092,node02:9092,node03:9092"</span>)</span><br><span class="line">      .option(<span class="string">"subscribe"</span>, <span class="string">"streaming_test_2"</span>)</span><br><span class="line">      .option(<span class="string">"startingOffsets"</span>, <span class="string">"earliest"</span>)</span><br><span class="line">      .load()</span><br><span class="line">      .selectExpr(<span class="string">"CAST(value AS STRING) as value"</span>)</span><br><span class="line">      .as[<span class="type">String</span>]</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 1::Toy Story (1995)::Animation|Children's|Comedy</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 3. 处理 CSV, Dataset(String), Dataset(id, name, category)</span></span><br><span class="line">    <span class="keyword">val</span> result = source.map(item =&gt; &#123;</span><br><span class="line">      <span class="keyword">val</span> arr = item.split(<span class="string">"::"</span>)</span><br><span class="line">      (arr(<span class="number">0</span>).toInt, arr(<span class="number">1</span>).toString, arr(<span class="number">2</span>).toString)</span><br><span class="line">    &#125;).as[(<span class="type">Int</span>, <span class="type">String</span>, <span class="type">String</span>)].toDF(<span class="string">"id"</span>, <span class="string">"name"</span>, <span class="string">"category"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 4. 落地到 MySQL</span></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">MySQLWriter</span> <span class="keyword">extends</span> <span class="title">ForeachWriter</span>[<span class="type">Row</span>] </span>&#123;</span><br><span class="line">      <span class="keyword">private</span> <span class="keyword">val</span> driver = <span class="string">"com.mysql.jdbc.Driver"</span></span><br><span class="line">      <span class="keyword">private</span> <span class="keyword">var</span> connection: sql.<span class="type">Connection</span> = _</span><br><span class="line">      <span class="keyword">private</span> <span class="keyword">val</span> url = <span class="string">"jdbc::mysql://node01:3306/streaming-movies-result"</span></span><br><span class="line">      <span class="keyword">private</span> <span class="keyword">var</span> statement: sql.<span class="type">Statement</span> = _</span><br><span class="line"></span><br><span class="line">      <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">open</span></span>(partitionId: <span class="type">Long</span>, version: <span class="type">Long</span>): <span class="type">Boolean</span> = &#123;</span><br><span class="line">        <span class="type">Class</span>.forName(driver)</span><br><span class="line">        connection = <span class="type">DriverManager</span>.getConnection(url)</span><br><span class="line">        statement = connection.createStatement()</span><br><span class="line">        <span class="literal">true</span></span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">process</span></span>(value: <span class="type">Row</span>): <span class="type">Unit</span> = &#123;</span><br><span class="line">        statement.executeUpdate(<span class="string">s"insert into movies values(<span class="subst">$&#123;value.get(0)&#125;</span>, <span class="subst">$&#123;value.get(1)&#125;</span>, <span class="subst">$&#123;value.get(2)&#125;</span>)"</span>)</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">close</span></span>(errorOrNull: <span class="type">Throwable</span>): <span class="type">Unit</span> = &#123;</span><br><span class="line">        connection.close()</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    result.writeStream</span><br><span class="line">      .foreach(<span class="keyword">new</span> <span class="type">MySQLWriter</span>)</span><br><span class="line">      .start()</span><br><span class="line">      .awaitTermination()</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="4-自定义Sink"><a href="#4-自定义Sink" class="headerlink" title="4  自定义Sink"></a>4  自定义Sink</h2><p><code>Foreach</code> 倾向于一次处理一条数据, 如果想拿到 <code>DataFrame</code> 幂等的插入外部数据源, 则需要自定义 <code>Sink</code></p>
+<p><strong>Spark 加载 Sink 流程分析</strong></p>
+<ol>
+<li><p><code>writeStream</code> 方法中会创建一个 <code>DataStreamWriter</code> 对象</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">writeStream</span></span>: <span class="type">DataStreamWriter</span>[<span class="type">T</span>] = &#123;</span><br><span class="line">  <span class="keyword">if</span> (!isStreaming) &#123;</span><br><span class="line">    logicalPlan.failAnalysis(</span><br><span class="line">      <span class="string">"'writeStream' can be called only on streaming Dataset/DataFrame"</span>)</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">new</span> <span class="type">DataStreamWriter</span>[<span class="type">T</span>](<span class="keyword">this</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在 <code>DataStreamWriter</code> 对象上通过 <code>format</code> 方法指定 <code>Sink</code> 的短名并记录下来</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">format</span></span>(source: <span class="type">String</span>): <span class="type">DataStreamWriter</span>[<span class="type">T</span>] = &#123;</span><br><span class="line">  <span class="keyword">this</span>.source = source</span><br><span class="line">  <span class="keyword">this</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>3  .最终会通过 <code>DataStreamWriter</code> 对象上的 <code>start</code> 方法启动执行, 其中会通过短名创建 <code>DataSource</code></p>
+</li>
+</ol>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> dataSource =</span><br><span class="line">    <span class="type">DataSource</span>(</span><br><span class="line">      df.sparkSession,</span><br><span class="line">      className = source, <span class="comment">//	传入的 Sink 短名</span></span><br><span class="line">      options = extraOptions.toMap,</span><br><span class="line">      partitionColumns = normalizedParCols.getOrElse(<span class="type">Nil</span>))</span><br></pre></td></tr></table></figure>
+<ol start="4">
+<li>在创建 <code>DataSource</code> 的时候, 会通过一个复杂的流程创建出对应的 <code>Source</code> 和 <code>Sink</code></li>
+</ol>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">lazy</span> <span class="keyword">val</span> providingClass: <span class="type">Class</span>[_] = <span class="type">DataSource</span>.lookupDataSource(className)</span><br></pre></td></tr></table></figure>
+<ol start="5">
+<li>在这个复杂的创建流程中, 有一行最关键的代码, 就是通过 <code>Java</code> 的类加载器加载所有的 <code>DataSourceRegister</code></li>
+</ol>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> serviceLoader = <span class="type">ServiceLoader</span>.load(classOf[<span class="type">DataSourceRegister</span>], loader)</span><br></pre></td></tr></table></figure>
+<ol start="6">
+<li>在 <code>DataSourceRegister</code> 中会创建对应的 <code>Source</code> 或者 <code>Sink</code></li>
+</ol>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">DataSourceRegister</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">shortName</span></span>(): <span class="type">String</span>       <span class="comment">//	提供短名</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">StreamSourceProvider</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">createSource</span></span>(            <span class="comment">//创建 Source</span></span><br><span class="line">      sqlContext: <span class="type">SQLContext</span>,</span><br><span class="line">      metadataPath: <span class="type">String</span>,</span><br><span class="line">      schema: <span class="type">Option</span>[<span class="type">StructType</span>],</span><br><span class="line">      providerName: <span class="type">String</span>,</span><br><span class="line">      parameters: <span class="type">Map</span>[<span class="type">String</span>, <span class="type">String</span>]): <span class="type">Source</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">StreamSinkProvider</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">createSink</span></span>(              <span class="comment">//创建 Sink</span></span><br><span class="line">      sqlContext: <span class="type">SQLContext</span>,</span><br><span class="line">      parameters: <span class="type">Map</span>[<span class="type">String</span>, <span class="type">String</span>],</span><br><span class="line">      partitionColumns: <span class="type">Seq</span>[<span class="type">String</span>],</span><br><span class="line">      outputMode: <span class="type">OutputMode</span>): <span class="type">Sink</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>自定义 <code>Sink</code> 的方式</strong></p>
+<ul>
+<li>根据前面的流程说明, 有两点非常重要<ul>
+<li><code>Spark</code> 会自动加载所有 <code>DataSourceRegister</code> 的子类, 所以需要通过 <code>DataSourceRegister</code> 加载 <code>Source</code> 和 <code>Sink</code></li>
+<li>Spark 提供了 <code>StreamSinkProvider</code> 用以创建 <code>Sink</code>, 提供必要的依赖</li>
+</ul>
+</li>
+<li>所以如果要创建自定义的 <code>Sink</code>, 需要做两件事<ol>
+<li>创建一个注册器, 继承 <code>DataSourceRegister</code> 提供注册功能, 继承 <code>StreamSinkProvider</code> 获取创建 <code>Sink</code> 的必备依赖</li>
+<li>创建一个 <code>Sink</code> 子类</li>
+</ol>
+</li>
+</ul>
+<p><strong>步骤</strong></p>
+<ol>
+<li>读取 <code>Kafka</code> 数据</li>
+<li>简单处理数据</li>
+<li>创建 <code>Sink</code></li>
+<li>创建 <code>Sink</code> 注册器</li>
+<li>使用自定义 <code>Sink</code></li>
+</ol>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">zdSink</span></span>(): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">import</span> org.apache.spark.sql.<span class="type">SparkSession</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> spark = <span class="type">SparkSession</span>.builder()</span><br><span class="line">      .master(<span class="string">"local[6]"</span>)</span><br><span class="line">      .appName(<span class="string">"kafka integration"</span>)</span><br><span class="line">      .getOrCreate()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">import</span> spark.implicits._</span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> source = spark</span><br><span class="line">      .readStream</span><br><span class="line">      .format(<span class="string">"kafka"</span>)</span><br><span class="line">      .option(<span class="string">"kafka.bootstrap.servers"</span>, <span class="string">"node01:9092,node02:9092,node03:9092"</span>)</span><br><span class="line">      .option(<span class="string">"subscribe"</span>, <span class="string">"streaming-bank"</span>)</span><br><span class="line">      .option(<span class="string">"startingOffsets"</span>, <span class="string">"earliest"</span>)</span><br><span class="line">      .load()</span><br><span class="line">      .selectExpr(<span class="string">"CAST(value AS STRING)"</span>)</span><br><span class="line">      .as[<span class="type">String</span>]</span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> result = source.map &#123;</span><br><span class="line">      item =&gt;</span><br><span class="line">        <span class="keyword">val</span> arr = item.replace(<span class="string">"\""</span>, <span class="string">""</span>).split(<span class="string">";"</span>)</span><br><span class="line">        (arr(<span class="number">0</span>).toInt, arr(<span class="number">1</span>).toInt, arr(<span class="number">5</span>).toInt)</span><br><span class="line">    &#125;</span><br><span class="line">      .as[(<span class="type">Int</span>, <span class="type">Int</span>, <span class="type">Int</span>)]</span><br><span class="line">      .toDF(<span class="string">"age"</span>, <span class="string">"job"</span>, <span class="string">"balance"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">MySQLSink</span>(<span class="params">options: <span class="type">Map</span>[<span class="type">String</span>, <span class="type">String</span>], outputMode: <span class="type">OutputMode</span></span>) <span class="keyword">extends</span> <span class="title">Sink</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">addBatch</span></span>(batchId: <span class="type">Long</span>, data: <span class="type">DataFrame</span>): <span class="type">Unit</span> = &#123;</span><br><span class="line">        <span class="keyword">val</span> userName = options.get(<span class="string">"userName"</span>).orNull</span><br><span class="line">        <span class="keyword">val</span> password = options.get(<span class="string">"password"</span>).orNull</span><br><span class="line">        <span class="keyword">val</span> table = options.get(<span class="string">"table"</span>).orNull</span><br><span class="line">        <span class="keyword">val</span> jdbcUrl = options.get(<span class="string">"jdbcUrl"</span>).orNull</span><br><span class="line"></span><br><span class="line">        <span class="keyword">val</span> properties = <span class="keyword">new</span> <span class="type">Properties</span></span><br><span class="line">        properties.setProperty(<span class="string">"user"</span>, userName)</span><br><span class="line">        properties.setProperty(<span class="string">"password"</span>, password)</span><br><span class="line"></span><br><span class="line">        data.write.mode(outputMode.toString).jdbc(jdbcUrl, table, properties)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">MySQLStreamSinkProvider</span> <span class="keyword">extends</span> <span class="title">StreamSinkProvider</span> <span class="keyword">with</span> <span class="title">DataSourceRegister</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">createSink</span></span>(sqlContext: <span class="type">SQLContext</span>,</span><br><span class="line">                              parameters: <span class="type">Map</span>[<span class="type">String</span>, <span class="type">String</span>],</span><br><span class="line">                              partitionColumns: <span class="type">Seq</span>[<span class="type">String</span>],</span><br><span class="line">                              outputMode: <span class="type">OutputMode</span>): <span class="type">Sink</span> = &#123;</span><br><span class="line">        <span class="keyword">new</span> <span class="type">MySQLSink</span>(parameters, outputMode)</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">shortName</span></span>(): <span class="type">String</span> = <span class="string">"mysql"</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    result.writeStream</span><br><span class="line">      .format(<span class="string">"mysql"</span>)</span><br><span class="line">      .option(<span class="string">"username"</span>, <span class="string">"root"</span>)</span><br><span class="line">      .option(<span class="string">"password"</span>, <span class="string">"root"</span>)</span><br><span class="line">      .option(<span class="string">"table"</span>, <span class="string">"streaming-bank-result"</span>)</span><br><span class="line">      .option(<span class="string">"jdbcUrl"</span>, <span class="string">"jdbc:mysql://node01:3306/test"</span>)</span><br><span class="line">      .start()</span><br><span class="line">      .awaitTermination()</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="5-Tigger"><a href="#5-Tigger" class="headerlink" title="5 Tigger"></a>5 Tigger</h2><p>如何控制 <code>StructuredStreaming</code> 的处理时间</p>
+<p>步骤</p>
+<ol>
+<li>微批次处理</li>
+<li>连续流处理</li>
+</ol>
+<p>什么是微批次</p>
+<p>并不是真正的流, 而是缓存一个批次周期的数据, 后处理这一批次的数据</p>
+<p><strong>通用流程</strong></p>
+<p>步骤</p>
+<ol>
+<li>根据 <code>Spark</code> 提供的调试用的数据源 <code>Rate</code> 创建流式 <code>DataFrame</code><ul>
+<li><code>Rate</code> 数据源会定期提供一个由两列 <code>timestamp, value</code> 组成的数据, <code>value</code> 是一个随机数</li>
+</ul>
+</li>
+<li>处理和聚合数据, 计算每个个位数和十位数各有多少条数据<ul>
+<li>对 <code>value</code> 求 <code>log10</code> 即可得出其位数</li>
+<li>后按照位数进行分组, 最终就可以看到每个位数的数据有多少个</li>
+</ul>
+</li>
+</ol>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> spark = <span class="type">SparkSession</span>.builder()</span><br><span class="line">  .master(<span class="string">"local[6]"</span>)</span><br><span class="line">  .appName(<span class="string">"socket_processor"</span>)</span><br><span class="line">  .getOrCreate()</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.spark.sql.functions._</span><br><span class="line"><span class="keyword">import</span> spark.implicits._</span><br><span class="line"></span><br><span class="line">spark.sparkContext.setLogLevel(<span class="string">"ERROR"</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> source = spark.readStream</span><br><span class="line">  .format(<span class="string">"rate"</span>)</span><br><span class="line">  .load()</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> result = source.select(log10(<span class="symbol">'value</span>) cast <span class="type">IntegerType</span> as <span class="symbol">'key</span>, <span class="symbol">'value</span>)</span><br><span class="line">    .groupBy(<span class="symbol">'key</span>)</span><br><span class="line">    .agg(count(<span class="symbol">'key</span>) as <span class="symbol">'count</span>)</span><br><span class="line">    .select(<span class="symbol">'key</span>, <span class="symbol">'count</span>)</span><br><span class="line">    .where(<span class="symbol">'key</span>.isNotNull)</span><br><span class="line">    .sort(<span class="symbol">'key</span>.asc)</span><br></pre></td></tr></table></figure>
+<p><strong>默认方式划分批次</strong></p>
+<p>介绍</p>
+<p>默认情况下的 <code>Structured Streaming</code> 程序会运行在微批次的模式下, 当一个批次结束后, 下一个批次会立即开始处理</p>
+<p>步骤</p>
+<ol>
+<li>指定落地到 <code>Console</code> 中, 不指定 <code>Trigger</code></li>
+</ol>
+<p>代码</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">result.writeStream</span><br><span class="line">  .outputMode(<span class="type">OutputMode</span>.<span class="type">Complete</span>())</span><br><span class="line">  .format(<span class="string">"console"</span>)</span><br><span class="line">  .start()</span><br><span class="line">  .awaitTermination()</span><br></pre></td></tr></table></figure>
+<p><strong>按照固定时间间隔划分批次</strong></p>
+<p>介绍</p>
+<p>使用微批次处理数据, 使用用户指定的时间间隔启动批次, 如果间隔指定为 <code>0</code>, 则尽可能快的去处理, 一个批次紧接着一个批次</p>
+<ul>
+<li>如果前一批数据提前完成, 待到批次间隔达成的时候再启动下一个批次</li>
+<li>如果前一批数据延后完成, 下一个批次会在前面批次结束后立即启动</li>
+<li>如果没有数据可用, 则不启动处理</li>
+</ul>
+<p>步骤</p>
+<ol>
+<li>通过 <code>Trigger.ProcessingTime()</code> 指定处理间隔</li>
+</ol>
+<p>代码</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">result.writeStream</span><br><span class="line">  .outputMode(<span class="type">OutputMode</span>.<span class="type">Complete</span>())</span><br><span class="line">  .format(<span class="string">"console"</span>)</span><br><span class="line">  .trigger(<span class="type">Trigger</span>.<span class="type">ProcessingTime</span>(<span class="string">"2 seconds"</span>))</span><br><span class="line">  .start()</span><br><span class="line">  .awaitTermination()</span><br></pre></td></tr></table></figure>
+<p><strong>一次性划分批次</strong></p>
+<p>介绍</p>
+<p>只划分一个批次, 处理完成以后就停止 <code>Spark</code> 工作, 当需要启动一下 <code>Spark</code> 处理遗留任务的时候, 处理完就关闭集群的情况下, 这个划分方式非常实用</p>
+<p>步骤</p>
+<ol>
+<li>使用 <code>Trigger.Once</code> 一次性划分批次</li>
+</ol>
+<p>代码</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">result.writeStream</span><br><span class="line">  .outputMode(<span class="type">OutputMode</span>.<span class="type">Complete</span>())</span><br><span class="line">  .format(<span class="string">"console"</span>)</span><br><span class="line">  .trigger(<span class="type">Trigger</span>.<span class="type">Once</span>())</span><br><span class="line">  .start()</span><br><span class="line">  .awaitTermination()</span><br></pre></td></tr></table></figure>
+<p><strong>连续流处理</strong></p>
+<p>介绍</p>
+<ul>
+<li>微批次会将收到的数据按照批次划分为不同的 <code>DataFrame</code>, 后执行 <code>DataFrame</code>, 所以其数据的处理延迟取决于每个 <code>DataFrame</code> 的处理速度, 最快也只能在一个 <code>DataFrame</code> 结束后立刻执行下一个, 最快可以达到 <code>100ms</code> 左右的端到端延迟</li>
+<li>而连续流处理可以做到大约 <code>1ms</code> 的端到端数据处理延迟</li>
+<li>连续流处理可以达到 <code>at-least-once</code> 的容错语义</li>
+<li>从 <code>Spark 2.3</code> 版本开始支持连续流处理, 我们所采用的 <code>2.2</code> 版本还没有这个特性, 并且这个特性截止到 <code>2.4</code> 依然是实验性质, 不建议在生产环境中使用</li>
+</ul>
+<p>操作</p>
+<p>步骤</p>
+<ol>
+<li>使用特殊的 <code>Trigger</code> 完成功能</li>
+</ol>
+<p>代码</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">result.writeStream</span><br><span class="line">  .outputMode(<span class="type">OutputMode</span>.<span class="type">Complete</span>())</span><br><span class="line">  .format(<span class="string">"console"</span>)</span><br><span class="line">  .trigger(<span class="type">Trigger</span>.<span class="type">Continuous</span>(<span class="string">"1 second"</span>))</span><br><span class="line">  .start()</span><br><span class="line">  .awaitTermination()</span><br></pre></td></tr></table></figure>
+<p>限制</p>
+<ul>
+<li>只支持 <code>Map</code> 类的有类型操作</li>
+<li>只支持普通的的 <code>SQL</code> 类操作, 不支持聚合</li>
+<li><code>Source</code> 只支持 <code>Kafka</code></li>
+<li><code>Sink</code> 只支持 <code>Kafka</code>, <code>Console</code>, <code>Memory</code></li>
+</ul>
+<h2 id="6-从-Source-到-Sink-的流程"><a href="#6-从-Source-到-Sink-的流程" class="headerlink" title="6  从 Source 到 Sink 的流程"></a>6  从 Source 到 Sink 的流程</h2><p><img src="/images/sparkstreaming/ss14.png" alt="img"></p>
+<ol>
+<li>在每个 <code>StreamExecution</code> 的批次最开始, <code>StreamExecution</code> 会向 <code>Source</code> 询问当前 <code>Source</code> 的最新进度, 即最新的 <code>offset</code></li>
+<li><code>StreamExecution</code> 将 <code>Offset</code> 放到 <code>WAL</code> 里</li>
+<li><code>StreamExecution</code> 从 <code>Source</code> 获取 <code>start offset</code>, <code>end offset</code> 区间内的数据</li>
+<li><code>StreamExecution</code> 触发计算逻辑 <code>logicalPlan</code> 的优化与编译</li>
+<li>计算结果写出给 <code>Sink</code><ul>
+<li>调用 <code>Sink.addBatch(batchId: Long, data: DataFrame)</code> 完成</li>
+<li>此时才会由 <code>Sink</code> 的写入操作开始触发实际的数据获取和计算过程</li>
+</ul>
+</li>
+<li>在数据完整写出到 <code>Sink</code> 后, <code>StreamExecution</code> 通知 <code>Source</code> 批次 <code>id</code> 写入到 <code>batchCommitLog</code>, 当前批次结束</li>
+</ol>
+<h2 id="7-错误恢复和容错语义"><a href="#7-错误恢复和容错语义" class="headerlink" title="7 错误恢复和容错语义"></a>7 错误恢复和容错语义</h2><h3 id="1-端到端"><a href="#1-端到端" class="headerlink" title="1  端到端"></a>1  端到端</h3><ul>
+<li><code>Source</code> 可能是 <code>Kafka</code>, <code>HDFS</code></li>
+<li><code>Sink</code> 也可能是 <code>Kafka</code>, <code>HDFS</code>, <code>MySQL</code> 等存储服务</li>
+<li>消息从 <code>Source</code> 取出, 经过 <code>Structured Streaming</code> 处理, 最后落地到 <code>Sink</code> 的过程, 叫做端到端</li>
+</ul>
+<h3 id="2-三种容错语义"><a href="#2-三种容错语义" class="headerlink" title="2  三种容错语义"></a>2  <strong>三种容错语义</strong></h3><p><strong>1   at-most-once</strong></p>
+<ul>
+<li>在数据从 <code>Source</code> 到 <code>Sink</code> 的过程中, 出错了, <code>Sink</code> 可能没收到数据, 但是不会收到两次, 叫做 <code>at-most-once</code></li>
+<li>一般错误恢复的时候, 不重复计算, 则是 <code>at-most-once</code></li>
+</ul>
+<p><strong>2   at-least-once</strong></p>
+<ul>
+<li>在数据从 <code>Source</code> 到 <code>Sink</code> 的过程中, 出错了, <code>Sink</code> 一定会收到数据, 但是可能收到两次, 叫做 <code>at-least-once</code></li>
+<li>一般错误恢复的时候, 重复计算可能完成也可能未完成的计算, 则是 <code>at-least-once</code></li>
+</ul>
+<p><strong>3  exactly-once</strong></p>
+<ul>
+<li>在数据从 <code>Source</code> 到 <code>Sink</code> 的过程中, 虽然出错了, <code>Sink</code> 一定恰好收到应该收到的数据, 一条不重复也一条都不少, 即是 <code>exactly-once</code></li>
+<li>想做到 <code>exactly-once</code> 是非常困难的</li>
+</ul>
+<h3 id="3-Sink-的容错"><a href="#3-Sink-的容错" class="headerlink" title="3  Sink 的容错"></a>3  <strong>Sink 的容错</strong></h3><p><img src="/images/sparkstreaming/ss15.png" alt="img"></p>
+<ul>
+<li><p>1   故障恢复一般分为 <code>Driver</code> 的容错和 <code>Task</code> 的容错</p>
+<ul>
+<li><code>Driver</code> 的容错指的是整个系统都挂掉了</li>
+<li><code>Task</code> 的容错指的是一个任务没运行明白, 重新运行一次</li>
+</ul>
+</li>
+<li><p>2   因为 <code>Spark</code> 的 <code>Executor</code> 能够非常好的处理 <code>Task</code> 的容错, 所以我们主要讨论 <code>Driver</code> 的容错, 如果出错的时候</p>
+<ul>
+<li><p>读取 <code>WAL offsetlog</code> 恢复出最新的 <code>offsets</code></p>
+<p>当 <code>StreamExecution</code> 找到 <code>Source</code> 获取数据的时候, 会将数据的起始放在 <code>WAL offsetlog</code> 中, 当出错要恢复的时候, 就可以从中获取当前处理批次的数据起始, 例如 <code>Kafka</code> 的 <code>Offset</code></p>
+</li>
+<li><p>读取 <code>batchCommitLog</code> 决定是否需要重做最近一个批次</p>
+<p>当 <code>Sink</code> 处理完批次的数据写入时, 会将当前的批次 <code>ID</code> 存入 <code>batchCommitLog</code>, 当出错的时候就可以从中取出进行到哪一个批次了, 和 <code>WAL</code> 对比即可得知当前批次是否处理完</p>
+</li>
+<li><p>如果有必要的话, 当前批次数据重做</p>
+<ul>
+<li>如果上次执行在 <code>(5)</code> 结束前即失效, 那么本次执行里 <code>Sink</code> 应该完整写出计算结果</li>
+<li>如果上次执行在 <code>(5)</code> 结束后才失效, 那么本次执行里 <code>Sink</code> 可以重新写出计算结果 (覆盖上次结果), 也可以跳过写出计算结果(因为上次执行已经完整写出过计算结果了)</li>
+</ul>
+</li>
+<li><p>这样即可保证每次执行的计算结果, 在 Sink 这个层面, 是 <strong>不重不丢</strong> 的, 即使中间发生过失效和恢复, 所以 <code>Structured Streaming</code> 可以做到 <code>exactly-once</code></p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="4-容错所需要的存储"><a href="#4-容错所需要的存储" class="headerlink" title="4 容错所需要的存储"></a>4 <strong>容错所需要的存储</strong></h3><ul>
+<li><p>存储</p>
+<ul>
+<li><code>offsetlog</code> 和 <code>batchCommitLog</code> 关乎于错误恢复</li>
+<li><code>offsetlog</code> 和 <code>batchCommitLog</code> 需要存储在可靠的空间里</li>
+<li><code>offsetlog</code> 和 <code>batchCommitLog</code> 存储在 <code>Checkpoint</code> 中</li>
+<li><code>WAL</code> 其实也存在于 <code>Checkpoint</code> 中</li>
+</ul>
+</li>
+<li><p>指定 <code>Checkpoint</code></p>
+<ul>
+<li>只有指定了 <code>Checkpoint</code> 路径的时候, 对应的容错功能才可以开启</li>
+</ul>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">aggDF</span><br><span class="line">  .writeStream</span><br><span class="line">  .outputMode(<span class="string">"complete"</span>)</span><br><span class="line">  .option(<span class="string">"checkpointLocation"</span>, <span class="string">"path/to/HDFS/dir"</span>) <span class="comment">//	指定 Checkpoint 的路径, 这个路径对应的目录必须是 HDFS 兼容的文件系统</span></span><br><span class="line">  .format(<span class="string">"memory"</span>)</span><br><span class="line">  .start()</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p><strong>需要的外部支持</strong></p>
+<p>如果要做到 <code>exactly-once</code>, 只是 <code>Structured Streaming</code> 能做到还不行, 还需要 <code>Source</code> 和 <code>Sink</code> 系统的支持</p>
+<ul>
+<li><p><code>Source</code> 需要支持数据重放</p>
+<p>当有必要的时候, <code>Structured Streaming</code> 需要根据 <code>start</code> 和 <code>end offset</code> 从 <code>Source</code> 系统中再次获取数据, 这叫做重放</p>
+</li>
+<li><p><code>Sink</code> 需要支持幂等写入</p>
+<p>如果需要重做整个批次的时候, <code>Sink</code> 要支持给定的 <code>ID</code> 写入数据, 这叫幂等写入, 一个 <code>ID</code> 对应一条数据进行写入, 如果前面已经写入, 则替换或者丢弃, 不能重复</p>
+</li>
+</ul>
+<p>所以 <code>Structured Streaming</code> 想要做到 <code>exactly-once</code>, 则也需要外部系统的支持, 如下</p>
+<p>Source</p>
+<table>
+<thead>
+<tr>
+<th><code>Sources</code></th>
+<th>是否可重放</th>
+<th>原生内置支持</th>
+<th>注解</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>HDFS</code></td>
+<td>可以</td>
+<td>已支持</td>
+<td>包括但不限于 <code>Text</code>, <code>JSON</code>, <code>CSV</code>, <code>Parquet</code>, <code>ORC</code></td>
+</tr>
+<tr>
+<td><code>Kafka</code></td>
+<td>可以</td>
+<td>已支持</td>
+<td><code>Kafka 0.10.0+</code></td>
+</tr>
+<tr>
+<td><code>RateStream</code></td>
+<td>可以</td>
+<td>已支持</td>
+<td>以一定速率产生数据</td>
+</tr>
+<tr>
+<td>RDBMS</td>
+<td>可以</td>
+<td>待支持</td>
+<td>预计后续很快会支持</td>
+</tr>
+<tr>
+<td>Socket</td>
+<td>不可以</td>
+<td>已支持</td>
+<td>主要用途是在技术会议和讲座上做 <code>Demo</code></td>
+</tr>
+</tbody>
+</table>
+<p>Sink</p>
+<table>
+<thead>
+<tr>
+<th><code>Sinks</code></th>
+<th>是否幂等写入</th>
+<th>原生内置支持</th>
+<th>注解</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>HDFS</code></td>
+<td>可以</td>
+<td>支持</td>
+<td>包括但不限于 <code>Text</code>, <code>JSON</code>, <code>CSV</code>, <code>Parquet</code>, <code>ORC</code></td>
+</tr>
+<tr>
+<td><code>ForeachSink</code></td>
+<td>可以</td>
+<td>支持</td>
+<td>可定制度非常高的 <code>Sink</code>, 是否可以幂等取决于具体的实现</td>
+</tr>
+<tr>
+<td><code>RDBMS</code></td>
+<td>可以</td>
+<td>待支持</td>
+<td>预计后续很快会支持</td>
+</tr>
+<tr>
+<td><code>Kafka</code></td>
+<td>不可以</td>
+<td>支持</td>
+<td><code>Kafka</code> 目前不支持幂等写入, 所以可能会有重复写入</td>
+</tr>
+</tbody>
+</table>
+<h1 id="六-有状态算子"><a href="#六-有状态算子" class="headerlink" title="六   . 有状态算子"></a>六   . 有状态算子</h1><h2 id="1状态"><a href="#1状态" class="headerlink" title="1状态"></a><strong>1状态</strong></h2><p>1   无状态算子</p>
+<p><img src="/images/sparkstreaming/ss16.png" alt="img"></p>
+<p>2  有状态算子</p>
+<p><img src="/images/sparkstreaming/ss17.png" alt="img"></p>
+<ul>
+<li>有中间状态需要保存</li>
+<li>增量查询</li>
+</ul>
+<h2 id="2-常规算子"><a href="#2-常规算子" class="headerlink" title="2  常规算子"></a>2  常规算子</h2><p><code>Structured Streaming</code> 的常规数据处理方式</p>
+<p>需求</p>
+<ul>
+<li>给定电影评分数据集 <code>ratings.dat</code></li>
+<li>筛选评分超过三分的电影</li>
+<li>以追加模式展示数据, 以流的方式来一批数据处理一批数据, 最终每一批次展示为如下效果</li>
+</ul>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="code">+------+</span>-------+</span><br><span class="line">|Rating|MovieID|</span><br><span class="line"><span class="code">+------+</span>-------+</span><br><span class="line">|     5|   1193|</span><br><span class="line">|     4|   3408|</span><br><span class="line"><span class="code">+------+</span>-------+</span><br></pre></td></tr></table></figure>
+<p>读取文件的时候只能读取一个文件夹, 因为是流的操作, 流的场景是源源不断有新的文件读取</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> source = spark.readStream</span><br><span class="line">  .textFile(<span class="string">"dataset/ratings"</span>)</span><br><span class="line">  .map(line =&gt; &#123;</span><br><span class="line">    <span class="keyword">val</span> columns = line.split(<span class="string">"::"</span>)</span><br><span class="line">    (columns(<span class="number">0</span>).toInt, columns(<span class="number">1</span>).toInt, columns(<span class="number">2</span>).toInt, columns(<span class="number">3</span>).toLong)</span><br><span class="line">  &#125;)</span><br><span class="line">  .toDF(<span class="string">"UserID"</span>, <span class="string">"MovieID"</span>, <span class="string">"Rating"</span>, <span class="string">"Timestamp"</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> result = source.select(<span class="symbol">'Rating</span>, <span class="symbol">'MovieID</span>)</span><br><span class="line">    .where(<span class="symbol">'Rating</span> &gt; <span class="number">3</span>)</span><br></pre></td></tr></table></figure>
+<p>针对静态数据集的很多转换算子, 都可以应用在流式的 <code>Dataset</code> 上, 例如 <code>Map</code>, <code>FlatMap</code>, <code>Where</code>, <code>Select</code> 等</p>
+<h2 id="3-分组算子"><a href="#3-分组算子" class="headerlink" title="3 分组算子"></a>3 分组算子</h2><p>能够使用分组完成常见需求, 并了解如何扩展行</p>
+<p>需求</p>
+<ul>
+<li>给定电影数据集 <code>movies.dat</code>, 其中三列 <code>MovieID</code>, <code>Title</code>, <code>Genres</code></li>
+<li>统计每个分类下的电影数量</li>
+</ul>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> source = spark.readStream</span><br><span class="line">  .textFile(<span class="string">"dataset/movies"</span>)</span><br><span class="line">  .map(line =&gt; &#123;</span><br><span class="line">    <span class="keyword">val</span> columns = line.split(<span class="string">"::"</span>)</span><br><span class="line">    (columns(<span class="number">0</span>).toInt, columns(<span class="number">1</span>).toString, columns(<span class="number">2</span>).toString.split(<span class="string">"\\|"</span>))</span><br><span class="line">  &#125;)</span><br><span class="line">  .toDF(<span class="string">"MovieID"</span>, <span class="string">"Title"</span>, <span class="string">"Genres"</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> result = source.select(explode(<span class="symbol">'Genres</span>) as <span class="symbol">'Genres</span>)</span><br><span class="line">    .groupBy(<span class="symbol">'Genres</span>)</span><br><span class="line">    .agg(count(<span class="symbol">'Genres</span>) as <span class="symbol">'Count</span>)</span><br><span class="line"></span><br><span class="line">result.writeStream</span><br><span class="line">  .outputMode(<span class="type">OutputMode</span>.<span class="type">Complete</span>())</span><br><span class="line">  .format(<span class="string">"console"</span>)</span><br><span class="line">  .queryName(<span class="string">"genres_count"</span>)</span><br><span class="line">  .start()</span><br><span class="line">  .awaitTermination()</span><br></pre></td></tr></table></figure>
+<p><code>Structured Streaming</code> 不仅支持 <code>groupBy</code>, 还支持 <code>groupByKey</code></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+      <div>
+        <div id="reward-container">
+  <div>Thank you for your accept. mua！</div>
+  <button id="reward-button" disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/reward/wechatpay.jpg" alt="丨HF丨 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/reward/alipay.jpg" alt="丨HF丨 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        
+
+
+
+
+  
+
+
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>丨HF丨</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    
+    <a href="https://manzhong.github.io/2018/05/10/StructuredStreaming.html" title="StructuredStreaming">https://manzhong.github.io/2018/05/10/StructuredStreaming.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+    <div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:16px;">-------------本文结束<i class="fa fa-heart"></i>感谢您的阅读-------------</div>
+    
+</div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/BigData/" rel="tag"><i class="fa fa-tag"></i> BigData</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/05/01/SparkStreaming.html" rel="next" title="SparkStreaming">
+                <i class="fa fa-chevron-left"></i> SparkStreaming
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/07/01/Kettle.html" rel="prev" title="Kettle">
+                Kettle <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC81MDA2Mi8yNjU1Mw=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/hexo.jpg" alt="丨HF丨">
+            
+              <p class="site-author-name" itemprop="name">丨HF丨</p>
+              <div class="site-description motion-element" itemprop="description">第二名就是头号输家!!!</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">54</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/ipyker" title="GitHub &rarr; https://github.com/ipyker" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:pyker@qq.com" title="E-Mail &rarr; mailto:pyker@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://weibo.com/viszhang" title="Weibo &rarr; https://weibo.com/viszhang" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="tencent://message/?uin=123435796&Site=&menu=yes" title="QQ &rarr; tencent://message/?uin=123435796&Site=&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i>QQ</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-book"></i>
+                推荐阅读
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://www.54tianzhisheng.cn/tags/Flink/" title="http://www.54tianzhisheng.cn/tags/Flink/" rel="noopener" target="_blank">Flink</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://nginxconfig.io/" title="https://nginxconfig.io/" rel="noopener" target="_blank">Nginxconfig</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://linux.51yip.com/" title="http://linux.51yip.com/" rel="noopener" target="_blank">Linux命令手册</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://echarts.baidu.com/index.html" title="https://echarts.baidu.com/index.html" rel="noopener" target="_blank">echarts可视化库</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+        </div>
+      </div>
+
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" style=" text-align:center;">&copy; 2017 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HF</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"> 站点字数合计:</i>
+    </span>
+    
+    <span title="站点总字数">961k</span>
+  
+  
+  <span class="post-meta-divider">|</span>
+  <a href="http://www.beian.miit.gov.cn" rel="noopener" target="_blank">粤ICP备19028706号 </a>
+
+</div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+
+<div class="run_time" style=" text-align:center;">
+  <span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+  <script>
+    var now = new Date(); 
+    function createtime() { 
+        var grt= new Date("07/23/2017 10:00:00");//此处修改你的建站时间或者网站上线时间 
+        now.setTime(now.getTime()+250); 
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days); 
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours); 
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum); 
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;} 
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum); 
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;} 
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 "; 
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒"; 
+    } 
+    setInterval("createtime()",250);
+  </script>
+</div>
+        
+<div class="busuanzi-count" style=" text-align:center;">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      我的第 <span class="busuanzi-value" id="busuanzi_value_site_uv"></span> 位朋友，
+    </span>
+  
+
+
+
+  
+    <span class="site-pv">
+      历经 <span class="busuanzi-value" id="busuanzi_value_site_pv"></span> 次回眸才与你相遇
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+  
+    
+    
+      
+    
+  
+  <script color="255,0,255" opacity="0.7" zindex="-1" count="140" src="//cdn.jsdelivr.net/gh/theme-next/theme-next-canvas-nest@1.0.0/canvas-nest.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.1"></script>
+
+  <script src="/js/motion.js?v=7.1.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/schemes/muse.js?v=7.1.1"></script>
+
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.1"></script>
+<script src="/js/post-details.js?v=7.1.1"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.1"></script>
+
+
+  
+
+  
+
+  
+  
+  
+
+  
+
+  
+  
+  
+
+
+  
+
+
+  
+    <script>
+  window.livereOptions = {
+    refer: '2018/05/10/StructuredStreaming.html'
+  };
+  (function(d, s) {
+    var j, e = d.getElementsByTagName(s)[0];
+    if (typeof LivereTower === 'function') { return; }
+    j = d.createElement(s);
+    j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+    j.async = true;
+    e.parentNode.insertBefore(j, e);
+  })(document, 'script');
+</script>
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <script src="/lib/bookmark/bookmark.min.js?v=1.0"></script>
+  <script>
+  
+    bookmark.scrollToMark('auto', "#更多");
+  
+  </script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

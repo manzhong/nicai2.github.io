@@ -1,0 +1,1762 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="true">
+
+
+
+  
+  
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.1.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":true,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: true,
+    fastclick: true,
+    lazyload: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"shrinkIn","post_header":"slideLeftIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideDownIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="#                                                 Azkaban 一 概述是由领英推出的一款开源免费的工作流调度器软件. 特点:  功能强大  可以调度几乎所有软件的执行（command） 配置简单  job配置文件 提供了web页面使用 提供模块化和可插拔的插件机制，原生支持command、Java、Hive、Pig、Hadoop java语言开">
+<meta name="keywords" content="BigData">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Azkaban">
+<meta property="og:url" content="https://manzhong.github.io/2017/07/10/Azkaban.html">
+<meta property="og:site_name" content="春雨里洗过的太阳">
+<meta property="og:description" content="#                                                 Azkaban 一 概述是由领英推出的一款开源免费的工作流调度器软件. 特点:  功能强大  可以调度几乎所有软件的执行（command） 配置简单  job配置文件 提供了web页面使用 提供模块化和可插拔的插件机制，原生支持command、Java、Hive、Pig、Hadoop java语言开">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-03-15T14:17:20.641Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Azkaban">
+<meta name="twitter:description" content="#                                                 Azkaban 一 概述是由领英推出的一款开源免费的工作流调度器软件. 特点:  功能强大  可以调度几乎所有软件的执行（command） 配置简单  job配置文件 提供了web页面使用 提供模块化和可插拔的插件机制，原生支持command、Java、Hive、Pig、Hadoop java语言开">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="春雨里洗过的太阳" type="application/atom+xml">
+
+
+
+  
+  
+  <link rel="canonical" href="https://manzhong.github.io/2017/07/10/Azkaban">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Azkaban | 春雨里洗过的太阳</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+ 
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">春雨里洗过的太阳</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-bookmark"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-互动">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/guestbook/" rel="section"><i class="menu-item-icon fa fa-fw fa-comments"></i> <br>互动</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://manzhong.github.io/2017/07/10/Azkaban.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="丨HF丨">
+      <meta itemprop="description" content="第二名就是头号输家!!!">
+      <meta itemprop="image" content="/images/hexo.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="春雨里洗过的太阳">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Azkaban
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2017-07-10 09:00:17" itemprop="dateCreated datePublished" datetime="2017-07-10T09:00:17+08:00">2017-07-10</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2020-03-15 22:17:20" itemprop="dateModified" datetime="2020-03-15T22:17:20+08:00">2020-03-15</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">11k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">10 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <pre><code>#                                                 Azkaban
+</code></pre><h2 id="一-概述"><a href="#一-概述" class="headerlink" title="一 概述"></a>一 概述</h2><p>是由领英推出的一款开源免费的工作流调度器软件.</p>
+<p>特点:</p>
+<ul>
+<li>功能强大  可以调度几乎所有软件的执行（command）</li>
+<li>配置简单  job配置文件</li>
+<li>提供了web页面使用</li>
+<li>提供模块化和可插拔的插件机制，原生支持command、Java、Hive、Pig、Hadoop</li>
+<li>java语言开发 源码清晰可见  可以进行二次开发</li>
+</ul>
+<p>工作流概述:</p>
+<p>​        工作流（Workflow），指“业务过程的部分或整体在计算机应用环境下的<strong>自动化</strong>”。</p>
+<p>​        一个完整的数据分析系统通常都是由多个前后依赖的模块组合构成的：数据采集、数据预处理、数据分析、数据展示等。各个模块单元之间存在时间先后依赖关系，且存在着周期性重复。为了很好地组织起这样的复杂执行计划，需要一个工作流调度系统来调度执行。</p>
+<p>实现方式:</p>
+<p>​            简单的任务调度：直接使用linux的crontab来定义,但是缺点也是比较明显，无法设置依赖。</p>
+<p>​            复杂的任务调度：自主开发调度平台，使用开源调度系统，比如<strong>azkaban</strong>、Apache Oozie、Cascading、Hamake等。其中知名度比较高的是Apache Oozie，但是其配置工作流的过程是编写大量的XML配置，而且代码复杂度比较高，不易于二次开发。</p>
+<p>工作流之间的对比:</p>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>Hamake</th>
+<th>Oozie</th>
+<th>Azkaban</th>
+<th>Cascading</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>工作流描述语言</td>
+<td>XML</td>
+<td>XML (xPDL based)</td>
+<td>text file with key/value pairs</td>
+<td>Java API</td>
+</tr>
+<tr>
+<td>依赖机制</td>
+<td>data-driven</td>
+<td>explicit</td>
+<td>explicit</td>
+<td>explicit</td>
+</tr>
+<tr>
+<td>是否要web容器</td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td>进度跟踪</td>
+<td>console/log messages</td>
+<td>web page</td>
+<td>web page</td>
+<td>Java API</td>
+</tr>
+<tr>
+<td>Hadoop job调度支持</td>
+<td>no</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>运行模式</td>
+<td>command line utility</td>
+<td>daemon</td>
+<td>daemon</td>
+<td>API</td>
+</tr>
+<tr>
+<td>Pig支持</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>事件通知</td>
+<td>no</td>
+<td>no</td>
+<td>no</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>需要安装</td>
+<td>no</td>
+<td>yes</td>
+<td>yes</td>
+<td>no</td>
+</tr>
+<tr>
+<td>支持的hadoop版本</td>
+<td>0.18+</td>
+<td>0.20+</td>
+<td>currently unknown</td>
+<td>0.18+</td>
+</tr>
+<tr>
+<td>重试支持</td>
+<td>no</td>
+<td>workflownode evel</td>
+<td>yes</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>运行任意命令</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Amazon EMR支持</td>
+<td>yes</td>
+<td>no</td>
+<td>currently unknown</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<p>##二 Azkaban调度器</p>
+<p>###1原理架构:</p>
+<p>mysql服务器: 存储元数据，如项目名称、项目描述、项目权限、任务状态、SLA规则等</p>
+<p>AzkabanWebServer: 对外提供web服务，使用户可以通过web页面管理。职责包括项目管理、权限授权、任务调度、监控executor。</p>
+<p>AzkabanExecutorServer: 负责具体的工作流的提交、执行。</p>
+<h3 id="2部署方式-3种"><a href="#2部署方式-3种" class="headerlink" title="2部署方式(3种)"></a>2部署方式(3种)</h3><ul>
+<li>单节点模式：web、executor在同一个进程  适用于测试体验 使用自带的H2数据库</li>
+<li>two-server: web、executor在不同的进程中  <strong>可以使用第三方数据库</strong></li>
+<li>mutil-executor-server:  web、executor在不同的机器上 <strong>可以部署多个executor服务器</strong> 可使用第三方数据库</li>
+</ul>
+<h3 id="3源码编译"><a href="#3源码编译" class="headerlink" title="3源码编译"></a>3源码编译</h3><p>1.Azkaban3.x在安装前需要自己编译成二进制包。并且提前安装好Maven,Ant,Node等软件</p>
+<p>2 编译环境</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">yum install –y git</span><br><span class="line"></span><br><span class="line">yum install –y gcc-c++</span><br></pre></td></tr></table></figure>
+<p>3 下载源码解析</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">wget https://github.com/azkaban/azkaban/archive/3.51.0.tar.gz</span><br><span class="line">tar -zxvf 3.51.0.tar.gz </span><br><span class="line">cd ./azkaban-3.51.0/</span><br></pre></td></tr></table></figure>
+<p>4 编译源码</p>
+<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./gradlew <span class="keyword">build </span>installDist -x test</span><br></pre></td></tr></table></figure>
+<p>Gradle是一个基于ApacheAnt和ApacheMaven的项目自动化构建工具。-x test 跳过测试。（注意联网下载jar可能会失败、慢）</p>
+<p>5 编译后安装包路径</p>
+<p>solo-server模式安装包路径</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">azkaban-solo-server<span class="regexp">/build/</span>distributions<span class="regexp">/</span></span><br></pre></td></tr></table></figure>
+<p>two-server模式和multiple-executor模式web-server安装包路径</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">azkaban-web-server<span class="regexp">/build/</span>distributions<span class="regexp">/</span></span><br></pre></td></tr></table></figure>
+<p>two-server模式和multiple-executor模式exec-server安装包路径</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">azkaban-exec-server<span class="regexp">/build/</span>distributions<span class="regexp">/</span></span><br></pre></td></tr></table></figure>
+<p>数据库相关安装包路径</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">azkaban-db<span class="regexp">/build/</span>distributions<span class="regexp">/</span></span><br></pre></td></tr></table></figure>
+<p>##三 安装部署</p>
+<h3 id="1单节点模式"><a href="#1单节点模式" class="headerlink" title="1单节点模式"></a>1单节点模式</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">mkdir /export/servers/azkaban</span><br><span class="line">tar -zxvf azkaban-solo-server-0.1.0-SNAPSHOT.tar.gz –C /export/servers/azkaban/</span><br><span class="line"></span><br><span class="line">vim conf/azkaban.properties</span><br><span class="line">default.timezone.id=Asia/Shanghai #修改时区</span><br><span class="line"></span><br><span class="line">vim  plugins/jobtypes/commonprivate.properties</span><br><span class="line">添加：memCheck.enabled=false</span><br><span class="line">azkaban默认需要3G的内存，剩余内存不足则会报异常</span><br></pre></td></tr></table></figure>
+<p>启动验证:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cd azkaban-solo-server-0.1.0-SNAPSHOT/</span><br><span class="line">bin/start-solo.sh</span><br><span class="line">注:启动/关闭必须进到azkaban-solo-server-0.1.0-SNAPSHOT/目录下。</span><br></pre></td></tr></table></figure>
+<p>AzkabanSingleServer(对于Azkaban solo‐server模式，Exec Server和Web Server在同一个进程中)</p>
+<p>登录页面:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">http://node01:8081/</span><br><span class="line">默认密码和用户名为  azkaban</span><br></pre></td></tr></table></figure>
+<p>测试:</p>
+<p>创建两个文件one.job ,two.job,内容如下，打包成zip包。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">##one.job</span><br><span class="line">cat one.job </span><br><span class="line">    type=command                        ##命令类型</span><br><span class="line">    command=echo &quot;this is job one&quot;</span><br><span class="line"></span><br><span class="line">##two.job </span><br><span class="line">cat two.job </span><br><span class="line">    type=command</span><br><span class="line">    dependencies=one                     ## 依赖于one.job one.job 执行完后 在执行自己的</span><br><span class="line">    command=echo &quot;this is job two&quot;</span><br></pre></td></tr></table></figure>
+<p>Create Project=&gt;Upload zip包=&gt;execute flow执行一步步操作即可。</p>
+<ul>
+<li>上传zip压缩包</li>
+<li>选择调度schduler或者立即执行executor工程。</li>
+</ul>
+<h3 id="2-two-server-模式"><a href="#2-two-server-模式" class="headerlink" title="2 two server 模式"></a>2 two server 模式</h3><p>节点规划:</p>
+<figure class="highlight axapta"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">node03        mysql</span><br><span class="line">node02        web-<span class="keyword">server</span>和exec-<span class="keyword">server</span>不同进程</span><br></pre></td></tr></table></figure>
+<p>node03 上mysql配置初始化:</p>
+<figure class="highlight dsconfig"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">tar </span>-<span class="string">zxvf </span><span class="string">azkaban-db-</span>0.1.<span class="string">0-SNAPSHOT.</span><span class="string">tar.</span><span class="string">gz </span>–C /<span class="string">export/</span><span class="string">servers/</span><span class="string">azkaban/</span></span><br><span class="line"></span><br><span class="line"><span class="string">Mysql上</span>创建对应的库、增加权限、创建表</span><br><span class="line"><span class="string">mysql&gt;</span> <span class="string">CREATE </span><span class="string">DATABASE </span><span class="string">azkaban_two_server;</span> <span class="comment">#创建数据库</span></span><br><span class="line"><span class="string">mysql&gt;</span> <span class="string">use </span><span class="string">azkaban_two_server;</span></span><br><span class="line"><span class="string">mysql&gt;</span> <span class="string">source </span>/<span class="string">export/</span><span class="string">servers/</span><span class="string">azkaban/</span><span class="string">azkaban-db-</span>0.1.<span class="string">0-SNAPSHOT/</span><span class="built_in">create-all-sql-0.1.0-SNAPSHOT.sql;</span></span><br><span class="line"><span class="built_in">#加载初始化sql创建表</span></span><br></pre></td></tr></table></figure>
+<p>node02上 配置</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">tar -zxvf azkaban-web-server-<span class="number">0.1</span>.<span class="number">0</span>-SNAPSHOT<span class="selector-class">.tar</span><span class="selector-class">.gz</span> –C /export/servers/azkaban/</span><br><span class="line">tar -zxvf azkaban-exec-server-<span class="number">0.1</span>.<span class="number">0</span>-SNAPSHOT<span class="selector-class">.tar</span><span class="selector-class">.gz</span> –C /export/servers/azkaban/</span><br></pre></td></tr></table></figure>
+<p>###2.1web配置:</p>
+<p>生成ssl证书：</p>
+<p><strong>服务器证书,将ssl证书安装在网站服务器上可以实现网站身份和数据加密传输双重功能</strong></p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">keytool -keystore keystore -<span class="built_in">alias</span> jetty -genkey -keyalg RSA</span><br></pre></td></tr></table></figure>
+<p>运行此命令后,会提示输入当前生成keystore的密码及相应信息,输入的密码请记住(<strong>所有密码统一以123456输入</strong>)。</p>
+<p>完成上述工作后,将在当前目录生成keystore证书文件,将keystore拷贝到 azkaban web服务器根目录中。</p>
+<p>配置 web服务器的 conf/azkaban.properties：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"># Azkaban Personalization Settings</span><br><span class="line">azkaban.name=Test</span><br><span class="line">azkaban.label=My Local Azkaban</span><br><span class="line">azkaban.color=#FF3601</span><br><span class="line">azkaban.default.servlet.path=/index</span><br><span class="line">web.resource.dir=web/</span><br><span class="line"># 1要修改的地方</span><br><span class="line">default.timezone.id=Asia/Shanghai</span><br><span class="line"># Azkaban UserManager class</span><br><span class="line">user.manager.class=azkaban.user.XmlUserManager</span><br><span class="line">user.manager.xml.file=conf/azkaban-users.xml</span><br><span class="line"># Loader for projects</span><br><span class="line">executor.global.properties=conf/global.properties</span><br><span class="line">azkaban.project.dir=projects</span><br><span class="line"># Velocity dev mode</span><br><span class="line">velocity.dev.mode=false</span><br><span class="line"># Azkaban Jetty server properties.</span><br><span class="line"># 2要修改的地方</span><br><span class="line">jetty.use.ssl=true</span><br><span class="line">jetty.ssl.port=8443</span><br><span class="line">jetty.maxThreads=25</span><br><span class="line">jetty.port=8081</span><br><span class="line"># Azkaban Executor settings</span><br><span class="line">#3要修改的地方</span><br><span class="line">executor.host=localhost</span><br><span class="line">executor.port=12321</span><br><span class="line"></span><br><span class="line">#  KeyStore for SSL ssl相关配置  注意密码和证书路径</span><br><span class="line"># 4要修改的地方</span><br><span class="line">jetty.keystore=keystore</span><br><span class="line">jetty.password=123456</span><br><span class="line">jetty.keypassword=123456</span><br><span class="line">jetty.truststore=keystore</span><br><span class="line">jetty.trustpassword=123456</span><br><span class="line"># mail settings</span><br><span class="line">mail.sender=</span><br><span class="line">mail.host=</span><br><span class="line"># User facing web server configurations used to construct the user facing server URLs. They are useful when there is a reverse proxy between Azkaban web servers and users.</span><br><span class="line"># enduser -&gt; myazkabanhost:443 -&gt; proxy -&gt; localhost:8081</span><br><span class="line"># when this parameters set then these parameters are used to generate email links.</span><br><span class="line"># if these parameters are not set then jetty.hostname, and jetty.port(if ssl configured jetty.ssl.port) are used.</span><br><span class="line"># azkaban.webserver.external_hostname=myazkabanhost.com</span><br><span class="line"># azkaban.webserver.external_ssl_port=443</span><br><span class="line"># azkaban.webserver.external_port=8081</span><br><span class="line">job.failure.email=</span><br><span class="line">job.success.email=</span><br><span class="line">lockdown.create.projects=false</span><br><span class="line">cache.directory=cache</span><br><span class="line"># JMX stats</span><br><span class="line">jetty.connector.stats=true</span><br><span class="line">executor.connector.stats=true</span><br><span class="line"># Azkaban mysql settings by default. Users should configure their own username and password.</span><br><span class="line">#5要修改的地方</span><br><span class="line">database.type=mysql</span><br><span class="line">mysql.port=3306</span><br><span class="line">mysql.host=node03</span><br><span class="line">mysql.database=azkaban_two_server</span><br><span class="line">mysql.user=root</span><br><span class="line">mysql.password=123456</span><br><span class="line">mysql.numconnections=100</span><br><span class="line">#Multiple Executor</span><br><span class="line">azkaban.use.multiple.executors=true</span><br><span class="line"># 6修改的地方 注释掉这一行 放弃检查内存</span><br><span class="line">#azkaban.executorselector.filters=StaticRemainingFlowSize,MinimumFreeMemory,CpuStatus</span><br><span class="line">azkaban.executorselector.comparator.NumberOfAssignedFlowComparator=1</span><br><span class="line">azkaban.executorselector.comparator.Memory=1</span><br><span class="line">azkaban.executorselector.comparator.LastDispatched=1</span><br><span class="line">azkaban.executorselector.comparator.CpuUsage=1</span><br></pre></td></tr></table></figure>
+<p>在web 的根目录下创建 目录:</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir -<span class="selector-tag">p</span> plugins/jobtypes</span><br></pre></td></tr></table></figure>
+<p>在这个目录下:</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">vim commonprivate.properties</span><br><span class="line"><span class="comment">#本地库</span></span><br><span class="line">azkaban.native.<span class="attribute">lib</span>=<span class="literal">false</span></span><br><span class="line"></span><br><span class="line">execute.as.<span class="attribute">user</span>=<span class="literal">false</span></span><br><span class="line"><span class="comment">#内存检测</span></span><br><span class="line">memCheck.<span class="attribute">enabled</span>=<span class="literal">false</span></span><br></pre></td></tr></table></figure>
+<h3 id="2-2-exec配置"><a href="#2-2-exec配置" class="headerlink" title="2.2 exec配置"></a>2.2 exec配置</h3><p>exec服务器下:conf/azkaban.properties：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"># Azkaban Personalization Settings</span><br><span class="line">azkaban.name=Test</span><br><span class="line">azkaban.label=My Local Azkaban</span><br><span class="line">azkaban.color=#FF3601</span><br><span class="line">azkaban.default.servlet.path=/index</span><br><span class="line">web.resource.dir=web/</span><br><span class="line"># 1要修改</span><br><span class="line">default.timezone.id=Asia/Shanghai</span><br><span class="line"># Azkaban UserManager class</span><br><span class="line">user.manager.class=azkaban.user.XmlUserManager</span><br><span class="line">user.manager.xml.file=conf/azkaban-users.xml</span><br><span class="line"># Loader for projects</span><br><span class="line">executor.global.properties=conf/global.properties</span><br><span class="line">azkaban.project.dir=projects</span><br><span class="line"># Velocity dev mode</span><br><span class="line">velocity.dev.mode=false</span><br><span class="line"># Azkaban Jetty server properties.</span><br><span class="line">jetty.use.ssl=false</span><br><span class="line">jetty.maxThreads=25</span><br><span class="line">jetty.port=8081</span><br><span class="line"># Where the Azkaban web server is located </span><br><span class="line"># 2要修改的地方</span><br><span class="line">azkaban.webserver.url=https://node02:8443</span><br><span class="line"># mail settings</span><br><span class="line">mail.sender=</span><br><span class="line">mail.host=</span><br><span class="line"># User facing web server configurations used to construct the user facing server URLs. They are useful when there is a reverse proxy between Azkaban web servers and users.</span><br><span class="line"># enduser -&gt; myazkabanhost:443 -&gt; proxy -&gt; localhost:8081</span><br><span class="line"># when this parameters set then these parameters are used to generate email links.</span><br><span class="line"># if these parameters are not set then jetty.hostname, and jetty.port(if ssl configured jetty.ssl.port) are used.</span><br><span class="line"># azkaban.webserver.external_hostname=myazkabanhost.com</span><br><span class="line"># azkaban.webserver.external_ssl_port=443</span><br><span class="line"># azkaban.webserver.external_port=8081</span><br><span class="line">job.failure.email=</span><br><span class="line">job.success.email=</span><br><span class="line">lockdown.create.projects=false</span><br><span class="line">cache.directory=cache</span><br><span class="line"># JMX stats</span><br><span class="line">jetty.connector.stats=true</span><br><span class="line">executor.connector.stats=true</span><br><span class="line"># Azkaban plugin settings</span><br><span class="line">azkaban.jobtype.plugin.dir=plugins/jobtypes</span><br><span class="line"># Azkaban mysql settings by default. Users should configure their own username and password.</span><br><span class="line"># 3要修改的地方</span><br><span class="line">database.type=mysql</span><br><span class="line">mysql.port=3306</span><br><span class="line">mysql.host=node03</span><br><span class="line">mysql.database=azkaban_two_server</span><br><span class="line">mysql.user=root</span><br><span class="line">mysql.password=123456</span><br><span class="line">mysql.numconnections=100</span><br><span class="line"># Azkaban Executor settings</span><br><span class="line">executor.maxThreads=50</span><br><span class="line"># 4要修改的地方 添加</span><br><span class="line">executor.port=12321</span><br><span class="line">executor.flow.threads=30</span><br></pre></td></tr></table></figure>
+<h3 id="2-3启动"><a href="#2-3启动" class="headerlink" title="2.3启动:"></a>2.3启动:</h3><p>先启动exec-server  在根目录下 bin/start-exec.sh</p>
+<p>再启动web-server。 在根目录下 bin/start-web.sh</p>
+<p>启动webServer之后进程失败消失，可通过安装包根目录下对应启动日志进行排查。</p>
+<p>解决:</p>
+<p>需要手动激活executor</p>
+<p>到exec服务器的根目录下</p>
+<p>向executor.port 发送一个executor 将其action改为activate</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -G "node02:$(&lt;./executor.port)/executor?action=activate" &amp;&amp; echo</span><br></pre></td></tr></table></figure>
+<p>重启web即可</p>
+<p>即可在页面测试</p>
+<p><strong>测试阶段可能一直处于running状态</strong></p>
+<p>解决:</p>
+<p>在exec服务器下 cd 到 plugins/jobtypes</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">vim commonprivate.properties</span><br><span class="line">加入以下配置:</span><br><span class="line">memCheck.enabled=false</span><br></pre></td></tr></table></figure>
+<p>重启exec和web  并重新向executor.port 发送一个executor 将其action改为activate</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -G "node02:$(&lt;./executor.port)/executor?action=activate" &amp;&amp; echo</span><br></pre></td></tr></table></figure>
+<p>特点:</p>
+<ul>
+<li>该模式的特点是web服务器和executor服务器分别位于不同的进程中</li>
+<li>使用第三方的数据库进行数据的保存 ：mysql</li>
+</ul>
+<p>注意事项:</p>
+<ul>
+<li>先对mysql进行初始化操作</li>
+<li>配置azkaban.properties 注意时区 mysql相关  ssl </li>
+<li>启动时候注意需要自己手动的激活executor服务器  在根目录下启动</li>
+<li>如果启动出错  通过安装包根目录下的日志进行判断</li>
+<li>访问的页面https</li>
+</ul>
+<h3 id="3multiple-executor模式部署"><a href="#3multiple-executor模式部署" class="headerlink" title="3multiple-executor模式部署"></a>3multiple-executor模式部署</h3><p>multiple-executor模式是多个executor Server分布在不同服务器上，只需要将azkaban-exec-server安装包拷贝到不同机器上即可组成分布式。</p>
+<p>节点配置:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">node03       mysql</span><br><span class="line">node02       web-server和 exec-server</span><br><span class="line">node01       exec-server</span><br></pre></td></tr></table></figure>
+<p>1  scp executor server安装包到node01</p>
+<p>前提 node01 和node02 有相同的目录结构(元数据存在的路径)才可以使用 pwd   否则回传到root路径下</p>
+<figure class="highlight mel"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scp -r azkaban-<span class="keyword">exec</span>-server<span class="number">-0.1</span><span class="number">.0</span>-SNAPSHOT/ node01:$PWD</span><br></pre></td></tr></table></figure>
+<p>启动:</p>
+<p>先启动exec 分别启动node01 和node02上的exec 在向executor.port 发送一个executor 将其action改为activate</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -G <span class="string">"node02:<span class="variable">$(&lt;./executor.port)</span>/executor?action=activate"</span> &amp;&amp; <span class="built_in">echo</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -G <span class="string">"node01:<span class="variable">$(&lt;./executor.port)</span>/executor?action=activate"</span> &amp;&amp; <span class="built_in">echo</span></span><br></pre></td></tr></table></figure>
+<p>在启动web即可</p>
+<ul>
+<li><p>所谓的  multiple-executor指的是可以在多个机器上分别部署executor服务器</p>
+<p>相当于做了一个负载均衡</p>
+</li>
+<li><p>特别注意：executor启动（包括重启）的时候 默认不会激活 需要自己手动激活</p>
+<p>对应的mysql中的表executors  active ：0 表示未激活 1表示激活</p>
+<p>可以自己手动修改数据提交激活 也可以使用官方的命令请求激活</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -G <span class="string">"node01:<span class="variable">$(&lt;./executor.port)</span>/executor?action=activate"</span> &amp;&amp; <span class="built_in">echo</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="五-实战"><a href="#五-实战" class="headerlink" title="五 实战"></a>五 实战</h2><ul>
+<li>理论上任何一款软件，只有可以通过shell command执行 都可以转化成为azkaban的调度执行</li>
+<li>type=command   command = sh xxx.sh</li>
+</ul>
+<h2 id="1．-shell-command调度"><a href="#1．-shell-command调度" class="headerlink" title="1． shell command调度"></a>1． shell command调度</h2><p> 创建job描述文件</p>
+<p>vi command.job</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#command.job</span></span><br><span class="line"><span class="attr">type</span>=command</span><br><span class="line"><span class="attr">command</span>=sh hello.sh</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hello.sh 内容</span><br><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line">date  &gt; /root/hello.txt</span><br></pre></td></tr></table></figure>
+<p>将hello.sh和command.job一起打包为zip</p>
+<p>上传azkaban</p>
+<h2 id="2．-job依赖调度"><a href="#2．-job依赖调度" class="headerlink" title="2． job依赖调度"></a>2． job依赖调度</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># foo.job</span></span><br><span class="line"><span class="built_in">type</span>=<span class="built_in">command</span></span><br><span class="line"><span class="built_in">command</span>=<span class="built_in">echo</span> foo</span><br></pre></td></tr></table></figure>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># bar.job</span></span><br><span class="line"><span class="attr">type</span>=command</span><br><span class="line"><span class="attr">dependencies</span>=foo</span><br><span class="line"><span class="attr">command</span>=echo bar</span><br></pre></td></tr></table></figure>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">type</span>=command</span><br><span class="line"><span class="attr">dependencies</span>=bar</span><br><span class="line"><span class="attr">command</span>=echo baidu</span><br></pre></td></tr></table></figure>
+<p>资源打包 zip上传:</p>
+<p>若前一个未成功  后一个不会执行</p>
+<h2 id="3-hdfs的调度"><a href="#3-hdfs的调度" class="headerlink" title="3 hdfs的调度"></a>3 hdfs的调度</h2><figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># fs.job</span></span><br><span class="line"><span class="attr">type</span>=command</span><br><span class="line"><span class="attr">command</span>=sh hdfs.sh</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line">/<span class="built_in">export</span>/servers/hadoop-2.7.5/bin/hadoop fs -mkdir /azaz666</span><br></pre></td></tr></table></figure>
+<p>打包压缩  zip</p>
+<p>通过azkaban的web管理平台创建project并上传job压缩包  启动执行该job</p>
+<h2 id="4-MAPREDUCE任务调度"><a href="#4-MAPREDUCE任务调度" class="headerlink" title="4 MAPREDUCE任务调度"></a>4 MAPREDUCE任务调度</h2><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># mrwc.job</span></span><br><span class="line">type=command</span><br><span class="line">command=<span class="regexp">/home/</span>hadoop<span class="regexp">/apps/</span>hadoop-<span class="number">2.6</span>.<span class="number">1</span><span class="regexp">/bin/</span>hadoop  jar hadoop-mapreduce-examples-<span class="number">2.6</span>.<span class="number">1</span>.jar wordcount <span class="regexp">/wordcount/i</span>nput <span class="regexp">/wordcount/</span>azout</span><br></pre></td></tr></table></figure>
+<p>将jar包和job文件打包zip压缩</p>
+<p>上传</p>
+<h2 id="5hive"><a href="#5hive" class="headerlink" title="5hive"></a>5hive</h2><p>hive脚本 test.sql</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> <span class="keyword">default</span>;</span><br><span class="line"><span class="keyword">drop</span> <span class="keyword">table</span> aztest;</span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> aztest(<span class="keyword">id</span> <span class="built_in">int</span>,<span class="keyword">name</span> <span class="keyword">string</span>) <span class="keyword">row</span> <span class="keyword">format</span> <span class="keyword">delimited</span> <span class="keyword">fields</span> <span class="keyword">terminated</span> <span class="keyword">by</span> <span class="string">','</span>;</span><br><span class="line"><span class="keyword">load</span> <span class="keyword">data</span> inpath <span class="string">'/aztest/hiveinput'</span> <span class="keyword">into</span> <span class="keyword">table</span> aztest;</span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> azres <span class="keyword">as</span> <span class="keyword">select</span> * <span class="keyword">from</span> aztest;</span><br><span class="line"><span class="keyword">insert</span> overwrite <span class="keyword">directory</span> <span class="string">'/aztest/hiveoutput'</span> <span class="keyword">select</span> <span class="keyword">count</span>(<span class="number">1</span>) <span class="keyword">from</span> aztest;</span><br></pre></td></tr></table></figure>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># hivef.job</span></span><br><span class="line"><span class="attr">type</span>=command</span><br><span class="line"><span class="attr">command</span>=/home/hadoop/apps/hive/bin/hive -f <span class="string">'test.sql'</span></span><br></pre></td></tr></table></figure>
+<h2 id="6定时任务调度"><a href="#6定时任务调度" class="headerlink" title="6定时任务调度"></a>6定时任务调度</h2><p>页面中选择schedule进行设置</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+      <div>
+        <div id="reward-container">
+  <div>Thank you for your accept. mua！</div>
+  <button id="reward-button" disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/reward/wechatpay.jpg" alt="丨HF丨 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/reward/alipay.jpg" alt="丨HF丨 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        
+
+
+
+
+  
+
+
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>fei</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    
+    <a href="https://manzhong.github.io/2017/07/10/Azkaban.html" title="Azkaban">https://manzhong.github.io/2017/07/10/Azkaban.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+    <div>
+      
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:16px;">-------------本文结束<i class="fa fa-heart"></i>感谢您的阅读-------------</div>
+    
+</div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/BigData/" rel="tag"><i class="fa fa-tag"></i> BigData</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/07/09/sqoop.html" rel="next" title="sqoop">
+                <i class="fa fa-chevron-left"></i> sqoop
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/11/Impala.html" rel="prev" title="Impala">
+                Impala <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC81MDA2Mi8yNjU1Mw=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/hexo.jpg" alt="丨HF丨">
+            
+              <p class="site-author-name" itemprop="name">丨HF丨</p>
+              <div class="site-description motion-element" itemprop="description">第二名就是头号输家!!!</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">54</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/ipyker" title="GitHub &rarr; https://github.com/ipyker" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:pyker@qq.com" title="E-Mail &rarr; mailto:pyker@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://weibo.com/viszhang" title="Weibo &rarr; https://weibo.com/viszhang" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="tencent://message/?uin=123435796&Site=&menu=yes" title="QQ &rarr; tencent://message/?uin=123435796&Site=&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i>QQ</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-book"></i>
+                推荐阅读
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://www.54tianzhisheng.cn/tags/Flink/" title="http://www.54tianzhisheng.cn/tags/Flink/" rel="noopener" target="_blank">Flink</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://nginxconfig.io/" title="https://nginxconfig.io/" rel="noopener" target="_blank">Nginxconfig</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://linux.51yip.com/" title="http://linux.51yip.com/" rel="noopener" target="_blank">Linux命令手册</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://echarts.baidu.com/index.html" title="https://echarts.baidu.com/index.html" rel="noopener" target="_blank">echarts可视化库</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+        </div>
+      </div>
+
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" style=" text-align:center;">&copy; 2017 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HF</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"> 站点字数合计:</i>
+    </span>
+    
+    <span title="站点总字数">961k</span>
+  
+  
+  <span class="post-meta-divider">|</span>
+  <a href="http://www.beian.miit.gov.cn" rel="noopener" target="_blank">粤ICP备19028706号 </a>
+
+</div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+
+<div class="run_time" style=" text-align:center;">
+  <span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+  <script>
+    var now = new Date(); 
+    function createtime() { 
+        var grt= new Date("07/23/2017 10:00:00");//此处修改你的建站时间或者网站上线时间 
+        now.setTime(now.getTime()+250); 
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days); 
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours); 
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum); 
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;} 
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum); 
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;} 
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 "; 
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒"; 
+    } 
+    setInterval("createtime()",250);
+  </script>
+</div>
+        
+<div class="busuanzi-count" style=" text-align:center;">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      我的第 <span class="busuanzi-value" id="busuanzi_value_site_uv"></span> 位朋友，
+    </span>
+  
+
+
+
+  
+    <span class="site-pv">
+      历经 <span class="busuanzi-value" id="busuanzi_value_site_pv"></span> 次回眸才与你相遇
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+  
+    
+    
+      
+    
+  
+  <script color="255,0,255" opacity="0.7" zindex="-1" count="140" src="//cdn.jsdelivr.net/gh/theme-next/theme-next-canvas-nest@1.0.0/canvas-nest.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.1"></script>
+
+  <script src="/js/motion.js?v=7.1.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/schemes/muse.js?v=7.1.1"></script>
+
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.1"></script>
+<script src="/js/post-details.js?v=7.1.1"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.1"></script>
+
+
+  
+
+  
+
+  
+  
+  
+
+  
+
+  
+  
+  
+
+
+  
+
+
+  
+    <script>
+  window.livereOptions = {
+    refer: '2017/07/10/Azkaban.html'
+  };
+  (function(d, s) {
+    var j, e = d.getElementsByTagName(s)[0];
+    if (typeof LivereTower === 'function') { return; }
+    j = d.createElement(s);
+    j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+    j.async = true;
+    e.parentNode.insertBefore(j, e);
+  })(document, 'script');
+</script>
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <script src="/lib/bookmark/bookmark.min.js?v=1.0"></script>
+  <script>
+  
+    bookmark.scrollToMark('auto', "#更多");
+  
+  </script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

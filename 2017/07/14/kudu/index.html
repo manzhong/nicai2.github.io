@@ -14,13 +14,12 @@
 
 <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css">
   <script src="/lib/pace/pace.min.js"></script>
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":false,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":false,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="KuDu 一概述 背景介绍 在KUDU之前，大数据主要以两种方式存储；   （1）静态数据：   以 HDFS 引擎作为存储引擎，适用于高吞吐量的离线大数据分析场景。  这类存储的局限性是数据无法进行随机的读写。   （2）动态数据：   以 HBase、Cassandra 作为存储引擎，适用于大数据随机读写场景。  局限性是批量读取吞吐量远不如 HDFS，不适用于批量数据分析的场景。  从上面分">
@@ -280,7 +279,7 @@
 <p>局限性是批量读取吞吐量远不如 HDFS，不适用于批量数据分析的场景。</p>
 <p>从上面分析可知，这两种数据在存储方式上完全不同，进而导致使用场景完全不同，但在真实的场景中，边界可能没有那么清晰，面对既需要随机读写，又需要批量分析的大数据场景，该如何选择呢？</p>
 <p>这个场景中，单种存储引擎无法满足业务需求，我们需要通过多种大数据工具组合来满足这一需求</p>
-<p><img data-src="/images/kudu/t.png" alt="img"></p>
+<p><img src="/images/kudu/t.png" alt="img"></p>
 <p>如上图所示，数据实时写入 HBase，实时的数据更新也在 HBase 完成，为了应对 OLAP 需求，我们定时将 HBase 数据写成静态的文件（如：Parquet）导入到 OLAP 引擎（如：Impala、hive）。这一架构能满足既需要随机读写，又可以支持 OLAP 分析的场景，但他有如下缺点：</p>
 <p>(1)<strong>架构复杂</strong>。从架构上看，数据在HBase、消息队列、HDFS 间流转，涉及环节太多，运维成本很高。并且每个环节需要保证高可用，都需要维护多个副本，存储空间也有一定的浪费。最后数据在多个系统上，对数据安全策略、监控等都提出了挑战。</p>
 <p>(2)<strong>时效性低</strong>。数据从HBase导出成静态文件是周期性的，一般这个周期是一天（或一小时），在时效性上不是很高。</p>
@@ -315,7 +314,7 @@
 </li>
 </ul>
 <p>与HDFS和HBase相似，Kudu使用单个的Master节点，用来管理集群的元数据，并且使用任意数量的Tablet Server（类似HBase中的RegionServer角色）节点用来存储实际数据。可以部署多个Master节点来提高容错性。</p>
-<p><img data-src="/images/kudu/t2.png" alt="img"></p>
+<p><img src="/images/kudu/t2.png" alt="img"></p>
 <h2 id="1．-Table"><a href="#1．-Table" class="headerlink" title="1． Table"></a>1． Table</h2><p>表（Table）是数据库中用来存储数据的对象，是有结构的数据集合。kudu中的表具有schema（纲要）和全局有序的primary key（主键）。kudu中一个table会被水平分成多个被称之为tablet的片段。</p>
 <h2 id="2．-Tablet"><a href="#2．-Tablet" class="headerlink" title="2． Tablet"></a>2． Tablet</h2><p>一个 tablet 是一张 table连续的片段，tablet是kudu表的水平分区，类似于HBase的region。每个tablet存储着一定连续range的数据（key），且tablet两两间的range不会重叠。一张表的所有tablet包含了这张表的所有key空间。</p>
 <p>tablet 会冗余存储。放置到多个 tablet server上，并且在任何给定的时间点，其中一个副本被认为是leader tablet,其余的被认之为follower tablet。每个tablet都可以进行数据的读请求，但只有Leader tablet负责写数据请求。</p>
@@ -534,7 +533,7 @@
 <p>• 可提供快速的列式查询 </p>
 <p>• 可支持快速的随机更新 </p>
 <p>• 可提供更为稳定的查询性能保障</p>
-<p><img data-src="/images/kudu/dcs.png" alt="img"></p>
+<p><img src="/images/kudu/dcs.png" alt="img"></p>
 <p>一张table会分成若干个tablet，每个tablet包括MetaData元信息及若干个RowSet。</p>
 <p>RowSet包含一个MemRowSet及若干个DiskRowSet，DiskRowSet中包含一个BloomFile、Ad_hoc Index、BaseData、DeltaMem及若干个RedoFile和UndoFile。</p>
 <p>MemRowSet：用于新数据insert及已在MemRowSet中的数据的更新，一个MemRowSet写满后会将数据刷到磁盘形成若干个DiskRowSet。默认是1G或者或者120S。</p>
@@ -546,27 +545,27 @@
 <p>RedoFile是基于BaseData之后时间的变更记录，通过在BaseData上apply RedoFile中的记录，可获得较新的数据。</p>
 <p>DeltaMem用于DiskRowSet中数据的变更，先写到内存中，写满后flush到磁盘形成RedoFile。</p>
 <p>REDO与UNDO与关系型数据库中的REDO与UNDO日志类似（在关系型数据库中，REDO日志记录了更新后的数据，可以用来恢复尚未写入Data File的已成功事务更新的数据。而UNDO日志用来记录事务更新之前的数据，可以用来在事务失败时进行回滚）</p>
-<p><img data-src="/images/kudu/dcs2.png" alt="img"></p>
+<p><img src="/images/kudu/dcs2.png" alt="img"></p>
 <p>MemRowSets可以对比理解成HBase中的MemStore, 而DiskRowSets可理解成HBase中的HFile。</p>
 <p>MemRowSets中的数据被Flush到磁盘之后，形成DiskRowSets。 DisRowSets中的数据，按照32MB大小为单位，按序划分为一个个的DiskRowSet。 DiskRowSet中的数据按照Column进行组织，与Parquet类似。</p>
 <p>这是Kudu可支持一些分析性查询的基础。每一个Column的数据被存储在一个相邻的数据区域，而这个数据区域进一步被细分成一个个的小的Page单元，与HBase File中的Block类似，对每一个Column Page可采用一些Encoding算法，以及一些通用的Compression算法。 既然可对Column Page可采用Encoding以及Compression算法，那么，对单条记录的更改就会比较困难了。</p>
 <p>前面提到了Kudu可支持单条记录级别的更新/删除，是如何做到的？</p>
 <p>与HBase类似，也是通过增加一条新的记录来描述这次更新/删除操作的。DiskRowSet是不可修改了，那么 KUDU 要如何应对数据的更新呢？在KUDU中，把DiskRowSet分为了两部分：base data、delta stores。base data 负责存储基础数据，delta stores负责存储 base data 中的变更数据.</p>
-<p><img data-src="/images/kudu/dcs3.png" alt="img"></p>
+<p><img src="/images/kudu/dcs3.png" alt="img"></p>
 <p>如上图所示，数据从MemRowSet 刷到磁盘后就形成了一份 DiskRowSet（只包含 base data），每份 DiskRowSet 在内存中都会有一个对应的 DeltaMemStore，负责记录此 DiskRowSet 后续的数据变更（更新、删除）。DeltaMemStore 内部维护一个 B-树索引，映射到每个 row_offset 对应的数据变更。DeltaMemStore 数据增长到一定程度后转化成二进制文件存储到磁盘，形成一个 DeltaFile，随着 base data 对应数据的不断变更，DeltaFile 逐渐增长。</p>
 <h2 id="3-tablet发现过程"><a href="#3-tablet发现过程" class="headerlink" title="3 tablet发现过程"></a>3 tablet发现过程</h2><p>当创建Kudu客户端时，其会从主服务器上获取tablet位置信息，然后直接与服务于该tablet的服务器进行交谈。</p>
 <p>为了优化读取和写入路径，客户端将保留该信息的本地缓存，以防止他们在每个请求时需要查询主机的tablet位置信息。随着时间的推移，客户端的缓存可能会变得过时，并且当写入被发送到不再是tablet领导者的tablet服务器时，则将被拒绝。然后客户端将通过查询主服务器发现新领导者的位置来更新其缓存。</p>
-<p><img data-src="/images/kudu/f.png" alt="img"></p>
+<p><img src="/images/kudu/f.png" alt="img"></p>
 <h2 id="4-kudu写流程"><a href="#4-kudu写流程" class="headerlink" title="4 kudu写流程"></a>4 kudu写流程</h2><p>当 Client 请求写数据时，先根据主键从Master Server中获取要访问的目标 Tablets，然后到依次对应的Tablet获取数据。</p>
 <p>因为KUDU表存在主键约束，所以需要进行主键是否已经存在的判断，这里就涉及到之前说的索引结构对读写的优化了。一个Tablet中存在很多个RowSets，为了提升性能，我们要尽可能地减少要扫描的RowSets数量。</p>
 <p>首先，我们先通过每个 RowSet 中记录的主键的（最大最小）范围，过滤掉一批不存在目标主键的RowSets，然后在根据RowSet中的布隆过滤器，过滤掉确定不存在目标主键的 RowSets，最后再通过RowSets中的 B-树索引，精确定位目标主键是否存在。</p>
 <p>如果主键已经存在，则报错（主键重复），否则就进行写数据（写 MemRowSet）。</p>
-<p><img data-src="/images/kudu/w.png" alt="img"></p>
+<p><img src="/images/kudu/w.png" alt="img"></p>
 <h2 id="5kudu读流程"><a href="#5kudu读流程" class="headerlink" title="5kudu读流程"></a>5kudu读流程</h2><p>数据读取过程大致如下：先根据要扫描数据的主键范围，定位到目标的Tablets，然后读取Tablets 中的RowSets。</p>
 <p>在读取每个RowSet时，先根据主键过滤要scan范围，然后加载范围内的base data，再找到对应的delta stores，应用所有变更，最后union上MemRowSet中的内容，返回数据给Client。</p>
-<p><img data-src="/images/kudu/r.png" alt="img"></p>
+<p><img src="/images/kudu/r.png" alt="img"></p>
 <h2 id="6kudu更新流程"><a href="#6kudu更新流程" class="headerlink" title="6kudu更新流程"></a>6kudu更新流程</h2><p>数据更新的核心是定位到待更新数据的位置，这块与写入的时候类似，就不展开了，等定位到具体位置后，然后将变更写到对应的delta store 中。</p>
-<p><img data-src="/images/kudu/updata.png" alt="img"></p>
+<p><img src="/images/kudu/updata.png" alt="img"></p>
 
     </div>
 
@@ -831,9 +830,6 @@
 
   
   <script src="/lib/anime.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
-  <script src="true"></script>
-  <script src="true"></script>
   <script src="/lib/velocity/velocity.min.js"></script>
   <script src="/lib/velocity/velocity.ui.min.js"></script>
 

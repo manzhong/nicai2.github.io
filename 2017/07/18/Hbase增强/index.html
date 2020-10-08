@@ -14,13 +14,12 @@
 
 <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css">
   <script src="/lib/pace/pace.min.js"></script>
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":false,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":false,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="Hbase增强 一 Hbase与MapReduce的集成 HBase当中的数据最终都是存储在HDFS上面的，HBase天生的支持MR的操作，我们可以通过MR直接处理HBase当中的数据，并且MR可以将处理后的结果直接存储到HBase当中去  需求一 读取myuser这张表当中的数据写入到HBase的另外一张表当中去 1 创建myuser2 表 其中列簇名与myuser中列簇名一致  依赖:  1">
@@ -435,10 +434,10 @@
 <h2 id="2、协处理器有两种：-observer-和-endpoint"><a href="#2、协处理器有两种：-observer-和-endpoint" class="headerlink" title="2、协处理器有两种： observer 和 endpoint"></a>2、协处理器有两种： observer 和 endpoint</h2><p>  (1) Observer 类似于传统数据库中的触发器，当发生某些事件的时候这类协处理器会被 Server 端调用。Observer Coprocessor 就是一些散布在 HBase Server 端代码中的 hook 钩子， 在固定的事件发生时被调用。比如： put 操作之前有钩子函数 prePut，该函数在 put 操作<br> 执行前会被 Region Server 调用；在 put 操作之后则有 postPut 钩子函数</p>
 <p>以 Hbase2.0.0 版本为例，它提供了三种观察者接口：<br> ● RegionObserver：提供客户端的数据操纵事件钩子： Get、 Put、 Delete、 Scan 等。<br> ● WALObserver：提供 WAL 相关操作钩子。<br> ● MasterObserver：提供 DDL-类型的操作钩子。如创建、删除、修改数据表等。<br> 到 0.96 版本又新增一个 RegionServerObserver</p>
 <p>下图是以 RegionObserver 为例子讲解 Observer 这种协处理器的原理：</p>
-<p><img data-src="/images/Hbase/xcl.png" alt="img"></p>
+<p><img src="/images/Hbase/xcl.png" alt="img"></p>
 <p> (2) Endpoint 协处理器类似传统数据库中的存储过程，客户端可以调用这些 Endpoint 协处 理器执行一段 Server 端代码，并将 Server 端代码的结果返回给客户端进一步处理，最常 见的用法就是进行聚集操作。如果没有协处理器，当用户需要找出一张表中的最大数据，即</p>
 <p>max 聚合操作，就必须进行全表扫描，在客户端代码内遍历扫描结果，并执行求最大值的 操作。这样的方法无法利用底层集群的并发能力，而将所有计算都集中到 Client 端统一执 行，势必效率低下。利用 Coprocessor，用户可以将求最大值的代码部署到 HBase Server 端，<br> HBase 将利用底层 cluster 的多个节点并发执行求最大值的操作。即在每个 Region 范围内 执行求最大值的代码，将每个 Region 的最大值在 Region Server 端计算出，仅仅将该 max 值返回给客户端。在客户端进一步将多个 Region 的最大值进一步处理而找到其中的最大值。<br> 这样整体的执行效率就会提高很多<br> 下图是 EndPoint 的工作原理：</p>
-<p><img data-src="/images/Hbase/xcl2.png" alt="img"></p>
+<p><img src="/images/Hbase/xcl2.png" alt="img"></p>
 <p>(3)总结</p>
 <p>Observer 允许集群在正常的客户端操作过程中可以有不同的行为表现<br> Endpoint 允许扩展集群的能力，对客户端应用开放新的运算命令<br> observer 类似于 RDBMS 中的触发器，主要在服务端工作<br> endpoint 类似于 RDBMS 中的存储过程，主要在 client 端工作<br> observer 可以实现权限管理、优先级设置、监控、 ddl 控制、 二级索引等功能<br> endpoint 可以实现 min、 max、 avg、 sum、 distinct、 group by 等功能</p>
 <h2 id="3、协处理器加载方式"><a href="#3、协处理器加载方式" class="headerlink" title="3、协处理器加载方式"></a>3、协处理器加载方式</h2><p>​     协处理器的加载方式有两种，我们称之为静态加载方式（ Static Load） 和动态加载方式 （ Dynamic Load）。 静态加载的协处理器称之为 System Coprocessor，动态加载的协处理器称 之为 Table Coprocessor<br>​      1、静态加载 </p>
@@ -488,7 +487,7 @@
 
 
 <h2 id="八-HBase调优"><a href="#八-HBase调优" class="headerlink" title="八 HBase调优"></a>八 HBase调优</h2><h2 id="1、通用优化"><a href="#1、通用优化" class="headerlink" title="1、通用优化"></a>1、通用优化</h2><h3 id="1、NameNode的元数据备份使用SSD"><a href="#1、NameNode的元数据备份使用SSD" class="headerlink" title="1、NameNode的元数据备份使用SSD"></a>1、NameNode的元数据备份使用SSD</h3><h3 id="2、定时备份NameNode上的元数据，每小时或者每天备份，如果数据极其重要，可以5"><a href="#2、定时备份NameNode上的元数据，每小时或者每天备份，如果数据极其重要，可以5" class="headerlink" title="2、定时备份NameNode上的元数据，每小时或者每天备份，如果数据极其重要，可以5~"></a>2、定时备份NameNode上的元数据，每小时或者每天备份，如果数据极其重要，可以5~</h3><p>10分钟备份一次。备份可以通过定时任务复制元数据目录即可。</p>
-<h3 id="3、为NameNode指定多个元数据目录，使用dfs-name-dir或者dfs-namenode-name-dir指定。一个指定本地磁盘，一个指定网络磁盘。这样可以提供元数据的冗余和健壮性，以免发生故障。"><a href="#3、为NameNode指定多个元数据目录，使用dfs-name-dir或者dfs-namenode-name-dir指定。一个指定本地磁盘，一个指定网络磁盘。这样可以提供元数据的冗余和健壮性，以免发生故障。" class="headerlink" title="3、为NameNode指定多个元数据目录，使用dfs.name.dir或者dfs.namenode.name.dir指定。一个指定本地磁盘，一个指定网络磁盘。这样可以提供元数据的冗余和健壮性，以免发生故障。"></a>3、为NameNode指定多个元数据目录，使用dfs.name.dir或者dfs.namenode.name.dir指定。一个指定本地磁盘，一个指定网络磁盘。这样可以提供元数据的冗余和健壮性，以免发生故障。</h3><h3 id="4、设置dfs-namenode-name-dir-restore为true，允许尝试恢复之前失败的dfs-namenode-name-dir目录，在创建checkpoint时做此尝试，如果设置了多个磁盘，建议允许。"><a href="#4、设置dfs-namenode-name-dir-restore为true，允许尝试恢复之前失败的dfs-namenode-name-dir目录，在创建checkpoint时做此尝试，如果设置了多个磁盘，建议允许。" class="headerlink" title="4、设置dfs.namenode.name.dir.restore为true，允许尝试恢复之前失败的dfs.namenode.name.dir目录，在创建checkpoint时做此尝试，如果设置了多个磁盘，建议允许。"></a>4、设置dfs.namenode.name.dir.restore为true，允许尝试恢复之前失败的dfs.namenode.name.dir目录，在创建checkpoint时做此尝试，如果设置了多个磁盘，建议允许。</h3><h3 id="5、NameNode节点必须配置为RAID1（镜像盘）结构。"><a href="#5、NameNode节点必须配置为RAID1（镜像盘）结构。" class="headerlink" title="5、NameNode节点必须配置为RAID1（镜像盘）结构。"></a>5、NameNode节点必须配置为RAID1（镜像盘）结构。</h3><h3 id="6、补充：什么是Raid0、Raid0-1、Raid1、Raid5"><a href="#6、补充：什么是Raid0、Raid0-1、Raid1、Raid5" class="headerlink" title="6、补充：什么是Raid0、Raid0+1、Raid1、Raid5"></a>6、补充：什么是Raid0、Raid0+1、Raid1、Raid5</h3><p><img data-src="/images/Hbase/r.jpg" alt="img"></p>
+<h3 id="3、为NameNode指定多个元数据目录，使用dfs-name-dir或者dfs-namenode-name-dir指定。一个指定本地磁盘，一个指定网络磁盘。这样可以提供元数据的冗余和健壮性，以免发生故障。"><a href="#3、为NameNode指定多个元数据目录，使用dfs-name-dir或者dfs-namenode-name-dir指定。一个指定本地磁盘，一个指定网络磁盘。这样可以提供元数据的冗余和健壮性，以免发生故障。" class="headerlink" title="3、为NameNode指定多个元数据目录，使用dfs.name.dir或者dfs.namenode.name.dir指定。一个指定本地磁盘，一个指定网络磁盘。这样可以提供元数据的冗余和健壮性，以免发生故障。"></a>3、为NameNode指定多个元数据目录，使用dfs.name.dir或者dfs.namenode.name.dir指定。一个指定本地磁盘，一个指定网络磁盘。这样可以提供元数据的冗余和健壮性，以免发生故障。</h3><h3 id="4、设置dfs-namenode-name-dir-restore为true，允许尝试恢复之前失败的dfs-namenode-name-dir目录，在创建checkpoint时做此尝试，如果设置了多个磁盘，建议允许。"><a href="#4、设置dfs-namenode-name-dir-restore为true，允许尝试恢复之前失败的dfs-namenode-name-dir目录，在创建checkpoint时做此尝试，如果设置了多个磁盘，建议允许。" class="headerlink" title="4、设置dfs.namenode.name.dir.restore为true，允许尝试恢复之前失败的dfs.namenode.name.dir目录，在创建checkpoint时做此尝试，如果设置了多个磁盘，建议允许。"></a>4、设置dfs.namenode.name.dir.restore为true，允许尝试恢复之前失败的dfs.namenode.name.dir目录，在创建checkpoint时做此尝试，如果设置了多个磁盘，建议允许。</h3><h3 id="5、NameNode节点必须配置为RAID1（镜像盘）结构。"><a href="#5、NameNode节点必须配置为RAID1（镜像盘）结构。" class="headerlink" title="5、NameNode节点必须配置为RAID1（镜像盘）结构。"></a>5、NameNode节点必须配置为RAID1（镜像盘）结构。</h3><h3 id="6、补充：什么是Raid0、Raid0-1、Raid1、Raid5"><a href="#6、补充：什么是Raid0、Raid0-1、Raid1、Raid5" class="headerlink" title="6、补充：什么是Raid0、Raid0+1、Raid1、Raid5"></a>6、补充：什么是Raid0、Raid0+1、Raid1、Raid5</h3><p><img src="/images/Hbase/r.jpg" alt="img"></p>
 <p><strong>Standalone</strong></p>
 <p>最普遍的单磁盘储存方式。</p>
 <p><strong>Cluster</strong></p>
@@ -896,9 +895,6 @@
 
   
   <script src="/lib/anime.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
-  <script src="true"></script>
-  <script src="true"></script>
   <script src="/lib/velocity/velocity.min.js"></script>
   <script src="/lib/velocity/velocity.ui.min.js"></script>
 

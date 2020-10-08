@@ -14,13 +14,12 @@
 
 <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css">
   <script src="/lib/pace/pace.min.js"></script>
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":false,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":false,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="Kafka消息队列 一消息队列概述 1 kafka企业级消息系统kafka企业级消息系统 为何使用消息系统  在没有使用消息系统以前，我们对于传统许多业务，以及跨服务器传递消息的时候，会采用串行方式或者并行方法；  与串行的差别是并行的方式可以缩短程序整体处理的时间。  消息系统:  消息系统负责将数据从一个应用程序传送到另一个应用程序，因此应用程序可以专注于数据，但是不必担心 如何共享它。分布式">
@@ -308,17 +307,17 @@
 <h2 id="5-1、指标分析"><a href="#5-1、指标分析" class="headerlink" title="5.1、指标分析"></a>5.1、指标分析</h2><p>kafka   通常用于操作监控数据。这设计聚合来自分布式应用程序的统计信息，   以产生操作的数据集中反馈</p>
 <h2 id="5-2、日志聚合解决方法"><a href="#5-2、日志聚合解决方法" class="headerlink" title="5.2、日志聚合解决方法"></a>5.2、日志聚合解决方法</h2><p>kafka可用于跨组织从多个服务器收集日志，并使他们以标准的合适提供给多个服务器。</p>
 <h2 id="5-3、流式处理"><a href="#5-3、流式处理" class="headerlink" title="5.3、流式处理"></a>5.3、流式处理</h2><p>流式处理框架（spark，storm，ﬂink）重主题中读取数据，对齐进行处理，并将处理后的数据写入新的主题，供 用户和应用程序使用，kafka的强耐久性在流处理的上下文中也非常的有用。</p>
-<h1 id="三架构"><a href="#三架构" class="headerlink" title="三架构"></a>三架构</h1><p><img data-src="/images/kafka/jg.jpg" alt="img"></p>
+<h1 id="三架构"><a href="#三架构" class="headerlink" title="三架构"></a>三架构</h1><p><img src="/images/kafka/jg.jpg" alt="img"></p>
 <p>四大核心:</p>
 <h5 id="生产者API"><a href="#生产者API" class="headerlink" title="生产者API"></a>生产者API</h5><p>允许应用程序发布记录流至一个或者多个kafka的主题（topics）。</p>
 <h5 id="消费者API"><a href="#消费者API" class="headerlink" title="消费者API"></a>消费者API</h5><p>允许应用程序订阅一个或者多个主题，并处理这些主题接收到的记录流。</p>
 <h5 id="StreamsAPI"><a href="#StreamsAPI" class="headerlink" title="StreamsAPI"></a>StreamsAPI</h5><p>允许应用程序充当流处理器（stream processor），从一个或者多个主题获取输入流，并生产一个输出流到一个或 者多个主题，能够有效的变化输入流为输出流。</p>
 <h5 id="ConnectorAPI"><a href="#ConnectorAPI" class="headerlink" title="ConnectorAPI"></a>ConnectorAPI</h5><p>允许构建和运行可重用的生产者或者消费者，能够把kafka主题连接到现有的应用程序或数据系统。例如：一个连 接到关系数据库的连接器可能会获取每个表的变化。</p>
 <p><strong>架构关系图</strong></p>
-<p><img data-src="/images/kafka/jgg.jpg" alt="img"></p>
+<p><img src="/images/kafka/jgg.jpg" alt="img"></p>
 <p>说明：kafka支持消息持久化，消费端为拉模型来拉取数据，消费状态和订阅关系有客户端负责维护，消息消费完 后，不会立即删除，会保留历史消息。因此支持多订阅时，消息只会存储一份就可以了</p>
 <p><strong>整体架构</strong></p>
-<p><img data-src="/images/kafka/ztjg.jpg" alt="img"></p>
+<p><img src="/images/kafka/ztjg.jpg" alt="img"></p>
 <p>一个典型的kafka集群中包含若干个Producer，若干个Broker，若干个Consumer，以及一个zookeeper集群； kafka通过zookeeper管理集群配置，选举leader，以及在Consumer Group发生变化时进行Rebalance（负载均 衡）；Producer使用push模式将消息发布到Broker；Consumer使用pull模式从Broker中订阅并消费消息。</p>
 <p><strong>kafka术语介绍</strong></p>
 <p><strong>Broker</strong>：kafka集群中包含一个或者多个服务实例，这种服务实例被称为Broker</p>
@@ -344,9 +343,9 @@
 <p>topic的Partition数量在创建topic时配置。</p>
 <p>Partition数量决定了每个Consumer group中并发消费者的最大数量。</p>
 <p>Consumer group A 有两个消费者来读取4个partition中数据；Consumer group B有四个消费者来读取4个 partition中的数据</p>
-<p><img data-src="/images/kafka/fq.jpg" alt="img"></p>
+<p><img src="/images/kafka/fq.jpg" alt="img"></p>
 <p><strong>kafka中的副本数</strong></p>
-<p><img data-src="/images/kafka/fb.jpg" alt="img"></p>
+<p><img src="/images/kafka/fb.jpg" alt="img"></p>
 <p>kafka分区副本数（kafka Partition Replicas)</p>
 <p>副本数（replication-factor）：控制消息保存在几个broker（服务器）上，一般情况下等于broker的个数</p>
 <p>一个broker服务下，是否可以创建多个副本因子？</p>
@@ -874,9 +873,6 @@
 
   
   <script src="/lib/anime.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
-  <script src="true"></script>
-  <script src="true"></script>
   <script src="/lib/velocity/velocity.min.js"></script>
   <script src="/lib/velocity/velocity.ui.min.js"></script>
 

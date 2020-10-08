@@ -14,13 +14,12 @@
 
 <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css">
   <script src="/lib/pace/pace.min.js"></script>
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":false,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":false,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="Oozie 一 概述  * 是一个工作流调度软件 本身属于cloudera 后来贡献给了apache  * oozie目的根据一个定义DAG（有向无环图）执行工作流程  * oozie本身的配置是一种xml格式的配置文件 oozie跟hue配合使用将会很方便  * oozie特点：顺序执行 周期重复定时 可视化 追踪结果  二 架构 Oozie Client：提供命令行、java api、rest">
@@ -278,22 +277,22 @@
 <h1 id="三-原理"><a href="#三-原理" class="headerlink" title="三 原理"></a>三 原理</h1><p>​            Oozie对工作流的编排，是基于workflow.xml文件来完成的。用户预先将工作流执行规则定制于workflow.xml文件中，并在job.properties配置相关的参数，然后由Oozie Server向MR提交job来启动工作流。</p>
 <h2 id="1-流程节点"><a href="#1-流程节点" class="headerlink" title="1 流程节点"></a>1 流程节点</h2><p><strong>Control Flow Nodes</strong>：控制工作流执行路径，包括start，end，kill，decision判断的节点，fork 插值 分开执行不同的任务 并行执行,join  合并。</p>
 <p><strong>Action Nodes</strong>：决定每个操作执行的任务类型，包括MapReduce、java、hive、shell等。</p>
-<p><img data-src="/images/Oozie/lc.png" alt="img"></p>
+<p><img src="/images/Oozie/lc.png" alt="img"></p>
 <p>上述两种类型结合起来 就可以描绘出一个工作流的DAG图。</p>
 <h2 id="2-工作流类型"><a href="#2-工作流类型" class="headerlink" title="2 工作流类型"></a>2 工作流类型</h2><ul>
 <li><ul>
 <li><p>workflow  基本类型的工作流  只会按照定义顺序执行 无定时触发和条件触发</p>
 </li>
-<li><p><img data-src="/images/Oozie/lx1.png" alt="img"></p>
+<li><p><img src="/images/Oozie/lx1.png" alt="img"></p>
 </li>
 </ul>
 </li>
 <li><p>coordinator   Coordinator将多个工作流Job组织起来，称为Coordinator<br>  Job，并指定触发时间和频率，还可以配置数据集、并发数等，类似于在工作流外部增加了一个协调器来管理这些工作流的工作流Job的运行。</p>
 <ul>
-<li><p><img data-src="/images/Oozie/lx2.png" alt="img"></p>
+<li><p><img src="/images/Oozie/lx2.png" alt="img"></p>
 </li>
 <li><p>bundle  针对coordinator的批处理工作流。Bundle将多个Coordinator管理起来，这样我们只需要一个Bundle提交即可。</p>
-<p><img data-src="/images/Oozie/lx3.png" alt="img"></p>
+<p><img src="/images/Oozie/lx3.png" alt="img"></p>
 </li>
 </ul>
 </li>
@@ -783,9 +782,6 @@
 
   
   <script src="/lib/anime.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
-  <script src="true"></script>
-  <script src="true"></script>
   <script src="/lib/velocity/velocity.min.js"></script>
   <script src="/lib/velocity/velocity.ui.min.js"></script>
 

@@ -14,13 +14,12 @@
 
 <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css">
   <script src="/lib/pace/pace.min.js"></script>
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":false,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":false,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="一 概述 1 数据分析的方式 数据分析的方式大致上可以划分为 SQL 和 命令式两种  命令式  在前面的 RDD 部分, 非常明显可以感觉的到是命令式的, 主要特征是通过一个算子, 可以得到一个结果, 通过结果再进行后续计算.  在前面的 RDD 部分, 非常明显可以感觉的到是命令式的, 主要特征是通过一个算子, 可以得到一个结果, 通过结果再进行后续计算.  1 2 3 4 5   sc.te">
@@ -312,7 +311,7 @@
 <p>而 <code>Spark</code> 出现了以后, 统一了两种数据处理范式, 是一种革新性的进步.</p>
 <p><strong>过程</strong></p>
 <p>因为 <code>SQL</code> 是数据分析领域一个非常重要的范式, 所以 <code>Spark</code> 一直想要支持这种范式, 而伴随着一些决策失误, 这个过程其实还是非常曲折的</p>
-<p><img data-src="/images/sparksql/gc.png" alt="img"></p>
+<p><img src="/images/sparksql/gc.png" alt="img"></p>
 <p><strong>Hive</strong></p>
 <ul>
 <li><p>解决的问题</p>
@@ -434,7 +433,7 @@
 <p>能够整合 <code>SQLContext</code>, <code>HiveContext</code>, <code>SparkContext</code>, <code>StreamingContext</code> 等不同的入口点为了支持更多的数据源, 应该完善读取和写入体系同时对于原来的入口点也不能放弃, 要向下兼容</p>
 </li>
 </ul>
-<h2 id="2-1-DataSet-和-DataFrame"><a href="#2-1-DataSet-和-DataFrame" class="headerlink" title="2.1 DataSet 和 DataFrame"></a>2.1 DataSet 和 DataFrame</h2><p><img data-src="/images/sparksql/sql1.png" alt="img"></p>
+<h2 id="2-1-DataSet-和-DataFrame"><a href="#2-1-DataSet-和-DataFrame" class="headerlink" title="2.1 DataSet 和 DataFrame"></a>2.1 DataSet 和 DataFrame</h2><p><img src="/images/sparksql/sql1.png" alt="img"></p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SparkSQL&#96; 最大的特点就是它针对于结构化数据设计, 所以 &#96;SparkSQL&#96; 应该是能支持针对某一个字段的访问的, 而这种访问方式有一个前提, 就是 &#96;SparkSQL&#96; 的数据集中, 要 **包含结构化信息**, 也就是俗称的 &#96;Schema</span><br></pre></td></tr></table></figure>
 
 <p>而 <code>SparkSQL</code> 对外提供的 <code>API</code> 有两类, 一类是直接执行 <code>SQL</code>, 另外一类就是命令式. <code>SparkSQL</code> 提供的命令式 <code>API</code> 就是 <code>DataFrame</code> 和 <code>Dataset</code>, 暂时也可以认为 <code>DataFrame</code> 就是 <code>Dataset</code>, 只是在不同的 <code>API</code> 中返回的是 <code>Dataset</code> 的不同表现形式</p>
@@ -448,7 +447,7 @@
 <p><code>SparkSQL</code> 提供了 <code>SQL</code> 和 命令式 <code>API</code> 两种不同的访问结构化数据的形式, 并且它们之间可以无缝的衔接</p>
 <p>命令式 <code>API</code> 由一个叫做 <code>Dataset</code> 的组件提供, 其还有一个变形, 叫做 <code>DataFrame</code></p>
 <h1 id="三-Catalyst-优化器"><a href="#三-Catalyst-优化器" class="headerlink" title="三 Catalyst 优化器"></a>三 Catalyst 优化器</h1><h2 id="3-1-rdd与sparksql-的对比"><a href="#3-1-rdd与sparksql-的对比" class="headerlink" title="3.1 rdd与sparksql 的对比"></a>3.1 rdd与sparksql 的对比</h2><p><strong>rdd运行流程</strong></p>
-<p><img data-src="/images/sparksql/sql2.png" alt="img"></p>
+<p><img src="/images/sparksql/sql2.png" alt="img"></p>
 <ul>
 <li><p>大致运行步骤</p>
 <p>先将 <code>RDD</code> 解析为由 <code>Stage</code> 组成的 <code>DAG</code>, 后将 <code>Stage</code> 转为 <code>Task</code> 直接运行</p>
@@ -466,7 +465,7 @@
 <li><code>RDD</code> 可以同时处理结构化和非结构化的数据</li>
 </ul>
 <p><strong>SparkSQL</strong></p>
-<p><img data-src="/images/sparksql/sql3.png" alt="img"></p>
+<p><img src="/images/sparksql/sql3.png" alt="img"></p>
 <p>和 <code>RDD</code> 不同, <code>SparkSQL</code> 的 <code>Dataset</code> 和 <code>SQL</code> 并不是直接生成计划交给集群执行, 而是经过了一个叫做 <code>Catalyst</code> 的优化器, 这个优化器能够自动帮助开发者优化代码</p>
 <p>也就是说, 在 <code>SparkSQL</code> 中, 开发者的代码即使不够优化, 也会被优化为相对较好的形式去执行</p>
 <ul>
@@ -475,14 +474,14 @@
 </li>
 </ul>
 <h2 id="3-2-Catalyst"><a href="#3-2-Catalyst" class="headerlink" title="3.2  Catalyst"></a>3.2  Catalyst</h2><p>为了解决过多依赖 <code>Hive</code> 的问题, <code>SparkSQL</code> 使用了一个新的 <code>SQL</code> 优化器替代 <code>Hive</code> 中的优化器, 这个优化器就是 <code>Catalyst</code>, 整个 <code>SparkSQL</code> 的架构大致如下</p>
-<p><img data-src="/images/sparksql/sql4.png" alt="img"></p>
+<p><img src="/images/sparksql/sql4.png" alt="img"></p>
 <ol>
 <li><code>API</code> 层简单的说就是 <code>Spark</code> 会通过一些 <code>API</code> 接受 <code>SQL</code> 语句</li>
 <li>收到 <code>SQL</code> 语句以后, 将其交给 <code>Catalyst</code>, <code>Catalyst</code> 负责解析 <code>SQL</code>, 生成执行计划等</li>
 <li><code>Catalyst</code> 的输出应该是 <code>RDD</code> 的执行计划</li>
 <li>最终交由集群运行</li>
 </ol>
-<p><img data-src="/images/sparksql/sql5.png" alt="img"></p>
+<p><img src="/images/sparksql/sql5.png" alt="img"></p>
 <p><strong>Step 1 : 解析</strong> <code>SQL</code><strong>, 并且生成</strong> <code>AST</code> <strong>(抽象语法树)</strong></p>
 <p><strong>Step 2 : 在</strong> <code>AST</code> <strong>中加入元数据信息, 做这一步主要是为了一些优化, 例如</strong> <code>col = col</code> <strong>这样的条件,</strong> </p>
 <p><strong>Step 3 : 对已经加入元数据的</strong> <code>AST</code><strong>, 输入优化器, 进行优化, 从两种常见的优化开始, 简单介绍</strong></p>
@@ -518,7 +517,7 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dataset.queryExecution.toRdd&#96; 这个 &#96;API&#96; 可以看到 &#96;Dataset&#96; 底层执行的 &#96;RDD&#96;, 这个 &#96;RDD&#96; 中的范型是 &#96;InternalRow&#96;, &#96;InternalRow&#96; 又称之为 &#96;Catalyst Row&#96;, 是 &#96;Dataset&#96; 底层的数据结构, 也就是说, 无论 &#96;Dataset&#96; 的范型是什么, 无论是 &#96;Dataset[Person]&#96; 还是其它的, 其最底层进行处理的数据结构都是 &#96;InternalRow</span><br></pre></td></tr></table></figure>
 
 <p>所以, <code>Dataset</code> 的范型对象在执行之前, 需要通过 <code>Encoder</code> 转换为 <code>InternalRow</code>, 在输入之前, 需要把 <code>InternalRow</code> 通过 <code>Decoder</code> 转换为范型对象</p>
-<p><img data-src="/images/sparksql/sql6.png" alt="img"></p>
+<p><img src="/images/sparksql/sql6.png" alt="img"></p>
 <p><strong>可以获取</strong> <code>Dataset</code> <strong>对应的</strong> <code>RDD</code> <strong>表示</strong></p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">在 <span class="type">Dataset</span> 中, 可以使用一个属性 rdd 来得到它的 <span class="type">RDD</span> 表示, 例如 <span class="type">Dataset</span>[<span class="type">T</span>] → <span class="type">RDD</span>[<span class="type">T</span>]</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> dataset: <span class="type">Dataset</span>[<span class="type">People</span>] = spark.createDataset(<span class="type">Seq</span>(<span class="type">People</span>(<span class="string">&quot;zhangsan&quot;</span>, <span class="number">9</span>), <span class="type">People</span>(<span class="string">&quot;lisi&quot;</span>, <span class="number">15</span>)))</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">(2) MapPartitionsRDD[3] at rdd at Testing.scala:159 []</span></span><br><span class="line"><span class="comment"> |  MapPartitionsRDD[2] at rdd at Testing.scala:159 []</span></span><br><span class="line"><span class="comment"> |  MapPartitionsRDD[1] at rdd at Testing.scala:159 []</span></span><br><span class="line"><span class="comment"> |  ParallelCollectionRDD[0] at rdd at Testing.scala:159 []</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="number">1</span>  	使用 <span class="type">Dataset</span>.rdd 将 <span class="type">Dataset</span> 转为 <span class="type">RDD</span> 的形式</span><br><span class="line">println(dataset.rdd.toDebugString) <span class="comment">// 这段代码的执行计划为什么多了两个步骤?</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">(2) MapPartitionsRDD[5] at toRdd at Testing.scala:160 []</span></span><br><span class="line"><span class="comment"> |  ParallelCollectionRDD[4] at toRdd at Testing.scala:160 []</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="number">2</span>   <span class="type">Dataset</span> 的执行计划底层的 <span class="type">RDD</span></span><br><span class="line">println(dataset.queryExecution.toRdd.toDebugString)</span><br></pre></td></tr></table></figure>
 
@@ -531,7 +530,7 @@
 </ol>
 <h1 id="五-DataFrame的特点"><a href="#五-DataFrame的特点" class="headerlink" title="五  DataFrame的特点"></a>五  DataFrame的特点</h1><p><code>DataFrame</code> 是 <code>SparkSQL</code> 中一个表示关系型数据库中 <code>表</code> 的函数式抽象, 其作用是让 <code>Spark</code> 处理大规模结构化数据的时候更加容易. 一般 <code>DataFrame</code> 可以处理结构化的数据, 或者是半结构化的数据, 因为这两类数据中都可以获取到 <code>Schema</code> 信息. 也就是说 <code>DataFrame</code> 中有 <code>Schema</code> 信息, 可以像操作表一样操作 <code>DataFrame</code>.</p>
 <p><code>DataFrame</code> 由两部分构成, 一是 <code>row</code> 的集合, 每个 <code>row</code> 对象表示一个行, 二是描述 <code>DataFrame</code> 结构的 <code>Schema</code></p>
-<p><img data-src="/images/sparksql/sql7.png" alt="img"></p>
+<p><img src="/images/sparksql/sql7.png" alt="img"></p>
 <p><code>DataFrame</code> 支持 <code>SQL</code> 中常见的操作, 例如: <code>select</code>, <code>filter</code>, <code>join</code>, <code>group</code>, <code>sort</code>, <code>join</code> 等</p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> spark: <span class="type">SparkSession</span> = <span class="keyword">new</span> sql.<span class="type">SparkSession</span>.<span class="type">Builder</span>()</span><br><span class="line">  .appName(<span class="string">&quot;hello&quot;</span>)</span><br><span class="line">  .master(<span class="string">&quot;local[6]&quot;</span>)</span><br><span class="line">  .getOrCreate()</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> spark.implicits._</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> peopleDF: <span class="type">DataFrame</span> = <span class="type">Seq</span>(<span class="type">People</span>(<span class="string">&quot;zhangsan&quot;</span>, <span class="number">15</span>), <span class="type">People</span>(<span class="string">&quot;lisi&quot;</span>, <span class="number">15</span>)).toDF()</span><br><span class="line">peopleDF.groupBy(<span class="symbol">&#x27;age</span>)</span><br><span class="line">  .count()</span><br><span class="line">  .show()</span><br></pre></td></tr></table></figure>
 
@@ -539,7 +538,7 @@
 <p>这种方式本质上是使用 <code>SparkSession</code> 中的隐式转换来进行的</p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> spark: <span class="type">SparkSession</span> = <span class="keyword">new</span> sql.<span class="type">SparkSession</span>.<span class="type">Builder</span>()</span><br><span class="line">  .appName(<span class="string">&quot;hello&quot;</span>)</span><br><span class="line">  .master(<span class="string">&quot;local[6]&quot;</span>)</span><br><span class="line">  .getOrCreate()</span><br><span class="line"></span><br><span class="line"><span class="comment">// 必须要导入隐式转换</span></span><br><span class="line"><span class="comment">// 注意: spark 在此处不是包, 而是 SparkSession 对象</span></span><br><span class="line"><span class="keyword">import</span> spark.implicits._</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> peopleDF: <span class="type">DataFrame</span> = <span class="type">Seq</span>(<span class="type">People</span>(<span class="string">&quot;zhangsan&quot;</span>, <span class="number">15</span>), <span class="type">People</span>(<span class="string">&quot;lisi&quot;</span>, <span class="number">15</span>)).toDF()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
-<p><img data-src="/images/sparksql/sql8.png" alt="img"></p>
+<p><img src="/images/sparksql/sql8.png" alt="img"></p>
 <p>根据源码可以知道, <code>toDF</code> 方法可以在 <code>RDD</code> 和 <code>Seq</code> 中使用</p>
 <p>通过集合创建 <code>DataFrame</code> 的时候, 集合中不仅可以包含样例类, 也可以只有普通数据类型, 后通过指定列名来创建</p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> spark: <span class="type">SparkSession</span> = <span class="keyword">new</span> sql.<span class="type">SparkSession</span>.<span class="type">Builder</span>()</span><br><span class="line">  .appName(<span class="string">&quot;hello&quot;</span>)</span><br><span class="line">  .master(<span class="string">&quot;local[6]&quot;</span>)</span><br><span class="line">  .getOrCreate()</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> spark.implicits._</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> df1: <span class="type">DataFrame</span> = <span class="type">Seq</span>(<span class="string">&quot;nihao&quot;</span>, <span class="string">&quot;hello&quot;</span>).toDF(<span class="string">&quot;text&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">+-----+</span></span><br><span class="line"><span class="comment">| text|</span></span><br><span class="line"><span class="comment">+-----+</span></span><br><span class="line"><span class="comment">|nihao|</span></span><br><span class="line"><span class="comment">|hello|</span></span><br><span class="line"><span class="comment">+-----+</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">df1.show()</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> df2: <span class="type">DataFrame</span> = <span class="type">Seq</span>((<span class="string">&quot;a&quot;</span>, <span class="number">1</span>), (<span class="string">&quot;b&quot;</span>, <span class="number">1</span>)).toDF(<span class="string">&quot;word&quot;</span>, <span class="string">&quot;count&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">+----+-----+</span></span><br><span class="line"><span class="comment">|word|count|</span></span><br><span class="line"><span class="comment">+----+-----+</span></span><br><span class="line"><span class="comment">|   a|    1|</span></span><br><span class="line"><span class="comment">|   b|    1|</span></span><br><span class="line"><span class="comment">+----+-----+</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">df2.show()</span><br></pre></td></tr></table></figure>
@@ -712,7 +711,7 @@
 <p>只需整合<code>MetaStore</code>, 元数据存储  因为<code>SparkSQL</code> 内置了 <code>HiveSQL</code> 的支持, 所以无需整合查询引擎</p>
 <p><strong>首先要开启<code>Hive</code> 的<code>MetaStore</code></strong></p>
 <p><code>Hive</code> 的 <code>MetaStore</code> 是一个 <code>Hive</code> 的组件, 一个 <code>Hive</code> 提供的程序, 用以保存和访问表的元数据, 整个 <code>Hive</code> 的结构大致如下</p>
-<p><img data-src="/images/sparksql/shzh.png" alt="img"></p>
+<p><img src="/images/sparksql/shzh.png" alt="img"></p>
 <p>其实 <code>Hive</code> 中主要的组件就三个, <code>HiveServer2</code> 负责接受外部系统的查询请求, 例如 <code>JDBC</code>, <code>HiveServer2</code> 接收到查询请求后, 交给 <code>Driver</code> 处理, <code>Driver</code> 会首先去询问 <code>MetaStore</code> 表在哪存, 后 <code>Driver</code> 程序通过 <code>MR</code> 程序来访问 <code>HDFS</code>从而获取结果返回给查询请求者</p>
 <p>而 <code>Hive</code> 的 <code>MetaStore</code> 对 <code>SparkSQL</code> 的意义非常重大, 如果 <code>SparkSQL</code> 可以直接访问 <code>Hive</code> 的 <code>MetaStore</code>, 则理论上可以做到和 <code>Hive</code> 一样的事情, 例如通过 <code>Hive</code> 表查询数据</p>
 <p><strong>而 Hive 的 MetaStore 的运行模式有三种</strong></p>
@@ -1276,9 +1275,6 @@
 
   
   <script src="/lib/anime.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
-  <script src="true"></script>
-  <script src="true"></script>
   <script src="/lib/velocity/velocity.min.js"></script>
   <script src="/lib/velocity/velocity.ui.min.js"></script>
 

@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":false,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="linux常用软件安装 如有需要,自行参考  一 mysql的安装 第一步：在线安装mysql相关的软件包  1   yum  install  mysql  mysql-server  mysql-devel   第二步：启动mysql的服务  &#x2F;etc&#x2F;init.d&#x2F;mysqld start  第三步：通过mysql安装自带脚本进行设置  &#x2F;usr&#x2F;bin&#x2F;mysql_secure_insta">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux开发环境搭建">
+<meta property="og:url" content="http://example.com/2017/07/03/linux%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/index.html">
+<meta property="og:site_name" content="春雨里洗过的太阳">
+<meta property="og:description" content="linux常用软件安装 如有需要,自行参考  一 mysql的安装 第一步：在线安装mysql相关的软件包  1   yum  install  mysql  mysql-server  mysql-devel   第二步：启动mysql的服务  &#x2F;etc&#x2F;init.d&#x2F;mysqld start  第三步：通过mysql安装自带脚本进行设置  &#x2F;usr&#x2F;bin&#x2F;mysql_secure_insta">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2017-07-03T14:30:33.000Z">
+<meta property="article:modified_time" content="2020-09-29T01:04:08.584Z">
+<meta property="article:author" content="HF">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2017/07/03/linux%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<link rel="stylesheet" type="text/css" href="/css/injector.css" />
+  <title>linux开发环境搭建 | 春雨里洗过的太阳</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">春雨里洗过的太阳</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">世间所有的相遇，都是久别重逢</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2017/07/03/linux%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/hexo.jpg">
+      <meta itemprop="name" content="HF">
+      <meta itemprop="description" content="第二名就是头号输家">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="春雨里洗过的太阳">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          linux开发环境搭建
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-07-03 22:30:33" itemprop="dateCreated datePublished" datetime="2017-07-03T22:30:33+08:00">2017-07-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-09-29 09:04:08" itemprop="dateModified" datetime="2020-09-29T09:04:08+08:00">2020-09-29</time>
+              </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>4.1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>4 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="linux常用软件安装"><a href="#linux常用软件安装" class="headerlink" title="linux常用软件安装"></a>linux常用软件安装</h1><p>如有需要,自行参考</p>
+<h2 id="一-mysql的安装"><a href="#一-mysql的安装" class="headerlink" title="一 mysql的安装"></a>一 mysql的安装</h2><p>第一步：在线安装mysql相关的软件包</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum  install  mysql  mysql-server  mysql-devel</span><br></pre></td></tr></table></figure>
+
+<p>第二步：启动mysql的服务</p>
+<pre><code>/etc/init.d/mysqld start</code></pre>
+<p>第三步：通过mysql安装自带脚本进行设置</p>
+<pre><code>/usr/bin/mysql_secure_installation</code></pre>
+<p>第四步：进入mysql的客户端然后进行授权</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"> grant all privileges on *.* to &#x27;root&#x27;@&#x27;%&#x27; identified by &#x27;123456&#x27; with grant option;</span><br><span class="line">flush privileges;</span><br></pre></td></tr></table></figure>
+
+<p>yum 安装的卸载</p>
+<p><strong>一、使用以下命令查看当前安装mysql情况，查找以前是否装有mysql</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#96;rpm -qa|&#96;&#96;grep&#96; &#96;-i mysql&#96;</span><br></pre></td></tr></table></figure>
+
+<p>显示之前安装了：</p>
+<p>​     MySQL-client-5.5.25a-1.rhel5</p>
+<p>​     MySQL-server-5.5.25a-1.rhel5</p>
+<p><strong>2、停止mysql服务、删除之前安装的mysql</strong></p>
+<p>service mysqld stop</p>
+<p>删除命令：<code>rpm -e –nodeps 包名</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#96;rpm -ev MySQL-client-5.5.25a-1.rhel5 &#96;&#96;rpm -ev MySQL-server-5.5.25a-1.rhel5&#96;</span><br></pre></td></tr></table></figure>
+
+<p>如果提示依赖包错误，则使用以下命令尝试</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#96;rpm -ev MySQL-client-5.5.25a-1.rhel5 --nodeps&#96;</span><br></pre></td></tr></table></figure>
+
+<p>如果提示错误：<code>error: %preun(xxxxxx) scriptlet failed, exit status 1</code></p>
+<p>则用以下命令尝试：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#96;rpm -e --noscripts MySQL-client-5.5.25a-1.rhel5&#96;</span><br></pre></td></tr></table></figure>
+
+<p><strong>3、查找之前老版本mysql的目录、并且删除老版本mysql的文件和库</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#96;find&#96; &#96;&#x2F; -name mysql&#96;</span><br></pre></td></tr></table></figure>
+
+<p>查找结果如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#96;find&#96; &#96;&#x2F; -name mysql &#96; &#96;&#x2F;var&#x2F;lib&#x2F;mysql&#96;&#96;&#x2F;var&#x2F;lib&#x2F;mysql&#x2F;mysql&#96;&#96;&#x2F;usr&#x2F;lib64&#x2F;mysql&#96;</span><br></pre></td></tr></table></figure>
+
+<p>删除对应的mysql目录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#96;rm&#96; &#96;-rf &#96;&#96;&#x2F;var&#x2F;lib&#x2F;mysql&#96;&#96;rm&#96; &#96;-rf &#96;&#96;&#x2F;var&#x2F;lib&#x2F;mysql&#96;&#96;rm&#96; &#96;-rf &#96;&#96;&#x2F;usr&#x2F;lib64&#x2F;mysql&#96;</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意：</strong>卸载后/etc/my.cnf不会删除，需要进行手工删除</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#96;rm&#96; &#96;-rf &#96;&#96;&#x2F;etc&#x2F;my&#96;&#96;.cnf&#96;</span><br></pre></td></tr></table></figure>
+
+<p><strong>4、再次查找机器是否安装mysql</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#96;rpm -qa|&#96;&#96;grep&#96; &#96;-i mysql&#96;</span><br></pre></td></tr></table></figure>
+
+<h2 id="二-jdk的安装"><a href="#二-jdk的安装" class="headerlink" title="二 jdk的安装"></a>二 jdk的安装</h2><p>1.1 查看自带的openjdk并卸载</p>
+<pre><code>查询
+rpm -qa | grep java
+卸载
+rpm -e java-1.6.0-openjdk-1.6.0.41-1.13.13.1.el6_8.x86_64 tzdata-java-2016j-1.el6.noarch java-1.7.0-openjdk-1.7.0.131-2.6.9.0.el6_8.x86_64 --nodeps</code></pre>
+<p>–nodeps  不管依赖直接删</p>
+<p> 2上传解压</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -zxvf jdk-8u141-linux-x64.tar.gz</span><br></pre></td></tr></table></figure>
+
+<p>3配置环境变量</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">vim</span> <span class="string">/etc/profile</span></span><br><span class="line"></span><br><span class="line"><span class="attr">添加</span></span><br><span class="line"><span class="attr">export</span> <span class="string">JAVA_HOME=/export/servers/jdk1.8.0_141</span></span><br><span class="line"><span class="attr">export</span> <span class="string">PATH=:$JAVA_HOME/bin:$PATH</span></span><br></pre></td></tr></table></figure>
+
+<p>4 生效</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">source &#x2F;etc&#x2F;profile</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="zookeeper的安装"><a href="#zookeeper的安装" class="headerlink" title="zookeeper的安装"></a>zookeeper的安装</h1><h1 id="Hadoop的安装"><a href="#Hadoop的安装" class="headerlink" title="Hadoop的安装"></a>Hadoop的安装</h1><h1 id="hive的安装"><a href="#hive的安装" class="headerlink" title="hive的安装"></a>hive的安装</h1><p>1上传压塑包并解压</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -zxvf apache-hive-2.1.1-bin.tar.gz</span><br></pre></td></tr></table></figure>
+
+<p>2 解压后可重命名</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mv apache-hive-2.1.1-bin hive</span><br></pre></td></tr></table></figure>
+
+<p>3 安装mysql省略</p>
+<p>4修改配置文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">cp hive-env.sh.template hive-env.sh</span><br><span class="line"></span><br><span class="line">配置</span><br><span class="line">HADOOP_HOME&#x3D;&#x2F;export&#x2F;servers&#x2F;hadoop-2.7.5</span><br><span class="line">export HIVE_CONF_DIR&#x3D;&#x2F;export&#x2F;servers&#x2F;hive&#x2F;conf</span><br></pre></td></tr></table></figure>
+
+<p>创建文件:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">vim hive-site.xml</span><br><span class="line"></span><br><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;</span></span><br><span class="line"><span class="meta">&lt;?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;configuration.xsl&quot;?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">name</span>&gt;</span>javax.jdo.option.ConnectionUserName<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">value</span>&gt;</span>root<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">name</span>&gt;</span>javax.jdo.option.ConnectionPassword<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">value</span>&gt;</span>123456<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">name</span>&gt;</span>javax.jdo.option.ConnectionURL<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">value</span>&gt;</span>jdbc:mysql://node03:3306/hive?createDatabaseIfNotExist=true<span class="symbol">&amp;amp;</span>useSSL=false<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">name</span>&gt;</span>javax.jdo.option.ConnectionDriverName<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">value</span>&gt;</span>com.mysql.jdbc.Driver<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">name</span>&gt;</span>hive.metastore.schema.verification<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">value</span>&gt;</span>false<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>datanucleus.schema.autoCreateAll<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">value</span>&gt;</span>true<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">name</span>&gt;</span>hive.server2.thrift.bind.host<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">value</span>&gt;</span>node03<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>5将数据库驱动加入hive下的lib目录下</p>
+<p>6配置hive环境变量</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">sudo vim /etc/profile</span><br><span class="line"></span><br><span class="line">export HIVE_HOME=/export/servers/hive</span><br><span class="line">export PATH=:$HIVE_HOME/bin:$PATH</span><br><span class="line"></span><br><span class="line">配后:</span><br><span class="line">source /etc/profile</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="flume的安装"><a href="#flume的安装" class="headerlink" title="flume的安装"></a>flume的安装</h1><h1 id="sqoop的安装"><a href="#sqoop的安装" class="headerlink" title="sqoop的安装"></a>sqoop的安装</h1><p>安装sqoop的前提是已经具备java和hadoop的环境</p>
+<p>上传解压后:</p>
+<p>配置文件修改:</p>
+<p>conf下的:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mv sqoop-env-template.sh sqoop-env.sh</span><br><span class="line">vi sqoop-env.sh</span><br><span class="line">export HADOOP_COMMON_HOME&#x3D; &#x2F;export&#x2F;servers&#x2F;hadoop-2.7.5 </span><br><span class="line">export HADOOP_MAPRED_HOME&#x3D; &#x2F;export&#x2F;servers&#x2F;hadoop-2.7.5</span><br><span class="line">export HIVE_HOME&#x3D; &#x2F;export&#x2F;servers&#x2F;hive</span><br></pre></td></tr></table></figure>
+
+<p>把数据库驱动加入lib目录下</p>
+<p>测试:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">bin&#x2F;sqoop list-databases \</span><br><span class="line">--connect jdbc:mysql:&#x2F;&#x2F;node01:3306&#x2F; \</span><br><span class="line">--username root \</span><br><span class="line">--password 123456</span><br></pre></td></tr></table></figure>
+
+<p>列出数据库中所有的数据库</p>
+<h1 id="azkaban的安装"><a href="#azkaban的安装" class="headerlink" title="azkaban的安装"></a>azkaban的安装</h1><h1 id="telnet-安装"><a href="#telnet-安装" class="headerlink" title="telnet 安装"></a>telnet 安装</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">yum list telnet*              列出telnet相关的安装包</span><br><span class="line">yum install telnet-server          安装telnet服务</span><br><span class="line">yum install telnet.*           安装telnet客户端</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>HF
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://example.com/2017/07/03/linux%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" title="linux开发环境搭建">http://example.com/2017/07/03/linux开发环境搭建/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/07/03/linux%E6%A0%B9%E7%9B%AE%E5%BD%95%E6%9D%83%E9%99%90%E4%BF%AE%E5%A4%8D%E6%96%B9%E6%B3%95/" rel="prev" title="linux根目录权限修复方法">
+      <i class="fa fa-chevron-left"></i> linux根目录权限修复方法
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/07/03/Linux%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/" rel="next" title="Linux常用命令">
+      Linux常用命令 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#linux%E5%B8%B8%E7%94%A8%E8%BD%AF%E4%BB%B6%E5%AE%89%E8%A3%85"><span class="nav-number">1.</span> <span class="nav-text">linux常用软件安装</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80-mysql%E7%9A%84%E5%AE%89%E8%A3%85"><span class="nav-number">1.1.</span> <span class="nav-text">一 mysql的安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C-jdk%E7%9A%84%E5%AE%89%E8%A3%85"><span class="nav-number">1.2.</span> <span class="nav-text">二 jdk的安装</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#zookeeper%E7%9A%84%E5%AE%89%E8%A3%85"><span class="nav-number">2.</span> <span class="nav-text">zookeeper的安装</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Hadoop%E7%9A%84%E5%AE%89%E8%A3%85"><span class="nav-number">3.</span> <span class="nav-text">Hadoop的安装</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#hive%E7%9A%84%E5%AE%89%E8%A3%85"><span class="nav-number">4.</span> <span class="nav-text">hive的安装</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#flume%E7%9A%84%E5%AE%89%E8%A3%85"><span class="nav-number">5.</span> <span class="nav-text">flume的安装</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#sqoop%E7%9A%84%E5%AE%89%E8%A3%85"><span class="nav-number">6.</span> <span class="nav-text">sqoop的安装</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#azkaban%E7%9A%84%E5%AE%89%E8%A3%85"><span class="nav-number">7.</span> <span class="nav-text">azkaban的安装</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#telnet-%E5%AE%89%E8%A3%85"><span class="nav-number">8.</span> <span class="nav-text">telnet 安装</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="HF"
+      src="/images/hexo.jpg">
+  <p class="site-author-name" itemprop="name">HF</p>
+  <div class="site-description" itemprop="description">第二名就是头号输家</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">65</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      推荐阅读
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="http://www.54tianzhisheng.cn/tags/Flink/" title="http:&#x2F;&#x2F;www.54tianzhisheng.cn&#x2F;tags&#x2F;Flink&#x2F;" rel="noopener" target="_blank">Flink</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://nginxconfig.io/" title="https:&#x2F;&#x2F;nginxconfig.io&#x2F;" rel="noopener" target="_blank">Nginxconfig</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://linux.51yip.com/" title="http:&#x2F;&#x2F;linux.51yip.com&#x2F;" rel="noopener" target="_blank">Linux命令手册</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://echarts.baidu.com/index.html" title="https:&#x2F;&#x2F;echarts.baidu.com&#x2F;index.html" rel="noopener" target="_blank">echarts可视化库</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    
+          <script type="text/javascript" charset="utf-8" src="/js/tagcloud.js"></script>
+         <script type="text/javascript" charset="utf-8" src="/js/tagcanvas.js"></script>
+           <div class="widget-wrap">
+        <h3 class="widget-title">Tag Cloud</h3>
+        <div id="myCanvasContainer" class="widget tagcloud">
+            <canvas width="250" height="250" id="resCanvas" style="width=100%">
+                <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Azkaban/" rel="tag">Azkaban</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ClouderaManager/" rel="tag">ClouderaManager</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ElSearch/" rel="tag">ElSearch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flink/" rel="tag">Flink</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flume/" rel="tag">Flume</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/" rel="tag">Hadoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hbase/" rel="tag">Hbase</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hdfs/" rel="tag">Hdfs</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hexo/" rel="tag">Hexo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hive/" rel="tag">Hive</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hue/" rel="tag">Hue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Impala/" rel="tag">Impala</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/" rel="tag">Java</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jvm/" rel="tag">Jvm</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kafka/" rel="tag">Kafka</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kettle/" rel="tag">Kettle</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kudu/" rel="tag">Kudu</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/" rel="tag">Linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Livy/" rel="tag">Livy</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MapReduce/" rel="tag">MapReduce</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mysql/" rel="tag">Mysql</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Oozie/" rel="tag">Oozie</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redis/" rel="tag">Redis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scala/" rel="tag">Scala</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Shell/" rel="tag">Shell</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spark/" rel="tag">Spark</a><span class="tag-list-count">15</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Sqoop/" rel="tag">Sqoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Storm/" rel="tag">Storm</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Yarn/" rel="tag">Yarn</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ZK/" rel="tag">ZK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8F%8D%E7%88%AC/" rel="tag">反爬</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%AB%98%E5%B9%B6%E5%8F%91%E4%B8%8E%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" rel="tag">高并发与负载均衡</a><span class="tag-list-count">1</span></li></ul>
+            </canvas>
+        </div>
+    </div>
+    
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright" style=" text-align:center;">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HF</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">1.1m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">17:20</span>
+</div>
+
+  <!-- 网站运行时间的设置 -->
+<div class="run_time" style=" text-align:center;">
+  <span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+  <script>
+    var now = new Date(); 
+    function createtime() { 
+        var grt= new Date("07/23/2017 10:00:00");//此处修改你的建站时间或者网站上线时间 
+        now.setTime(now.getTime()+250); 
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days); 
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours); 
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum); 
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;} 
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum); 
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;} 
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 "; 
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒"; 
+    } 
+    setInterval("createtime()",250);
+  </script>
+</div>
+        
+<div class="busuanzi-count" style=" text-align:center;">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      我的第 <span class="busuanzi-value" id="busuanzi_value_site_uv"></span> 位朋友，
+    </span>
+  
+
+
+
+  
+    <span class="site-pv">
+      历经 <span class="busuanzi-value" id="busuanzi_value_site_pv"></span> 次回眸才与你相遇
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div class="moon-menu-item" onclick="back2bottom()">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div class="moon-menu-item" onclick="back2top()">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/clicklove.js"></script>
+<!-- 雪花特效 -->
+<script type="text/javascript" src="http://libs.baidu.com/jquery/1.8.3/jquery.js"></script>
+<script type="text/javascript" src="http://libs.baidu.com/jquery/1.8.3/jquery.min.js"></script>
+<script type="text/javascript" src="/js/snow.js"></script>

@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":false,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="一、概述 操作 excel 是程序员经常要遇到的场景。因为产品、运营的数据都是以这种格式存储。所以，当程序员拿到这些数据肯定要解析，甚至需要把结果输出成 excel 文件。  下面就介绍如果用 Python 方面的读、写 excel 文件。  二、openpyxl A Python library to read&#x2F;write Excel 2010 xlsx&#x2F;xlsm files  借助 Pytho">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python操作excel">
+<meta property="og:url" content="http://example.com/2020/06/01/python%E6%93%8D%E4%BD%9Cexcel/index.html">
+<meta property="og:site_name" content="春雨里洗过的太阳">
+<meta property="og:description" content="一、概述 操作 excel 是程序员经常要遇到的场景。因为产品、运营的数据都是以这种格式存储。所以，当程序员拿到这些数据肯定要解析，甚至需要把结果输出成 excel 文件。  下面就介绍如果用 Python 方面的读、写 excel 文件。  二、openpyxl A Python library to read&#x2F;write Excel 2010 xlsx&#x2F;xlsm files  借助 Pytho">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-06-01T15:14:07.000Z">
+<meta property="article:modified_time" content="2020-09-29T01:04:08.590Z">
+<meta property="article:author" content="HF">
+<meta property="article:tag" content="Python">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2020/06/01/python%E6%93%8D%E4%BD%9Cexcel/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<link rel="stylesheet" type="text/css" href="/css/injector.css" />
+  <title>python操作excel | 春雨里洗过的太阳</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">春雨里洗过的太阳</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">世间所有的相遇，都是久别重逢</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/06/01/python%E6%93%8D%E4%BD%9Cexcel/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/hexo.jpg">
+      <meta itemprop="name" content="HF">
+      <meta itemprop="description" content="第二名就是头号输家">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="春雨里洗过的太阳">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          python操作excel
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-06-01 23:14:07" itemprop="dateCreated datePublished" datetime="2020-06-01T23:14:07+08:00">2020-06-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-09-29 09:04:08" itemprop="dateModified" datetime="2020-09-29T09:04:08+08:00">2020-09-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.2k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <script src=/js/crypto-js.js></script>
+<script>
+function doDecrypt (pwd, onError) {
+	console.log('in doDecrypt');
+	const txt = document.getElementById('enc_content').innerHTML;
+	let plantext;
+	try {
+		const bytes = CryptoJS.AES.decrypt(txt, pwd);
+		var plaintext = bytes.toString(CryptoJS.enc.Utf8);
+	} catch(err) {
+		if(onError) {
+			onError(err);
+		}
+		return;
+	}
+	document.getElementById('enc_content').innerHTML = plaintext;
+	document.getElementById('enc_content').style.display = 'block';
+	document.getElementById('enc_passwd').style.display = 'none';
+	if(typeof MathJax !== 'undefined') {
+		MathJax.Hub.Queue(
+			['resetEquationNumbers', MathJax.InputJax.TeX],
+			['PreProcess', MathJax.Hub],
+			['Reprocess', MathJax.Hub]
+		);
+	}
+}
+</script>
+<div id="enc_content" style="display:none">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</div>
+<div id="enc_passwd"> <input id="enc_pwd_input" type="password" style="border-radius: 5px;border-style: groove;height: 30px;width: 50%;cursor: auto;font-size: 102%;color: currentColor;outline: none;text-overflow: initial;padding-left: 5px;" onkeydown="if (event.keyCode == 13) { decrypt(); return false;}"> <input type="submit" value="解&nbsp;密" onclick="decrypt()" style="width: 58px;height: 34px;border-radius: 5px;background-color: white;border-style: solid;color: currentColor;"><div id="enc_error" style="display: inline-block;color: #d84527;margin-left: 10px"></div>
+<script>
+var onError = function(error) {
+	document.getElementById("enc_error").innerHTML = "password error!"
+};
+function decrypt() {
+var passwd = document.getElementById("enc_pwd_input").value;
+console.log(passwd);
+doDecrypt(passwd, onError);
+}
+</script>
+</div>
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>HF
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://example.com/2020/06/01/python%E6%93%8D%E4%BD%9Cexcel/" title="python操作excel">http://example.com/2020/06/01/python操作excel/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Python/" rel="tag"># Python</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/05/31/SparkGraphx/" rel="prev" title="SparkGraphx">
+      <i class="fa fa-chevron-left"></i> SparkGraphx
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/06/07/Hive%E7%9A%84%E8%87%AA%E5%AE%9A%E4%B9%89%E5%87%BD%E6%95%B0/" rel="next" title="Hive的自定义函数">
+      Hive的自定义函数 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="HF"
+      src="/images/hexo.jpg">
+  <p class="site-author-name" itemprop="name">HF</p>
+  <div class="site-description" itemprop="description">第二名就是头号输家</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">65</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      推荐阅读
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="http://www.54tianzhisheng.cn/tags/Flink/" title="http:&#x2F;&#x2F;www.54tianzhisheng.cn&#x2F;tags&#x2F;Flink&#x2F;" rel="noopener" target="_blank">Flink</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://nginxconfig.io/" title="https:&#x2F;&#x2F;nginxconfig.io&#x2F;" rel="noopener" target="_blank">Nginxconfig</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://linux.51yip.com/" title="http:&#x2F;&#x2F;linux.51yip.com&#x2F;" rel="noopener" target="_blank">Linux命令手册</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://echarts.baidu.com/index.html" title="https:&#x2F;&#x2F;echarts.baidu.com&#x2F;index.html" rel="noopener" target="_blank">echarts可视化库</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    
+          <script type="text/javascript" charset="utf-8" src="/js/tagcloud.js"></script>
+         <script type="text/javascript" charset="utf-8" src="/js/tagcanvas.js"></script>
+           <div class="widget-wrap">
+        <h3 class="widget-title">Tag Cloud</h3>
+        <div id="myCanvasContainer" class="widget tagcloud">
+            <canvas width="250" height="250" id="resCanvas" style="width=100%">
+                <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Azkaban/" rel="tag">Azkaban</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ClouderaManager/" rel="tag">ClouderaManager</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ElSearch/" rel="tag">ElSearch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flink/" rel="tag">Flink</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flume/" rel="tag">Flume</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/" rel="tag">Hadoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hbase/" rel="tag">Hbase</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hdfs/" rel="tag">Hdfs</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hexo/" rel="tag">Hexo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hive/" rel="tag">Hive</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hue/" rel="tag">Hue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Impala/" rel="tag">Impala</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/" rel="tag">Java</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jvm/" rel="tag">Jvm</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kafka/" rel="tag">Kafka</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kettle/" rel="tag">Kettle</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kudu/" rel="tag">Kudu</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/" rel="tag">Linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Livy/" rel="tag">Livy</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MapReduce/" rel="tag">MapReduce</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mysql/" rel="tag">Mysql</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Oozie/" rel="tag">Oozie</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redis/" rel="tag">Redis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scala/" rel="tag">Scala</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Shell/" rel="tag">Shell</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spark/" rel="tag">Spark</a><span class="tag-list-count">15</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Sqoop/" rel="tag">Sqoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Storm/" rel="tag">Storm</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Yarn/" rel="tag">Yarn</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ZK/" rel="tag">ZK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8F%8D%E7%88%AC/" rel="tag">反爬</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%AB%98%E5%B9%B6%E5%8F%91%E4%B8%8E%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" rel="tag">高并发与负载均衡</a><span class="tag-list-count">1</span></li></ul>
+            </canvas>
+        </div>
+    </div>
+    
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright" style=" text-align:center;">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HF</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">1.1m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">17:20</span>
+</div>
+
+  <!-- 网站运行时间的设置 -->
+<div class="run_time" style=" text-align:center;">
+  <span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+  <script>
+    var now = new Date(); 
+    function createtime() { 
+        var grt= new Date("07/23/2017 10:00:00");//此处修改你的建站时间或者网站上线时间 
+        now.setTime(now.getTime()+250); 
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days); 
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours); 
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum); 
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;} 
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum); 
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;} 
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 "; 
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒"; 
+    } 
+    setInterval("createtime()",250);
+  </script>
+</div>
+        
+<div class="busuanzi-count" style=" text-align:center;">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      我的第 <span class="busuanzi-value" id="busuanzi_value_site_uv"></span> 位朋友，
+    </span>
+  
+
+
+
+  
+    <span class="site-pv">
+      历经 <span class="busuanzi-value" id="busuanzi_value_site_pv"></span> 次回眸才与你相遇
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div class="moon-menu-item" onclick="back2bottom()">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div class="moon-menu-item" onclick="back2top()">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/clicklove.js"></script>
+<!-- 雪花特效 -->
+<script type="text/javascript" src="http://libs.baidu.com/jquery/1.8.3/jquery.js"></script>
+<script type="text/javascript" src="http://libs.baidu.com/jquery/1.8.3/jquery.min.js"></script>
+<script type="text/javascript" src="/js/snow.js"></script>

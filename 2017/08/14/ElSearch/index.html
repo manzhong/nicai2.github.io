@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":false,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="#一 Lucene  全文检索:  索引&amp;检索  倒排索引 :  1我是中国人  2 中国是全球人口最多的国家 ,中国人也最多  例如这两句 用 倒排索引  1，我 （1:1）｛0｝ 第一个1 为第一行 第二个1 为个数 0 为行偏移量   2，中国 (1:1) {2},(2:2){0，15}    #二 es 概述  全称 Elastic Search 基于Lucene ES只是封装了Lucen">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ElSearch">
+<meta property="og:url" content="http://example.com/2017/08/14/ElSearch/index.html">
+<meta property="og:site_name" content="春雨里洗过的太阳">
+<meta property="og:description" content="#一 Lucene  全文检索:  索引&amp;检索  倒排索引 :  1我是中国人  2 中国是全球人口最多的国家 ,中国人也最多  例如这两句 用 倒排索引  1，我 （1:1）｛0｝ 第一个1 为第一行 第二个1 为个数 0 为行偏移量   2，中国 (1:1) {2},(2:2){0，15}    #二 es 概述  全称 Elastic Search 基于Lucene ES只是封装了Lucen">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/images/Es/dc.jpg">
+<meta property="og:image" content="http://example.com/images/Es/sy.png">
+<meta property="og:image" content="http://example.com/images/Es/dp.png">
+<meta property="og:image" content="http://example.com/images/Es/s.png">
+<meta property="og:image" content="http://example.com/images/Es/x.png">
+<meta property="article:published_time" content="2017-08-14T08:52:11.000Z">
+<meta property="article:modified_time" content="2020-09-29T01:04:08.560Z">
+<meta property="article:author" content="HF">
+<meta property="article:tag" content="ElSearch">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/Es/dc.jpg">
+
+<link rel="canonical" href="http://example.com/2017/08/14/ElSearch/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<link rel="stylesheet" type="text/css" href="/css/injector.css" />
+  <title>ElSearch | 春雨里洗过的太阳</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">春雨里洗过的太阳</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">世间所有的相遇，都是久别重逢</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2017/08/14/ElSearch/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/hexo.jpg">
+      <meta itemprop="name" content="HF">
+      <meta itemprop="description" content="第二名就是头号输家">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="春雨里洗过的太阳">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ElSearch
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-08-14 16:52:11" itemprop="dateCreated datePublished" datetime="2017-08-14T16:52:11+08:00">2017-08-14</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-09-29 09:04:08" itemprop="dateModified" datetime="2020-09-29T09:04:08+08:00">2020-09-29</time>
+              </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>3.3k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>#一 Lucene</p>
+<p>全文检索:</p>
+<p>索引&amp;检索</p>
+<p>倒排索引   :</p>
+<p>1我是中国人</p>
+<p>2 中国是全球人口最多的国家 ,中国人也最多</p>
+<p>例如这两句 用  倒排索引</p>
+<p>1，我 （1:1）｛0｝                 第一个1  为第一行 第二个1 为个数  0 为行偏移量  </p>
+<p>2，中国 (1:1) {2},(2:2){0，15}</p>
+<p><img src="/images/Es/dc.jpg" alt="img"></p>
+<p>#二 es 概述</p>
+<p>全称 Elastic Search 基于Lucene   ES只是封装了Lucene  es 制定了一套规则 ,发送给我的数据只要满足一定的格式即可,而不管你的数据来源,只要满足这个规则es就可以对其进行操作.</p>
+<p>Elastic有一条完整的产品线及解决方案：Elasticsearch、Kibana、Logstash等，前面说的三个就是大家常说的ELK技术栈。</p>
+<p>##1特点</p>
+<ul>
+<li>分布式，无需人工搭建集群（solr就需要人为配置，使用Zookeeper作为注册中心）</li>
+<li>Restful风格，一切API都遵循Rest原则，容易上手</li>
+<li>近实时搜索，数据更新在Elasticsearch中几乎是完全同步的。</li>
+</ul>
+<h2 id="2原理与应用"><a href="#2原理与应用" class="headerlink" title="2原理与应用"></a>2原理与应用</h2><h3 id="1-2-1索引结构"><a href="#1-2-1索引结构" class="headerlink" title="1.2.1索引结构"></a>1.2.1索引结构</h3><p>​    下图是ElasticSearch的索引结构，下边黑色部分是物理结构，上边黄色部分是逻辑结构，逻辑结构也是为了更好的去描述ElasticSearch的工作原理及去使用物理结构中的索引文件。</p>
+<p><img src="/images/Es/sy.png" alt="img"></p>
+<p>逻辑结构部分是一个倒排索引表：</p>
+<p>1、将要搜索的文档内容分词，所有不重复的词组成分词列表。</p>
+<p>2、将搜索的文档最终以Document方式存储起来。</p>
+<p>3、每个词和docment都有关联。</p>
+<p>如下：</p>
+<p><img src="/images/Es/dp.png" alt="img"></p>
+<p>现在，如果我们想搜索 <code>quick brown</code> ，我们只需要查找包含每个词条的文档：</p>
+<p><img src="/images/Es/s.png" alt="img"></p>
+<p>两个文档都匹配，但是第一个文档比第二个匹配度更高。如果我们使用仅计算匹配词条数量的简单 <em>相似性算法</em> ，那么，我们可以说，对于我们查询的相关性来讲，第一个文档比第二个文档更佳。</p>
+<h2 id="3-RESTful应用方法"><a href="#3-RESTful应用方法" class="headerlink" title="3 RESTful应用方法"></a>3 RESTful应用方法</h2><p>Elasticsearch提供 RESTful Api接口进行索引、搜索，并且支持多种客户端。</p>
+<p>es在项目中的应用:</p>
+<p><img src="/images/Es/x.png" alt="img"></p>
+<ol>
+<li>用户在前端搜索关键字</li>
+</ol>
+<p>2）项目前端通过http方式请求项目服务端</p>
+<p>3）项目服务端通过Http RESTful方式请求ES集群进行搜索</p>
+<p>4）ES集群从索引库检索数据。</p>
+<h2 id="三-安装与部署-集群"><a href="#三-安装与部署-集群" class="headerlink" title="三 安装与部署 集群"></a>三 安装与部署 集群</h2><h3 id="1-新建用户"><a href="#1-新建用户" class="headerlink" title="1 新建用户"></a>1 新建用户</h3><p>出于安全考虑，elasticsearch默认不允许以root账号运行。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">useradd es</span><br><span class="line">passwd 123456</span><br><span class="line">切换用户  su - es</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-上传压塑包并解压"><a href="#2-上传压塑包并解压" class="headerlink" title="2 上传压塑包并解压"></a>2 上传压塑包并解压</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -zxvf elasticsearch-6.2.4.tar.gz</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-修改配置文件"><a href="#3-修改配置文件" class="headerlink" title="3 修改配置文件"></a>3 修改配置文件</h3><p>要修改两个配置文件在 config目录下</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cd config</span><br></pre></td></tr></table></figure>
+
+<p>elasticsearch.yml和jvm.options</p>
+<h4 id="3-1-修改jvm-options"><a href="#3-1-修改jvm-options" class="headerlink" title="3.1 修改jvm.options"></a>3.1 修改jvm.options</h4><p>Elasticsearch基于Lucene的，而Lucene底层是java实现，因此我们需要配置jvm参数。</p>
+<p>编辑jvm.options：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">vim jvm.options</span><br><span class="line">默认配置如下：</span><br><span class="line"></span><br><span class="line">    -Xms1g</span><br><span class="line">    -Xmx1g</span><br><span class="line"></span><br><span class="line">内存占用太多了，我们调小一些：</span><br><span class="line">-Xms512m</span><br><span class="line">-Xmx512m</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-2-修改elasticsearch-yml"><a href="#3-2-修改elasticsearch-yml" class="headerlink" title="3.2 修改elasticsearch.yml"></a>3.2 修改elasticsearch.yml</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim elasticsearch.yml</span><br></pre></td></tr></table></figure>
+
+<p>修改数据和日志目录：</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">path.data:</span> <span class="string">/export/server/elasticsearch/data</span> <span class="comment"># 数据目录位置</span></span><br><span class="line"><span class="attr">path.logs:</span> <span class="string">/export/server/elasticsearch/logs</span> <span class="comment"># 日志目录位置</span></span><br></pre></td></tr></table></figure>
+
+<p>我们把data和logs目录修改指向了elasticsearch的安装目录。但是这两个目录并不存在，因此我们需要创建出来。</p>
+<p>进入elasticsearch的根目录，然后创建：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mkdir data</span><br><span class="line">mkdir logs</span><br></pre></td></tr></table></figure>
+
+<p>修改绑定的ip：</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">network.host:</span> <span class="number">0.0</span><span class="number">.0</span><span class="number">.0</span> <span class="comment"># 绑定到0.0.0.0，允许任何ip来访问</span></span><br></pre></td></tr></table></figure>
+
+<p>默认只允许本机访问，修改为0.0.0.0后则可以远程访问</p>
+<p>这个是做的单机安装，如果要做集群，只需要在这个配置文件中添加其它节点信息即可。</p>
+<blockquote>
+<p>elasticsearch.ym文件中的其他配置</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>属性名</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>cluster.name</td>
+<td>配置elasticsearch的集群名称，默认是elasticsearch。建议修改成一个有意义的名称。</td>
+</tr>
+<tr>
+<td>node.name</td>
+<td>节点名，es会默认随机指定一个名字，建议指定一个有意义的名称，方便管理</td>
+</tr>
+<tr>
+<td>path.conf</td>
+<td>设置配置文件的存储路径，tar或zip包安装默认在es根目录下的config文件夹，rpm安装默认在/etc/ elasticsearch</td>
+</tr>
+<tr>
+<td>path.data</td>
+<td>设置索引数据的存储路径，默认是es根目录下的data文件夹，可以设置多个存储路径，用逗号隔开</td>
+</tr>
+<tr>
+<td>path.logs</td>
+<td>设置日志文件的存储路径，默认是es根目录下的logs文件夹</td>
+</tr>
+<tr>
+<td>path.plugins</td>
+<td>设置插件的存放路径，默认是es根目录下的plugins文件夹</td>
+</tr>
+<tr>
+<td>bootstrap.memory_lock</td>
+<td>设置为true可以锁住ES使用的内存，避免内存进行swap</td>
+</tr>
+<tr>
+<td>network.host</td>
+<td>设置bind_host和publish_host，设置为0.0.0.0允许外网访问</td>
+</tr>
+<tr>
+<td>http.port</td>
+<td>设置对外服务的http端口，默认为9200。</td>
+</tr>
+<tr>
+<td>transport.tcp.port</td>
+<td>集群结点之间通信端口</td>
+</tr>
+<tr>
+<td>discovery.zen.ping.timeout</td>
+<td>设置ES自动发现节点连接超时的时间，默认为3秒，如果网络延迟高可设置大些</td>
+</tr>
+<tr>
+<td>discovery.zen.minimum_master_nodes</td>
+<td>主结点数量的最少值 ,此值的公式为：(master_eligible_nodes / 2) + 1 ，比如：有3个符合要求的主结点，那么这里要设置为2</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p>cluster.name: </p>
+<p>​    配置elasticsearch的集群名称，默认是elasticsearch。建议修改成一个有意义的名称。</p>
+<p>node.name:</p>
+<p>​    节点名，通常一台物理服务器就是一个节点，es会默认随机指定一个名字，建议指定一个有意义的名称，方便管理</p>
+<p>​    一个或多个节点组成一个cluster集群，集群是一个逻辑的概念，节点是物理概念，后边章节会详细介绍。</p>
+<p>path.conf:      设置配置文件的存储路径，tar或zip包安装默认在es根目录下的config文件夹，rpm安装默认在/etc/ elasticsearch </p>
+<p>path.data:     设置索引数据的存储路径，默认是es根目录下的data文件夹，可以设置多个存储路径，用逗号隔开。 path.logs:     设置日志文件的存储路径，默认是es根目录下的logs文件夹 </p>
+<p>path.plugins:      设置插件的存放路径，默认是es根目录下的plugins文件夹</p>
+<p>bootstrap.memory_lock: true     设置为true可以锁住ES使用的内存，避免内存与swap分区交换数据。 </p>
+<p>network.host:      设置绑定主机的ip地址，设置为0.0.0.0表示绑定任何ip，允许外网访问，生产环境建议设置为具体的ip。 http.port: 9200     设置对外服务的http端口，默认为9200。</p>
+<p>transport.tcp.port: 9300  集群结点之间通信端口</p>
+<p>node.master:      指定该节点是否有资格被选举成为master结点，默认是true，如果原来的master宕机会重新选举新的master。 </p>
+<p>node.data:      指定该节点是否存储索引数据，默认为true。</p>
+<p>discovery.zen.ping.unicast.hosts: [“host1:port”, “host2:port”, “…”]     设置集群中master节点的初始列表。</p>
+<p>discovery.zen.ping.timeout: 3s     设置ES自动发现节点连接超时的时间，默认为3秒，如果网络延迟高可设置大些。 discovery.zen.minimum_master_nodes:</p>
+<p>​    主结点数量的最少值 ,此值的公式为：(master_eligible_nodes / 2) + 1 ，比如：有3个符合要求的主结点，那么这里要设置为2。</p>
+<p>node.max_local_storage_nodes: </p>
+<p>​    单机允许的最大存储结点数，通常单机启动一个结点建议设置为1，开发环境如果单机启动多个节点可设置大于1.</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>HF
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://example.com/2017/08/14/ElSearch/" title="ElSearch">http://example.com/2017/08/14/ElSearch/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/ElSearch/" rel="tag"># ElSearch</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/08/13/Scala%E9%AB%98%E7%BA%A7/" rel="prev" title="Scala高级">
+      <i class="fa fa-chevron-left"></i> Scala高级
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/08/15/spark%E5%85%A5%E9%97%A8/" rel="next" title="spark入门">
+      spark入门 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#2%E5%8E%9F%E7%90%86%E4%B8%8E%E5%BA%94%E7%94%A8"><span class="nav-number">1.</span> <span class="nav-text">2原理与应用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-1%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84"><span class="nav-number">1.1.</span> <span class="nav-text">1.2.1索引结构</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-RESTful%E5%BA%94%E7%94%A8%E6%96%B9%E6%B3%95"><span class="nav-number">2.</span> <span class="nav-text">3 RESTful应用方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89-%E5%AE%89%E8%A3%85%E4%B8%8E%E9%83%A8%E7%BD%B2-%E9%9B%86%E7%BE%A4"><span class="nav-number">3.</span> <span class="nav-text">三 安装与部署 集群</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E6%96%B0%E5%BB%BA%E7%94%A8%E6%88%B7"><span class="nav-number">3.1.</span> <span class="nav-text">1 新建用户</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E4%B8%8A%E4%BC%A0%E5%8E%8B%E5%A1%91%E5%8C%85%E5%B9%B6%E8%A7%A3%E5%8E%8B"><span class="nav-number">3.2.</span> <span class="nav-text">2 上传压塑包并解压</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E4%BF%AE%E6%94%B9%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="nav-number">3.3.</span> <span class="nav-text">3 修改配置文件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-%E4%BF%AE%E6%94%B9jvm-options"><span class="nav-number">3.3.1.</span> <span class="nav-text">3.1 修改jvm.options</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-%E4%BF%AE%E6%94%B9elasticsearch-yml"><span class="nav-number">3.3.2.</span> <span class="nav-text">3.2 修改elasticsearch.yml</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="HF"
+      src="/images/hexo.jpg">
+  <p class="site-author-name" itemprop="name">HF</p>
+  <div class="site-description" itemprop="description">第二名就是头号输家</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">65</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      推荐阅读
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="http://www.54tianzhisheng.cn/tags/Flink/" title="http:&#x2F;&#x2F;www.54tianzhisheng.cn&#x2F;tags&#x2F;Flink&#x2F;" rel="noopener" target="_blank">Flink</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://nginxconfig.io/" title="https:&#x2F;&#x2F;nginxconfig.io&#x2F;" rel="noopener" target="_blank">Nginxconfig</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://linux.51yip.com/" title="http:&#x2F;&#x2F;linux.51yip.com&#x2F;" rel="noopener" target="_blank">Linux命令手册</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://echarts.baidu.com/index.html" title="https:&#x2F;&#x2F;echarts.baidu.com&#x2F;index.html" rel="noopener" target="_blank">echarts可视化库</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    
+          <script type="text/javascript" charset="utf-8" src="/js/tagcloud.js"></script>
+         <script type="text/javascript" charset="utf-8" src="/js/tagcanvas.js"></script>
+           <div class="widget-wrap">
+        <h3 class="widget-title">Tag Cloud</h3>
+        <div id="myCanvasContainer" class="widget tagcloud">
+            <canvas width="250" height="250" id="resCanvas" style="width=100%">
+                <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Azkaban/" rel="tag">Azkaban</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ClouderaManager/" rel="tag">ClouderaManager</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ElSearch/" rel="tag">ElSearch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flink/" rel="tag">Flink</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flume/" rel="tag">Flume</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/" rel="tag">Hadoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hbase/" rel="tag">Hbase</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hdfs/" rel="tag">Hdfs</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hexo/" rel="tag">Hexo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hive/" rel="tag">Hive</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hue/" rel="tag">Hue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Impala/" rel="tag">Impala</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/" rel="tag">Java</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jvm/" rel="tag">Jvm</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kafka/" rel="tag">Kafka</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kettle/" rel="tag">Kettle</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kudu/" rel="tag">Kudu</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/" rel="tag">Linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Livy/" rel="tag">Livy</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MapReduce/" rel="tag">MapReduce</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mysql/" rel="tag">Mysql</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Oozie/" rel="tag">Oozie</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redis/" rel="tag">Redis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scala/" rel="tag">Scala</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Shell/" rel="tag">Shell</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spark/" rel="tag">Spark</a><span class="tag-list-count">15</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Sqoop/" rel="tag">Sqoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Storm/" rel="tag">Storm</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Yarn/" rel="tag">Yarn</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ZK/" rel="tag">ZK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8F%8D%E7%88%AC/" rel="tag">反爬</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%AB%98%E5%B9%B6%E5%8F%91%E4%B8%8E%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" rel="tag">高并发与负载均衡</a><span class="tag-list-count">1</span></li></ul>
+            </canvas>
+        </div>
+    </div>
+    
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright" style=" text-align:center;">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HF</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">1.1m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">17:20</span>
+</div>
+
+  <!-- 网站运行时间的设置 -->
+<div class="run_time" style=" text-align:center;">
+  <span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+  <script>
+    var now = new Date(); 
+    function createtime() { 
+        var grt= new Date("07/23/2017 10:00:00");//此处修改你的建站时间或者网站上线时间 
+        now.setTime(now.getTime()+250); 
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days); 
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours); 
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum); 
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;} 
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum); 
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;} 
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 "; 
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒"; 
+    } 
+    setInterval("createtime()",250);
+  </script>
+</div>
+        
+<div class="busuanzi-count" style=" text-align:center;">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      我的第 <span class="busuanzi-value" id="busuanzi_value_site_uv"></span> 位朋友，
+    </span>
+  
+
+
+
+  
+    <span class="site-pv">
+      历经 <span class="busuanzi-value" id="busuanzi_value_site_pv"></span> 次回眸才与你相遇
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div class="moon-menu-item" onclick="back2bottom()">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div class="moon-menu-item" onclick="back2top()">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/clicklove.js"></script>
+<!-- 雪花特效 -->
+<script type="text/javascript" src="http://libs.baidu.com/jquery/1.8.3/jquery.js"></script>
+<script type="text/javascript" src="http://libs.baidu.com/jquery/1.8.3/jquery.min.js"></script>
+<script type="text/javascript" src="/js/snow.js"></script>

@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":false,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="一 词法,语法解析简介 SQL作为现代计算机行业的数据处理事实标准，一直倍受数据分析师和软件开发者所青睐，从最早应用SQL的单机DBMS（如MySQL、Oracle），到NoSQL提供SQL兼容层（如HBase的Phoenix），到最近火热的NewSQL（如Spanner、TiDB），还有几乎所有主流的计算框架（如Spark、Flink）都兼容了SQL。  SQL规范也一直在稳定发展，近年来通过语">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SparkSql语法词法解析">
+<meta property="og:url" content="http://example.com/2020/05/31/SparkSql%E8%AF%AD%E6%B3%95%E8%AF%8D%E6%B3%95%E8%A7%A3%E6%9E%90/index.html">
+<meta property="og:site_name" content="春雨里洗过的太阳">
+<meta property="og:description" content="一 词法,语法解析简介 SQL作为现代计算机行业的数据处理事实标准，一直倍受数据分析师和软件开发者所青睐，从最早应用SQL的单机DBMS（如MySQL、Oracle），到NoSQL提供SQL兼容层（如HBase的Phoenix），到最近火热的NewSQL（如Spanner、TiDB），还有几乎所有主流的计算框架（如Spark、Flink）都兼容了SQL。  SQL规范也一直在稳定发展，近年来通过语">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-05-31T13:46:49.000Z">
+<meta property="article:modified_time" content="2020-09-29T01:04:08.577Z">
+<meta property="article:author" content="HF">
+<meta property="article:tag" content="Spark">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2020/05/31/SparkSql%E8%AF%AD%E6%B3%95%E8%AF%8D%E6%B3%95%E8%A7%A3%E6%9E%90/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<link rel="stylesheet" type="text/css" href="/css/injector.css" />
+  <title>SparkSql语法词法解析 | 春雨里洗过的太阳</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">春雨里洗过的太阳</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">世间所有的相遇，都是久别重逢</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/05/31/SparkSql%E8%AF%AD%E6%B3%95%E8%AF%8D%E6%B3%95%E8%A7%A3%E6%9E%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/hexo.jpg">
+      <meta itemprop="name" content="HF">
+      <meta itemprop="description" content="第二名就是头号输家">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="春雨里洗过的太阳">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SparkSql语法词法解析
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-05-31 21:46:49" itemprop="dateCreated datePublished" datetime="2020-05-31T21:46:49+08:00">2020-05-31</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-09-29 09:04:08" itemprop="dateModified" datetime="2020-09-29T09:04:08+08:00">2020-09-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spark/" itemprop="url" rel="index"><span itemprop="name">Spark</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>7.2k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>7 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="一-词法-语法解析简介"><a href="#一-词法-语法解析简介" class="headerlink" title="一 词法,语法解析简介"></a>一 词法,语法解析简介</h1><p>SQL作为现代计算机行业的数据处理事实标准，一直倍受数据分析师和软件开发者所青睐，从最早应用SQL的单机DBMS（如MySQL、Oracle），到NoSQL提供SQL兼容层（如HBase的Phoenix），到最近火热的NewSQL（如Spanner、TiDB），还有几乎所有主流的计算框架（如Spark、Flink）都兼容了SQL。</p>
+<p>SQL规范也一直在稳定发展，近年来通过语法拓展满足了离线批处理、流式处理以及时序数据处理几乎所有的需求，并且因为用户基数极大，兼容SQL让用户可以没有学习成本地把业务迁移到新的软件系统中。SQL本质上是一种数据处理的描述语言，或者说是一系列符合SQL标准的字符串，任何系统都可以解析SQL来生成对用平台的任务，因此SQL parser就是这些系统中最重要的组件之一，而且通过拓展SQL parser还可以实现自定义的SQL语义。那么怎样才可以实现自己的SQL parser呢，正是本文准备介绍的。</p>
+<h1 id="二-实现sql-parser原理"><a href="#二-实现sql-parser原理" class="headerlink" title="二 实现sql parser原理"></a>二 实现sql parser原理</h1><p>SQL是一种描述语言的规范，有SQL86、SQL89、SQL92、SQL1999、SQL2003、SQL2006、SQL2008、SQL2011等标准，而MySQL、Oracle甚至Spark也有自己支持的SQL规范，所谓SQL兼容其实也不是和SQL社区定义的标准100%一样，和Python定义语法规范但还有CPython、Jython、Cython等多种虚拟机实现类似。而SQL描述语言相比其他编程语言更简单一些，一般分为DDL和DML，大部分计算系统只是支持DML中的查询语法，也就是SELECT FROM语句，因为对于计算系统来说不需要管理Schema的修改以及数据的增删改，如果是兼容SQL的存储系统就需要兼容几乎所有DDL和DML语句。</p>
+<p>那么要解析用户编写的SQL字符串一般有以下几种方法：</p>
+<ol>
+<li>简单字符串处理，使用字符串查找或者正则表达式来提取SQL中的字段，对于简单的SQL可以这样实现，但SQL规范还有复杂的开闭括号以及嵌套查询，复杂SQL几乎不可能通过字符串匹配来实现。</li>
+<li>使用已有的开源SQL解释器，不同开源系统解析SQL后的应用是不一样的，一般会转化成自己实现的抽象语法树，这些数据结构包含自己定义的树节点以及表达式节点，要兼容使用这些数据结构是非常困难的，这也是为什么开源项目中支持SQL的很多但基本不可以复用同一套实现的原因。</li>
+<li>从头实现SQL解释器，对SQL做词法解析、语法解析的项目已经有很多了，<strong>通过遍历抽象语法树来解析SQL实现对应的业务逻辑</strong>，从头实现一个SQL解释器并没有想象中困难，而且还可以选择增加或减少支持的SQL语法范围。</li>
+</ol>
+<p><strong>本文会基于这里会基于封装性更好并且更加易用的Antlr4来介绍,(Presto和Spark都是基于Antlr框架来实现SQL parser的，也就是他们没有重复造SQL词法解析器、SQL语法解析器的轮子)</strong></p>
+<h1 id="三-使用Antlr4基于spark环境解析sparkSql"><a href="#三-使用Antlr4基于spark环境解析sparkSql" class="headerlink" title="三 使用Antlr4基于spark环境解析sparkSql"></a>三 使用Antlr4基于spark环境解析sparkSql</h1><p>Antlr4是一个Java实现的开源项目，用户需要编写g4后缀的语法文件，Antlr4可以自动生成词法解析器和语法解析器，提供给开发者的接口是已经解析好的抽象语法树以及易于访问的Listener和Visitor基类。什么意思呢，就是如果你要实现一个SQL parser，<strong>只要提供一个SQL语法规范的g4描述文件，这个文件可以从Presto或Spark项目中获得</strong>，那么Antlr就会生成编译过程中的抽象语法树，用户也只需要写一个Java类来选择感兴趣的节点接口，g4文件格式需要符合Antlr要求但因为是标准SQL我们不用自己重新写可以复用Presto或Spark的</p>
+<p>spark的g4文件地址:</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">https://github.com/apache/spark/blob/v2.3.1/sql/catalyst/src/main/antlr4/org/apache/spark/sql/catalyst/parser/SqlBase.g4</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>基于现有的语法文件和开源库，用户只要只要传入SQL字符串，就可以马上得到SQL的抽象语法树了</strong>。这里推荐使用IntelliJ IDEA，安装antlr插件后，输入SQL资源就可以可视化这棵抽象语法树，方面后续遍历抽象语法树实现自己的业务逻辑。</p>
+<p>有了抽象语法树，以及Antlr自动生成的Visitor基类，用户只需要自己的Visitor类即可，这部分需要参考Antlr的使用文档，实际上也并不复杂。例如我们需要解析SQL获取用户查询的表明，从下面的抽象语法树结构看到需要遍历的节点是fromClause、relationPrimary、tableIdentifier、identifier和strictIdentifier，当然如果用户写的是“SELECT c1, c2 FROM t1 as t2”，那么还可以在tableAlias节点获取重命名的字段。</p>
+<p>要获取这个表名并打印出来，实现的Visitor类代码也很直观，<strong>只需要重写我们关注的几个节点的visit函数即可</strong>，如果要支持获取其他字段只需多visit几个节点即可，示例代码如下。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//在这个类里可以获取sql中的内容 具体参考官方文档</span></span><br><span class="line"><span class="keyword">import</span> org.antlr.v4.runtime.tree.ParseTree;</span><br><span class="line"><span class="keyword">import</span> org.apache.spark.sql.catalyst.parser.SqlBaseBaseVisitor;</span><br><span class="line"><span class="keyword">import</span> org.apache.spark.sql.catalyst.parser.SqlBaseParser;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SimpleSqlVisitor</span> <span class="keyword">extends</span> <span class="title">SqlBaseBaseVisitor</span> </span>&#123;</span><br><span class="line">  </span><br><span class="line">     String tableName=<span class="string">&quot;&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getTableName</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> tableName;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setTableName</span><span class="params">(String tableName)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.tableName = tableName;</span><br><span class="line">    &#125;</span><br><span class="line">	<span class="comment">//获取drop的tablename</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">visitDropTable</span><span class="params">(SqlBaseParser.DropTableContext ctx)</span> </span>&#123;</span><br><span class="line">        List&lt;ParseTree&gt; children = ctx.children;</span><br><span class="line">        String droptableName=<span class="string">&quot;&quot;</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span> ;i&lt;children.size();i++)&#123;</span><br><span class="line">            ParseTree parseTree = children.get(i);</span><br><span class="line">            String text = parseTree.getText();</span><br><span class="line">            <span class="keyword">if</span>(text.equalsIgnoreCase(<span class="string">&quot;exists&quot;</span>))&#123;</span><br><span class="line">                droptableName=children.get(i+<span class="number">1</span>).getText();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(droptableName);</span><br><span class="line">        <span class="keyword">this</span>.tableName=droptableName;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">super</span>.visitDropTable(ctx);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//获取insert overwrite的tablename</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">visitInsertOverwriteTable</span><span class="params">(SqlBaseParser.InsertOverwriteTableContext ctx)</span> </span>&#123;</span><br><span class="line">        List&lt;ParseTree&gt; children = ctx.children;</span><br><span class="line">        String tableName=<span class="string">&quot;&quot;</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span> ;i&lt;children.size();i++)&#123;</span><br><span class="line">            ParseTree parseTree = children.get(i);</span><br><span class="line">            String text = parseTree.getText();</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span>(text.equalsIgnoreCase(<span class="string">&quot;table&quot;</span>))&#123;</span><br><span class="line">                tableName=children.get(i+<span class="number">1</span>).getText();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">this</span>.tableName=tableName;</span><br><span class="line"></span><br><span class="line">        System.out.println(tableName);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">super</span>.visitInsertOverwriteTable(ctx);</span><br><span class="line">    &#125;</span><br><span class="line"><span class="comment">//获取create的tablename</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">visitCreateHiveTable</span><span class="params">(SqlBaseParser.CreateHiveTableContext ctx)</span> </span>&#123;</span><br><span class="line">        List&lt;ParseTree&gt; children = ctx.children;</span><br><span class="line">        String tableName=<span class="string">&quot;&quot;</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span> ;i&lt;children.size();i++)&#123;</span><br><span class="line">            ParseTree parseTree = children.get(i);</span><br><span class="line">            String text = parseTree.getText();</span><br><span class="line">           <span class="comment">// System.out.println(text+&quot;2222&quot;);</span></span><br><span class="line">            <span class="keyword">if</span>(text.contains(<span class="string">&quot;CREATETABLE&quot;</span>))&#123;</span><br><span class="line">                tableName=text.split(<span class="string">&quot;TABLE&quot;</span>)[<span class="number">1</span>];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(tableName);</span><br><span class="line">        <span class="keyword">this</span>.tableName=tableName;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">super</span>.visitCreateHiveTable(ctx);</span><br><span class="line">    &#125;</span><br><span class="line"><span class="comment">//获取insert into的tablename</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">visitInsertIntoTable</span><span class="params">(SqlBaseParser.InsertIntoTableContext ctx)</span> </span>&#123;</span><br><span class="line">        List&lt;ParseTree&gt; children = ctx.children;</span><br><span class="line">        String tableName=<span class="string">&quot;&quot;</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span> ;i&lt;children.size();i++)&#123;</span><br><span class="line">            ParseTree parseTree = children.get(i);</span><br><span class="line">            String text = parseTree.getText();</span><br><span class="line">            <span class="keyword">if</span>(text.equalsIgnoreCase(<span class="string">&quot;table&quot;</span>))&#123;</span><br><span class="line">                tableName=children.get(i+<span class="number">1</span>).getText();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">this</span>.tableName=tableName;</span><br><span class="line">        System.out.println(tableName);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">super</span>.visitInsertIntoTable(ctx);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">visitFromClause</span><span class="params">(SqlBaseParser.FromClauseContext ctx)</span> </span>&#123;</span><br><span class="line">        String tableName = visitRelation(ctx.relation(<span class="number">0</span>));</span><br><span class="line">        System.out.println(<span class="string">&quot;SQL table name: &quot;</span> + tableName);</span><br><span class="line">        <span class="keyword">return</span> tableName;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">visitRelation</span><span class="params">(SqlBaseParser.RelationContext ctx)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (ctx.relationPrimary() <span class="keyword">instanceof</span> TableNameContext) &#123;</span><br><span class="line">            <span class="keyword">return</span> visitTableName((TableNameContext)ctx.relationPrimary());</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">visitTableName</span><span class="params">(SqlBaseParser.TableNameContext ctx)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> visitTableIdentifier(ctx.tableIdentifier());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">visitTableIdentifier</span><span class="params">(SqlBaseParser.TableIdentifierContext ctx)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> ctx.getChild(<span class="number">0</span>).getText();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后我们需要输入一个SQL字符串进行测试，实现简单的Java main函数，初始化我们定制的visitor实例，然后以此调用Antlr提供的lexer和parser，示例如下。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SqlExample</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] argv)</span> </span>&#123;</span><br><span class="line">        String sqlText = <span class="string">&quot;SELECT C1, C2 FROM T1&quot;</span>;</span><br><span class="line">				String sqlF = sqlText.toUpperCase();</span><br><span class="line">        SimpleSqlVisitor visitor = <span class="keyword">new</span> SimpleSqlVisitor();</span><br><span class="line">        SqlBaseLexer lexer = <span class="keyword">new</span> SqlBaseLexer(CharStreams.fromString(sqlText));</span><br><span class="line">        CommonTokenStream tokenStream = <span class="keyword">new</span> CommonTokenStream(lexer);</span><br><span class="line">        SqlBaseParser parser = <span class="keyword">new</span> SqlBaseParser(tokenStream);</span><br><span class="line"></span><br><span class="line">        parser.singleStatement().accept(visitor);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果是不需要提取SQL脚本内容，只是想实现一个SQL语法校验功能，那么直接运行visitor检查是否抛lexer或者parser异常即可，或者可以实现一个error listener，直接截取语法异常相关的信息。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SimpleErrorListener</span> <span class="keyword">extends</span> <span class="title">BaseErrorListener</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">syntaxError</span><span class="params">(Recognizer&lt;?, ?&gt; recognizer, Object offendingSymbol, <span class="keyword">int</span> line,</span></span></span><br><span class="line"><span class="function"><span class="params">            <span class="keyword">int</span> charPositionInLine, String msg, RecognitionException e)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// super.syntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, e);</span></span><br><span class="line">        System.out.println(<span class="string">&quot;Get SQL syntax error&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最后需要在parser处注册使用，如果传入语法错误的SQL语句，通过回调找到我们自定义的error listener错误处理逻辑。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SqlExample</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] argv)</span> </span>&#123;</span><br><span class="line">        String sqlText = <span class="string">&quot;SELECT2 C1, C2 FROM T1&quot;</span>;</span><br><span class="line"></span><br><span class="line">        SimpleSqlVisitor visitor = <span class="keyword">new</span> SimpleSqlVisitor();</span><br><span class="line">        SqlBaseLexer lexer = <span class="keyword">new</span> SqlBaseLexer(CharStreams.fromString(sqlText));</span><br><span class="line">        CommonTokenStream tokenStream = <span class="keyword">new</span> CommonTokenStream(lexer);</span><br><span class="line">        SqlBaseParser parser = <span class="keyword">new</span> SqlBaseParser(tokenStream);</span><br><span class="line">        SimpleErrorListener errorListener = <span class="keyword">new</span> SimpleErrorListener();</span><br><span class="line">        parser.addErrorListener(errorListener);</span><br><span class="line"></span><br><span class="line">        parser.singleStatement().accept(visitor);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>在spark的项目中不需要提供g4描述文件;</strong></p>
+<p><strong>ps: 当在spark的项目中,对于sql只想解析sql,看有无词法语法错误,可以这样写:</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> plan =sparkSession.sessionState.sqlParser.parsePlan(sql)</span><br><span class="line">logger.info(plan)</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="四-Antlr4-的使用"><a href="#四-Antlr4-的使用" class="headerlink" title="四 Antlr4 的使用"></a>四 Antlr4 的使用</h1>
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>HF
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://example.com/2020/05/31/SparkSql%E8%AF%AD%E6%B3%95%E8%AF%8D%E6%B3%95%E8%A7%A3%E6%9E%90/" title="SparkSql语法词法解析">http://example.com/2020/05/31/SparkSql语法词法解析/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Spark/" rel="tag"># Spark</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/05/17/SparkSql%E8%B0%83%E4%BC%98/" rel="prev" title="SparkSql调优">
+      <i class="fa fa-chevron-left"></i> SparkSql调优
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/05/31/Livy/" rel="next" title="Livy">
+      Livy <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%80-%E8%AF%8D%E6%B3%95-%E8%AF%AD%E6%B3%95%E8%A7%A3%E6%9E%90%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">一 词法,语法解析简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%8C-%E5%AE%9E%E7%8E%B0sql-parser%E5%8E%9F%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">二 实现sql parser原理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%89-%E4%BD%BF%E7%94%A8Antlr4%E5%9F%BA%E4%BA%8Espark%E7%8E%AF%E5%A2%83%E8%A7%A3%E6%9E%90sparkSql"><span class="nav-number">3.</span> <span class="nav-text">三 使用Antlr4基于spark环境解析sparkSql</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9B%9B-Antlr4-%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-number">4.</span> <span class="nav-text">四 Antlr4 的使用</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="HF"
+      src="/images/hexo.jpg">
+  <p class="site-author-name" itemprop="name">HF</p>
+  <div class="site-description" itemprop="description">第二名就是头号输家</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">65</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      推荐阅读
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="http://www.54tianzhisheng.cn/tags/Flink/" title="http:&#x2F;&#x2F;www.54tianzhisheng.cn&#x2F;tags&#x2F;Flink&#x2F;" rel="noopener" target="_blank">Flink</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://nginxconfig.io/" title="https:&#x2F;&#x2F;nginxconfig.io&#x2F;" rel="noopener" target="_blank">Nginxconfig</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://linux.51yip.com/" title="http:&#x2F;&#x2F;linux.51yip.com&#x2F;" rel="noopener" target="_blank">Linux命令手册</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://echarts.baidu.com/index.html" title="https:&#x2F;&#x2F;echarts.baidu.com&#x2F;index.html" rel="noopener" target="_blank">echarts可视化库</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    
+          <script type="text/javascript" charset="utf-8" src="/js/tagcloud.js"></script>
+         <script type="text/javascript" charset="utf-8" src="/js/tagcanvas.js"></script>
+           <div class="widget-wrap">
+        <h3 class="widget-title">Tag Cloud</h3>
+        <div id="myCanvasContainer" class="widget tagcloud">
+            <canvas width="250" height="250" id="resCanvas" style="width=100%">
+                <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Azkaban/" rel="tag">Azkaban</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ClouderaManager/" rel="tag">ClouderaManager</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ElSearch/" rel="tag">ElSearch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flink/" rel="tag">Flink</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flume/" rel="tag">Flume</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/" rel="tag">Hadoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hbase/" rel="tag">Hbase</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hdfs/" rel="tag">Hdfs</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hexo/" rel="tag">Hexo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hive/" rel="tag">Hive</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hue/" rel="tag">Hue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Impala/" rel="tag">Impala</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/" rel="tag">Java</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jvm/" rel="tag">Jvm</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kafka/" rel="tag">Kafka</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kettle/" rel="tag">Kettle</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kudu/" rel="tag">Kudu</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/" rel="tag">Linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Livy/" rel="tag">Livy</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MapReduce/" rel="tag">MapReduce</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mysql/" rel="tag">Mysql</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Oozie/" rel="tag">Oozie</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redis/" rel="tag">Redis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scala/" rel="tag">Scala</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Shell/" rel="tag">Shell</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spark/" rel="tag">Spark</a><span class="tag-list-count">15</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Sqoop/" rel="tag">Sqoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Storm/" rel="tag">Storm</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Yarn/" rel="tag">Yarn</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ZK/" rel="tag">ZK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8F%8D%E7%88%AC/" rel="tag">反爬</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%AB%98%E5%B9%B6%E5%8F%91%E4%B8%8E%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" rel="tag">高并发与负载均衡</a><span class="tag-list-count">1</span></li></ul>
+            </canvas>
+        </div>
+    </div>
+    
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright" style=" text-align:center;">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HF</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">1.1m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">17:20</span>
+</div>
+
+  <!-- 网站运行时间的设置 -->
+<div class="run_time" style=" text-align:center;">
+  <span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+  <script>
+    var now = new Date(); 
+    function createtime() { 
+        var grt= new Date("07/23/2017 10:00:00");//此处修改你的建站时间或者网站上线时间 
+        now.setTime(now.getTime()+250); 
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days); 
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours); 
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum); 
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;} 
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum); 
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;} 
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 "; 
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒"; 
+    } 
+    setInterval("createtime()",250);
+  </script>
+</div>
+        
+<div class="busuanzi-count" style=" text-align:center;">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      我的第 <span class="busuanzi-value" id="busuanzi_value_site_uv"></span> 位朋友，
+    </span>
+  
+
+
+
+  
+    <span class="site-pv">
+      历经 <span class="busuanzi-value" id="busuanzi_value_site_pv"></span> 次回眸才与你相遇
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div class="moon-menu-item" onclick="back2bottom()">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div class="moon-menu-item" onclick="back2top()">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/clicklove.js"></script>
+<!-- 雪花特效 -->
+<script type="text/javascript" src="http://libs.baidu.com/jquery/1.8.3/jquery.js"></script>
+<script type="text/javascript" src="http://libs.baidu.com/jquery/1.8.3/jquery.min.js"></script>
+<script type="text/javascript" src="/js/snow.js"></script>

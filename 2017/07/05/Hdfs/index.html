@@ -14,12 +14,13 @@
 
 <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css">
   <script src="/lib/pace/pace.min.js"></script>
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":false,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":false,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="Hadoop的核心 Hdfs 1. HDFS概述 1.1 介绍  在现代的企业环境中，单机容量往往无法存储大量数据，需要跨机器存储。统一管理分布在集群上的文件系统称为分布式文件系统 。  ​ HDFS（Hadoop Distributed File System）是 Apache Hadoop 项目的一个子项目. Hadoop 非常适于存储大型数据 (比如 TB 和 PB), 其就是使用 HDFS">
@@ -461,7 +462,7 @@
 
 <h3 id="8-3-清除测试数据"><a href="#8-3-清除测试数据" class="headerlink" title="8.3 清除测试数据"></a>8.3 清除测试数据</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hadoop jar /export/servers/hadoop-2.7.5/share/hadoop/mapreduce/hadoop-mapreduce-client-jobclient-2.7.5.jar   TestDFSIO -clean</span><br></pre></td></tr></table></figure>
 
-<h2 id="9-HDFS-文件写入过程"><a href="#9-HDFS-文件写入过程" class="headerlink" title="9.HDFS 文件写入过程"></a>9.HDFS 文件写入过程</h2><p><img src="/images/hdfs/w.bmp" alt="img"></p>
+<h2 id="9-HDFS-文件写入过程"><a href="#9-HDFS-文件写入过程" class="headerlink" title="9.HDFS 文件写入过程"></a>9.HDFS 文件写入过程</h2><p><img data-src="/images/hdfs/w.bmp" alt="img"></p>
 <ol>
 <li><p>Client 发起文件上传请求, 通过 RPC 与 NameNode 建立通讯, NameNode 检查目标文件是否已存在, 父目录是否存在, 返回是否可以上传</p>
 </li>
@@ -481,7 +482,7 @@
 <li><p>当一个 block 传输完成之后, Client 再次请求 NameNode 上传第二个 block 到服务 1</p>
 </li>
 </ol>
-<h2 id="10-HDFS-文件读取过程"><a href="#10-HDFS-文件读取过程" class="headerlink" title="10.HDFS 文件读取过程"></a>10.HDFS 文件读取过程</h2><p><img src="/images/hdfs/r.bmp" alt="img"></p>
+<h2 id="10-HDFS-文件读取过程"><a href="#10-HDFS-文件读取过程" class="headerlink" title="10.HDFS 文件读取过程"></a>10.HDFS 文件读取过程</h2><p><img data-src="/images/hdfs/r.bmp" alt="img"></p>
 <ol>
 <li>Client向NameNode发起RPC请求，来确定请求文件block所在的位置；</li>
 <li>NameNode会视情况返回文件的部分或者全部block列表，对于每个block，NameNode 都会返回含有该 block 副本的 DataNode 地址；  这些返回的 DN 地址，会按照集群拓扑结构得出 DataNode 与客户端的距离，然后进行排序，排序两个规则：网络拓扑结构中距离 Client 近的排靠前；心跳机制中超时汇报的 DN 状态为 STALE，这样的排靠后；</li>
@@ -535,7 +536,7 @@
 </ul>
 </li>
 </ul>
-<p><img src="/images/hdfs/s.bmp" alt="img"></p>
+<p><img data-src="/images/hdfs/s.bmp" alt="img"></p>
 <ol>
 <li>SecondaryNameNode 通知 NameNode 切换 editlog</li>
 <li>SecondaryNameNode 从 NameNode 中获得 fsimage 和 editlog(通过http方式)</li>
@@ -666,7 +667,7 @@
 
 <h2 id="2：HDFS的高可用机制"><a href="#2：HDFS的高可用机制" class="headerlink" title="2：HDFS的高可用机制"></a>2：HDFS的高可用机制</h2><h3 id="2-1-HDFS高可用介绍"><a href="#2-1-HDFS高可用介绍" class="headerlink" title="2.1 HDFS高可用介绍"></a>2.1 HDFS高可用介绍</h3><p>在Hadoop 中，NameNode 所处的位置是非常重要的，整个HDFS文件系统的元数据信息都由NameNode 来管理，NameNode的可用性直接决定了Hadoop 的可用性，一旦NameNode进程不能工作了，就会影响整个集群的正常使用。 </p>
 <p>在典型的HA集群中，两台独立的机器被配置为NameNode。在工作集群中，NameNode机器中的一个处于Active状态，另一个处于Standby状态。Active NameNode负责群集中的所有客户端操作，而Standby充当从服务器。Standby机器保持足够的状态以提供快速故障切换（如果需要）。    </p>
-<h3 id="2-2-组件介绍"><a href="#2-2-组件介绍" class="headerlink" title="2.2 组件介绍"></a>2.2 组件介绍</h3><p><img src="/images/hdfs/ha.jpg" alt="img"></p>
+<h3 id="2-2-组件介绍"><a href="#2-2-组件介绍" class="headerlink" title="2.2 组件介绍"></a>2.2 组件介绍</h3><p><img data-src="/images/hdfs/ha.jpg" alt="img"></p>
 <p><code>ZKFailoverController</code></p>
 <p>是基于Zookeeper的故障转移控制器，它负责控制NameNode的主备切换，ZKFailoverController会监测NameNode的健康状态，当发现Active NameNode出现异常时会通过Zookeeper进行一次新的选举，完成Active和Standby状态的切换</p>
 <p><code>HealthMonitor</code></p>
@@ -677,7 +678,7 @@
 <p>NameNode包含了HDFS的元数据信息和数据块信息（blockmap），其中数据块信息通过DataNode主动向Active NameNode和Standby NameNode上报</p>
 <p><code>共享存储系统</code></p>
 <p>共享存储系统负责存储HDFS的元数据（EditsLog），Active NameNode（写入）和 Standby NameNode（读取）通过共享存储系统实现元数据同步，在主备切换过程中，新的Active NameNode必须确保元数据同步完成才能对外提供服务</p>
-<h2 id="3-Hadoop的联邦机制-Federation"><a href="#3-Hadoop的联邦机制-Federation" class="headerlink" title="3: Hadoop的联邦机制(Federation)"></a>3: Hadoop的联邦机制(Federation)</h2><p><img src="/images/hdfs/lb.jpg" alt="img"></p>
+<h2 id="3-Hadoop的联邦机制-Federation"><a href="#3-Hadoop的联邦机制-Federation" class="headerlink" title="3: Hadoop的联邦机制(Federation)"></a>3: Hadoop的联邦机制(Federation)</h2><p><img data-src="/images/hdfs/lb.jpg" alt="img"></p>
 <h3 id="3-1背景概述"><a href="#3-1背景概述" class="headerlink" title="3.1背景概述"></a>3.1<strong>背景概述</strong></h3><p>单NameNode的架构使得HDFS在集群扩展性和性能上都有潜在的问题，当集群大到一定程度后，NameNode进程使用的内存可能会达到上百G，NameNode成为了性能的瓶颈。因而提出了namenode水平扩展方案– Federation。</p>
 <p>Federation中文意思为联邦,联盟，是NameNode的Federation,也就是会有多个NameNode。多个NameNode的情况意味着有多个namespace(命名空间)，区别于HA模式下的多NameNode，它们是拥有着同一个namespace。既然说到了NameNode的命名空间的概念,</p>
 <p>我们可以很明显地看出现有的HDFS数据管理,数据存储2层分层的结构.也就是说,所有关于存储数据的信息和管理是放在NameNode这边,而真实数据的存储则是在各个DataNode下.而这些隶属于同一个NameNode所管理的数据都是在同一个命名空间下的.而一个namespace对应一个block pool。Block Pool是同一个namespace下的block的集合.当然这是我们最常见的单个namespace的情况,也就是一个NameNode管理集群中所有元数据信息的时候.如果我们遇到了之前提到的NameNode内存使用过高的问题,这时候怎么办?元数据空间依然还是在不断增大,一味调高NameNode的jvm大小绝对不是一个持久的办法.这时候就诞生了HDFS Federation的机制.</p>
@@ -960,6 +961,9 @@
 
   
   <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="true"></script>
+  <script src="true"></script>
   <script src="/lib/velocity/velocity.min.js"></script>
   <script src="/lib/velocity/velocity.ui.min.js"></script>
 

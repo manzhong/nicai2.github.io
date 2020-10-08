@@ -14,12 +14,13 @@
 
 <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css">
   <script src="/lib/pace/pace.min.js"></script>
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":false,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":false,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="JVM  一 Java -version  1 hotspot 热点探测 jvm核心 jdk1.5 之后有 为执行引擎  优化class文件 因为CPU不会直接执行class文件 要转为二进制才可以  2 jdk 有client 和server默认启动为client 可在jre&#x2F;lib&#x2F;i386 里吧两者顺序调整 前面的先起  当大型项目时 可改为server  在jdk1.8之后都默认为serv">
@@ -272,9 +273,9 @@
 <p>当大型项目时 可改为server</p>
 <p>在jdk1.8之后都默认为server 且client 为ignore</p>
 <p>二   Jvm结构</p>
-<p>​              <img src="/images/jvm/jvm%E7%BB%93%E6%9E%84%E5%9B%BE.jpg" alt="img">                </p>
-<p> <img src="/images/jvm/jvm%E7%AE%80%E4%BB%8B.jpg" alt="img"></p>
-<p> <img src="/images/jvm/jvm%E7%AE%80%E4%BB%8B2.jpg" alt="img"></p>
+<p>​              <img data-src="/images/jvm/jvm%E7%BB%93%E6%9E%84%E5%9B%BE.jpg" alt="img">                </p>
+<p> <img data-src="/images/jvm/jvm%E7%AE%80%E4%BB%8B.jpg" alt="img"></p>
+<p> <img data-src="/images/jvm/jvm%E7%AE%80%E4%BB%8B2.jpg" alt="img"></p>
 <p>三 堆结构图及分代</p>
 <p>Jvm 根据对象的存活周期不同 把堆内存分为 新生代,老年代,和永久代</p>
 <p>目的  提高对象内存分配和垃圾回收效率</p>
@@ -558,6 +559,9 @@
 
   
   <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="true"></script>
+  <script src="true"></script>
   <script src="/lib/velocity/velocity.min.js"></script>
   <script src="/lib/velocity/velocity.ui.min.js"></script>
 

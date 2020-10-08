@@ -14,12 +14,13 @@
 
 <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css">
   <script src="/lib/pace/pace.min.js"></script>
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":false,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":false,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="Zookeeper学习笔记 一概述 zookeeper是一个开源的分布式协调服务框架,主要解决分布式集群中应用系统的一致性问题和数据管理问题.    二特点 zoo本质上为一个分布式文件系统适合存放小文件.  Zookeeper 中存储的其实是一个又一个 Znode, Znode 是 Zookeeper 中的节点   * Znode 是有路径的, 例如 &#x2F;data&#x2F;host1, &#x2F;data&#x2F;hos">
@@ -267,7 +268,7 @@
 
       
         <h1 id="Zookeeper学习笔记"><a href="#Zookeeper学习笔记" class="headerlink" title="Zookeeper学习笔记"></a>Zookeeper学习笔记</h1><h2 id="一概述"><a href="#一概述" class="headerlink" title="一概述"></a>一概述</h2><p>zookeeper是一个开源的分布式协调服务框架,主要解决分布式集群中应用系统的一致性问题和数据管理问题.</p>
-<p><img src="/images/zookeeper/1-%E5%88%86%E5%B8%83%E5%BC%8F%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F.png" alt="img"></p>
+<p><img data-src="/images/zookeeper/1-%E5%88%86%E5%B8%83%E5%BC%8F%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F.png" alt="img"></p>
 <h2 id="二特点"><a href="#二特点" class="headerlink" title="二特点"></a>二特点</h2><p>zoo本质上为一个分布式文件系统适合存放小文件.</p>
 <p>Zookeeper 中存储的其实是一个又一个 Znode, Znode 是 Zookeeper 中的节点</p>
 <ul>
@@ -286,7 +287,7 @@
 <p>​     发布/订阅一般有两种设计模式：推模式和拉模式，服务端主动将数据更新发送给所有订阅的客户端称为推模式；客户端主动请求获取最新数据称为拉模式.</p>
 <p>   Zookeeper采用了推拉相结合的模式，客户端向服务端注册自己需要关注的节点，一旦该节点数据发生变更，那么服务端就会向相应的客户端推送Watcher事件通知，客户端接收到此通知后，主动到服务端获取最新的数据。</p>
 <h5 id="3-2-命名服务"><a href="#3-2-命名服务" class="headerlink" title="3.2 命名服务"></a>3.2 命名服务</h5><p>　　命名服务是分步实现系统中较为常见的一类场景，分布式系统中，被命名的实体通常可以是集群中的机器、提供的服务地址或远程对象等，通过命名服务，客户端可以根据指定名字来获取资源的实体，在分布式环境中，上层应用仅仅需要一个全局唯一的名字。Zookeeper可以实现一套分布式全局唯一ID的分配机制。</p>
-<p><img src="/images/zookeeper/1561706612382.png" alt="img"></p>
+<p><img data-src="/images/zookeeper/1561706612382.png" alt="img"></p>
 <p>　　通过调用Zookeeper节点创建的API接口就可以创建一个顺序节点，并且在API返回值中会返回这个节点的完整名字，利用此特性，可以生成全局ID，其步骤如下</p>
 <ol>
 <li>客户端根据任务类型，在指定类型的任务下通过调用接口创建一个顺序节点，如”job-“。</li>
@@ -300,15 +301,15 @@
 <p>　　③ <strong>系统调度</strong>，Zookeeper能够实现如下系统调度模式：分布式系统由控制台和一些客户端系统两部分构成，控制台的职责就是需要将一些指令信息发送给所有的客户端，以控制他们进行相应的业务逻辑，后台管理人员在控制台上做一些操作，实际上就是修改Zookeeper上某些节点的数据，Zookeeper可以把数据变更以时间通知的形式发送给订阅客户端。</p>
 <h5 id="3-4分布式锁"><a href="#3-4分布式锁" class="headerlink" title="3.4分布式锁"></a>3.4分布式锁</h5><p>　　分布式锁用于控制分布式系统之间同步访问共享资源的一种方式，可以保证不同系统访问一个或一组资源时的一致性，主要分为排它锁和共享锁。</p>
 <p>　　<a href=""><strong>排它锁又称为写锁或独占锁</strong></a>，若事务T1对数据对象O1加上了排它锁，那么在整个加锁期间，只允许事务T1对O1进行读取和更新操作，其他任何事务都不能再对这个数据对象进行任何类型的操作，直到T1释放了排它锁。</p>
-<p><img src="/images/zookeeper/1561706638372.png" alt="img">　</p>
+<p><img data-src="/images/zookeeper/1561706638372.png" alt="img">　</p>
 <p>　① <strong>获取锁</strong>，在需要获取排它锁时，所有客户端通过调用接口，在/exclusive_lock节点下创建临时子节点/exclusive_lock/lock。Zookeeper可以保证只有一个客户端能够创建成功，没有成功的客户端需要注册/exclusive_lock节点监听。</p>
 <p>　② <strong>释放锁</strong>，当获取锁的客户端宕机或者正常完成业务逻辑都会导致临时节点的删除，此时，所有在/exclusive_lock节点上注册监听的客户端都会收到通知，可以重新发起分布式锁获取。</p>
 <p><a href=""><strong>共享锁又称为读锁</strong></a>，若事务T1对数据对象O1加上共享锁，那么当前事务只能对O1进行读取操作，其他事务也只能对这个数据对象加共享锁，直到该数据对象上的所有共享锁都被释放。在需要获取共享锁时，所有客户端都会到/shared_lock下面创建一个临时顺序节点</p>
-<p><img src="/images/zookeeper/1558060430149.png" alt="img">　</p>
+<p><img data-src="/images/zookeeper/1558060430149.png" alt="img">　</p>
 <h5 id="3-5-分布式队列"><a href="#3-5-分布式队列" class="headerlink" title="3.5 分布式队列"></a>3.5 分布式队列</h5><p>　 有一些时候，多个团队需要共同完成一个任务，比如，A团队将Hadoop集群计算的结果交给B团队继续计算，B完成了自己任务再交给C团队继续做。这就有点像业务系统的工作流一样，一环一环地传下 去.</p>
 <p>   分布式环境下，我们同样需要一个类似单进程队列的组件，用来实现跨进程、跨主机、跨网络的数据共享和数据传递，这就是我们的分布式队列。 </p>
 <h2 id="四架构"><a href="#四架构" class="headerlink" title="四架构"></a>四架构</h2><p>Zookeeper集群是一个基于主从架构的高可用集群</p>
-<p><img src="/images/zookeeper/Zookeeper%E7%9A%84%E6%9E%B6%E6%9E%84.jpg"></p>
+<p><img data-src="/images/zookeeper/Zookeeper%E7%9A%84%E6%9E%B6%E6%9E%84.jpg"></p>
 <p>​     每个服务器承担如下三种角色中的一种</p>
 <ul>
 <li><p><strong>Leader</strong> 一个Zookeeper集群同一时间只会有一个实际工作的Leader，它会发起并维护与各Follwer及Observer间的心跳。所有的写操作必须要通过Leader完成再由Leader将写操作广播给其它服务器。</p>
@@ -882,6 +883,9 @@
 
   
   <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="true"></script>
+  <script src="true"></script>
   <script src="/lib/velocity/velocity.min.js"></script>
   <script src="/lib/velocity/velocity.ui.min.js"></script>
 

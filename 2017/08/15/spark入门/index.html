@@ -14,12 +14,13 @@
 
 <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css">
   <script src="/lib/pace/pace.min.js"></script>
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":false,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":false,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="#一 Spark 概述  ##1 什么是Spark  Apache Spark 是一个快速的, 多用途的集群计算系统, 相对于 Hadoop MapReduce 将中间结果保存在磁盘中, Spark 使用了内存保存中间结果, 能在数据尚未写入硬盘时在内存中进行运算.  Spark 只是一个计算框架, 不像 Hadoop 一样包含了分布式文件系统和完备的调度系统, 如果要使用 Spark, 需要搭载">
@@ -337,7 +338,7 @@
 <li>Spark 提供了 批处理(RDDs), 结构化查询(DataFrame), 流计算(SparkStreaming), 机器学习(MLlib), 图计算(GraphX) 等组件</li>
 <li>这些组件均是依托于通用的计算引擎 RDDs 而构建出的, 所以 <code>spark-core</code> 的 RDDs 是整个 Spark 的基础</li>
 </ul>
-<p><img src="/images/spark/zj.jpg" alt="img"></p>
+<p><img data-src="/images/spark/zj.jpg" alt="img"></p>
 <h3 id="Spark和Hadoop的异同"><a href="#Spark和Hadoop的异同" class="headerlink" title="Spark和Hadoop的异同"></a>Spark和Hadoop的异同</h3><table>
 <thead>
 <tr>
@@ -374,7 +375,7 @@
 </tbody></table>
 <h1 id="二-集群搭建"><a href="#二-集群搭建" class="headerlink" title="二 集群搭建"></a>二 集群搭建</h1><h2 id="1-spark集群结构"><a href="#1-spark集群结构" class="headerlink" title="1 spark集群结构"></a>1 spark集群结构</h2><p>Spark 自身是没有集群管理工具的, 但是如果想要管理数以千计台机器的集群, 没有一个集群管理工具还不太现实, 所以 Spark 可以借助外部的集群工具来进行管理</p>
 <p>整个流程就是使用 Spark 的 Client 提交任务, 找到集群管理工具申请资源, 后将计算任务分发到集群中运行</p>
-<p><img src="/images/spark/j.png" alt="img"></p>
+<p><img data-src="/images/spark/j.png" alt="img"></p>
 <p>名词解释</p>
 <ul>
 <li><p><code>Driver</code></p>
@@ -416,12 +417,12 @@
 <li>Kubernetes</li>
 </ul>
 <p><strong>Driver 和 Worker 什么时候被启动?</strong></p>
-<p><img src="/images/spark/s.png" alt="img"></p>
+<p><img data-src="/images/spark/s.png" alt="img"></p>
 <ul>
 <li>Standalone 集群中, 分为两个角色: Master 和 Slave, 而 Slave 就是 Worker, 所以在 Standalone 集群中, 启动之初就会创建固定数量的 Worker</li>
 <li>Driver 的启动分为两种模式: Client 和 Cluster. 在 Client 模式下, Driver 运行在 Client 端, 在 Client 启动的时候被启动. 在 Cluster 模式下, Driver 运行在某个 Worker 中, 随着应用的提交而启动</li>
 </ul>
-<p><img src="/images/spark/ya.png" alt="img"></p>
+<p><img data-src="/images/spark/ya.png" alt="img"></p>
 <ul>
 <li>在 Yarn 集群模式下, 也依然分为 Client 模式和 Cluster 模式, 较新的版本中已经逐渐在废弃 Client 模式了, 所以上图所示为 Cluster 模式</li>
 <li>如果要在 Yarn 中运行 Spark 程序, 首先会和 RM 交互, 开启 ApplicationMaster, 其中运行了 Driver, Driver创建基础环境后, 会由 RM 提供对应的容器, 运行 Executor, Executor会反向向 Driver 反向注册自己, 并申请 Tasks 执行</li>
@@ -579,7 +580,7 @@
 <ul>
 <li>蒙特卡洛算法概述</li>
 </ul>
-<p><img src="/images/spark/sf.png" alt="img"></p>
+<p><img data-src="/images/spark/sf.png" alt="img"></p>
 <p>通过迭代循环投点的方式实现蒙特卡洛算法求圆周率</p>
 <ul>
 <li><p>计算过程</p>
@@ -637,7 +638,7 @@
 <p>上述代码中 <code>sc</code> 变量指的是 SparkContext, 是 Spark 程序的上下文和入口</p>
 <p>正常情况下我们需要自己创建, 但是如果使用 Spark shell 的话, Spark shell 会帮助我们创建, 并且以变量 <code>sc</code> 的形式提供给我们调用</p>
 <p><strong>运行流程</strong></p>
-<p><img src="/images/spark/yxlc.png" alt="img"></p>
+<p><img data-src="/images/spark/yxlc.png" alt="img"></p>
 <ol>
 <li><code>flatMap(_.split(&quot; &quot;))</code> 将数据转为数组的形式, 并展平为多个数据</li>
 <li><code>map_, 1</code> 将数据转换为元组的形式</li>
@@ -795,7 +796,7 @@
 <li>RDD 是只读的</li>
 <li>RDD 之间有依赖关系, 根据执行操作的操作符的不同, 依赖关系可以分为宽依赖和窄依赖</li>
 </ol>
-<h2 id="2-rdd-分区"><a href="#2-rdd-分区" class="headerlink" title="2 rdd 分区"></a>2 rdd 分区</h2><p><img src="/images/spark/rddf.png" alt="img"></p>
+<h2 id="2-rdd-分区"><a href="#2-rdd-分区" class="headerlink" title="2 rdd 分区"></a>2 rdd 分区</h2><p><img data-src="/images/spark/rddf.png" alt="img"></p>
 <p>整个 WordCount 案例的程序从结构上可以用上图表示, 分为两个大部分</p>
 <p>存储</p>
 <p>文件如果存放在 HDFS 上, 是分块的, 类似上图所示, 这个 <code>wordcount.txt</code> 分了三块</p>
@@ -1190,6 +1191,9 @@
 
   
   <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="true"></script>
+  <script src="true"></script>
   <script src="/lib/velocity/velocity.min.js"></script>
   <script src="/lib/velocity/velocity.ui.min.js"></script>
 

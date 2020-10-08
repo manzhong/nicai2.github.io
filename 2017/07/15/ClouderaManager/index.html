@@ -14,12 +14,13 @@
 
 <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css">
   <script src="/lib/pace/pace.min.js"></script>
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":false,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":false,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="ClouderaManager cm 管理工具,用来安装cdh  cdh (cloudera distribute hadoop)  版本:5.14.0  Cloudera Manager是cloudera公司提供的一种大数据的解决方案，可以通过ClouderaManager管理界面来对我们的集群进行安装和操作，提供了良好的UI界面交互，使得我们管理集群不用熟悉任何的linux技术，只需要通过网页">
@@ -277,7 +278,7 @@
 <p>cdh (cloudera distribute hadoop&lt;hadoop,zookeeper,hbase……&gt;)</p>
 <p>版本:5.14.0</p>
 <p>Cloudera Manager是cloudera公司提供的一种大数据的解决方案，可以通过ClouderaManager管理界面来对我们的集群进行安装和操作，提供了良好的UI界面交互，使得我们管理集群不用熟悉任何的linux技术，只需要通过网页浏览器就可以实现我们的集群的操作和管理，让我们使用和管理集群更加的方便。</p>
-<h1 id="1、ClouderaManager整体架构"><a href="#1、ClouderaManager整体架构" class="headerlink" title="1、ClouderaManager整体架构"></a>1、ClouderaManager整体架构</h1><p><img src="/images/ClouderaManager/clip_image001.png" alt="img"></p>
+<h1 id="1、ClouderaManager整体架构"><a href="#1、ClouderaManager整体架构" class="headerlink" title="1、ClouderaManager整体架构"></a>1、ClouderaManager整体架构</h1><p><img data-src="/images/ClouderaManager/clip_image001.png" alt="img"></p>
 <p>Cloudera Manager的核心是Cloudera Manager Server。Server托管Admin Console Web Server和应用程序逻辑。它负责安装软件、配置、启动和停止服务以及管理运行服务的群集。</p>
 <p>解释：</p>
 <p>·        Agent：安装在每台主机上。它负责启动和停止进程，解压缩配置，触发安装和监控主机</p>
@@ -386,7 +387,7 @@
 
 <h2 id="2-4、两台机器关闭selinux"><a href="#2-4、两台机器关闭selinux" class="headerlink" title="2.4、两台机器关闭selinux"></a>2.4、两台机器关闭selinux</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">vim &#x2F;etc&#x2F;selinux&#x2F;config</span><br><span class="line">SELINUX&#x3D;disabled</span><br></pre></td></tr></table></figure>
 
-<p><img src="/images/ClouderaManager/clip_image003.jpg" alt="img"></p>
+<p><img data-src="/images/ClouderaManager/clip_image003.jpg" alt="img"></p>
 <h2 id="2-5、两台机器安装jdk"><a href="#2-5、两台机器安装jdk" class="headerlink" title="2.5、两台机器安装jdk"></a>2.5、两台机器安装jdk</h2><p>将我们的jdk的压缩包上传到node01.hadoop.com的/export/softwares路径下</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd &#x2F;export&#x2F;softwares&#x2F;</span><br><span class="line">tar -zxvf jdk-8u141-linux-x64.tar.gz  -C &#x2F;export&#x2F;servers&#x2F;</span><br></pre></td></tr></table></figure>
 
@@ -399,7 +400,7 @@
 <h2 id="2-6、两台机器实现SSH免密码登录"><a href="#2-6、两台机器实现SSH免密码登录" class="headerlink" title="2.6、两台机器实现SSH免密码登录"></a>2.6、两台机器实现SSH免密码登录</h2><h3 id="第一步：两台器生成公钥与私钥"><a href="#第一步：两台器生成公钥与私钥" class="headerlink" title="第一步：两台器生成公钥与私钥"></a>第一步：两台器生成公钥与私钥</h3><p>两台机器上面执行以下命令，然后按下三个回车键即可生成公钥与私钥</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa</span><br></pre></td></tr></table></figure>
 
-<p><img src="/images/ClouderaManager/clip_image005.jpg" alt="img"></p>
+<p><img data-src="/images/ClouderaManager/clip_image005.jpg" alt="img"></p>
 <h3 id="第二步：两台机器将公钥拷贝到同一个文件当中去"><a href="#第二步：两台机器将公钥拷贝到同一个文件当中去" class="headerlink" title="第二步：两台机器将公钥拷贝到同一个文件当中去"></a>第二步：两台机器将公钥拷贝到同一个文件当中去</h3><p>两台机器执行以下命令</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-copy-id node01.hadoop.com</span><br></pre></td></tr></table></figure>
 
@@ -409,7 +410,7 @@
 <h2 id="2-7、第二台机器安装mysql数据库"><a href="#2-7、第二台机器安装mysql数据库" class="headerlink" title="2.7、第二台机器安装mysql数据库"></a>2.7、第二台机器安装mysql数据库</h2><p>通过yum源，在线安装mysql</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">yum  install  mysql  mysql-server  mysql-devel</span><br><span class="line">&#x2F;etc&#x2F;init.d&#x2F;mysqld start</span><br><span class="line">&#x2F;usr&#x2F;bin&#x2F;mysql_secure_installation</span><br><span class="line"> grant all privileges on . to &#39;root&#39;@&#39;%&#39; identified by &#39;123456&#39; with grant option;</span><br><span class="line"> flush privileges;</span><br></pre></td></tr></table></figure>
 
-<p><img src="/images/ClouderaManager/clip_image007.jpg" alt="img"></p>
+<p><img data-src="/images/ClouderaManager/clip_image007.jpg" alt="img"></p>
 <h2 id="2-8、解除linux系统打开文件最大数量的限制"><a href="#2-8、解除linux系统打开文件最大数量的限制" class="headerlink" title="2.8、解除linux系统打开文件最大数量的限制"></a>2.8、解除linux系统打开文件最大数量的限制</h2><p>两台机器都需要执行</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi &#x2F;etc&#x2F;security&#x2F;limits.conf</span><br></pre></td></tr></table></figure>
 
@@ -429,7 +430,7 @@
 <p>并编辑文件rc.local ：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">vim &#x2F;etc&#x2F;rc.local</span><br><span class="line"></span><br><span class="line">echo never &gt; &#x2F;sys&#x2F;kernel&#x2F;mm&#x2F;transparent_hugepage&#x2F;defrag</span><br><span class="line">echo never &gt; &#x2F;sys&#x2F;kernel&#x2F;mm&#x2F;transparent_hugepage&#x2F;enabled</span><br></pre></td></tr></table></figure>
 
-<p><img src="/images/ClouderaManager/clip_image009.jpg" alt="img"></p>
+<p><img data-src="/images/ClouderaManager/clip_image009.jpg" alt="img"></p>
 <h2 id="2-10、两台机器时钟同步"><a href="#2-10、两台机器时钟同步" class="headerlink" title="2.10、两台机器时钟同步"></a>2.10、两台机器时钟同步</h2><p>两台机器需要进行时钟同步操作，保证两台机器时间相同</p>
 <h1 id="3、clouderaManager安装资源下载"><a href="#3、clouderaManager安装资源下载" class="headerlink" title="3、clouderaManager安装资源下载"></a>3、clouderaManager安装资源下载</h1><h2 id="第一步：下载安装资源并上传到服务器"><a href="#第一步：下载安装资源并上传到服务器" class="headerlink" title="第一步：下载安装资源并上传到服务器"></a>第一步：下载安装资源并上传到服务器</h2><p>我们这里安装CM5.14.0这个版本，需要下载以下这些资源，一共是四个文件即可</p>
 <p>下载cm5的压缩包</p>
@@ -446,18 +447,18 @@
 <p>第三个文件具体下载地址：</p>
 <p><a target="_blank" rel="noopener" href="http://archive.cloudera.com/cdh5/parcels/5.14.0/manifest.json">http://archive.cloudera.com/cdh5/parcels/5.14.0/manifest.json</a></p>
 <p>将这四个安装包都上传到第一台机器的/opt/softwares路径下</p>
-<p><img src="/images/ClouderaManager/clip_image011.jpg" alt="img"></p>
+<p><img data-src="/images/ClouderaManager/clip_image011.jpg" alt="img"></p>
 <h2 id="第二步：解压压缩包到指定路径"><a href="#第二步：解压压缩包到指定路径" class="headerlink" title="第二步：解压压缩包到指定路径"></a>第二步：解压压缩包到指定路径</h2><p>解压CM安装包到/opt路径下去</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cd &#x2F;export&#x2F;softwares</span><br><span class="line"></span><br><span class="line">tar -zxvf cloudera-manager-el6-cm5.14.0_x86_64.tar.gz -C &#x2F;opt&#x2F;</span><br></pre></td></tr></table></figure>
 
 <h2 id="第三步：将我们的parcel包的三个文件拷贝到对应路径"><a href="#第三步：将我们的parcel包的三个文件拷贝到对应路径" class="headerlink" title="第三步：将我们的parcel包的三个文件拷贝到对应路径"></a>第三步：将我们的parcel包的三个文件拷贝到对应路径</h2><p>将我们的parcel包含三个文件，拷贝到/opt/cloudera/parcel-repo路径下面去，并记得有个文件需要重命名</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cd &#x2F;export&#x2F;softwares&#x2F;</span><br><span class="line"></span><br><span class="line">cp CDH-5.14.0-1.cdh5.14.0.p0.24-el6.parcel CDH-5.14.0-1.cdh5.14.0.p0.24-el6.parcel.sha1 manifest.json  &#x2F;opt&#x2F;cloudera&#x2F;parcel-repo&#x2F;</span><br></pre></td></tr></table></figure>
 
-<p><img src="/images/ClouderaManager/clip_image013.jpg" alt="img"></p>
+<p><img data-src="/images/ClouderaManager/clip_image013.jpg" alt="img"></p>
 <p>重命名标黄的这个文件</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cd &#x2F;opt&#x2F;cloudera&#x2F;parcel-repo&#x2F;</span><br><span class="line"></span><br><span class="line">mv CDH-5.14.0-1.cdh5.14.0.p0.24-el6.parcel.sha1 CDH-5.14.0-1.cdh5.14.0.p0.24-el6.parcel.sha</span><br></pre></td></tr></table></figure>
 
-<p><img src="/images/ClouderaManager/clip_image015.jpg" alt="img"></p>
+<p><img data-src="/images/ClouderaManager/clip_image015.jpg" alt="img"></p>
 <h2 id="第四步：所有节点添加普通用户并给与sudo权限"><a href="#第四步：所有节点添加普通用户并给与sudo权限" class="headerlink" title="第四步：所有节点添加普通用户并给与sudo权限"></a>第四步：所有节点添加普通用户并给与sudo权限</h2><p>在node01机器上面添加普通用户并赋予sudo权限</p>
 <p>执行以下命令创建普通用户cloudera-scm</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">useradd --system --home&#x3D;&#x2F;opt&#x2F;cm-5.14.0&#x2F;run&#x2F;cloudera-scm-server --no-create-home --shell&#x3D;&#x2F;bin&#x2F;false --comment &quot;Cloudera SCM User&quot; cloudera-scm</span><br></pre></td></tr></table></figure>
@@ -465,11 +466,11 @@
 <p>赋予cloudera-scm普通用户的sudo权限</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">vim &#x2F;etc&#x2F;sudoers</span><br><span class="line"></span><br><span class="line">cloudera-scm ALL&#x3D;(ALL) NOPASSWD: ALL</span><br></pre></td></tr></table></figure>
 
-<p><img src="/images/ClouderaManager/clip_image017.jpg" alt="img"></p>
+<p><img data-src="/images/ClouderaManager/clip_image017.jpg" alt="img"></p>
 <h2 id="第五步：更改主节点的配置文件"><a href="#第五步：更改主节点的配置文件" class="headerlink" title="第五步：更改主节点的配置文件"></a>第五步：更改主节点的配置文件</h2><p>node01机器上面更改配置文件</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">vim &#x2F;opt&#x2F;cm-5.14.0&#x2F;etc&#x2F;cloudera-scm-agent&#x2F;config.ini</span><br><span class="line"></span><br><span class="line">server_host&#x3D;node01.hadoop.com</span><br></pre></td></tr></table></figure>
 
-<p><img src="/images/ClouderaManager/clip_image019.jpg" alt="img"></p>
+<p><img data-src="/images/ClouderaManager/clip_image019.jpg" alt="img"></p>
 <h2 id="第六步：将-opt目录下的安装包发放到其他机器"><a href="#第六步：将-opt目录下的安装包发放到其他机器" class="headerlink" title="第六步：将/opt目录下的安装包发放到其他机器"></a>第六步：将/opt目录下的安装包发放到其他机器</h2><p>将第一台机器的安装包发放到其他机器</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cd &#x2F;opt</span><br><span class="line"></span><br><span class="line">scp -r cloudera&#x2F; cm-5.14.0&#x2F; node02:&#x2F;opt</span><br></pre></td></tr></table></figure>
 
@@ -486,11 +487,11 @@
 <h2 id="第九步：为clouderaManager创建数据库"><a href="#第九步：为clouderaManager创建数据库" class="headerlink" title="第九步：为clouderaManager创建数据库"></a>第九步：为clouderaManager创建数据库</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;opt&#x2F;cm-5.14.0&#x2F;share&#x2F;cmf&#x2F;schema&#x2F;scm_prepare_database.sh mysql -hnode02  -uroot -p123456 --scm-host node01 scm root 123456</span><br></pre></td></tr></table></figure>
 
 <p>命令说明：/<strong>opt</strong>/<strong>cm</strong>-5.14.0/share/cmf/schema/scm_prepare_database.<strong>sh</strong> 数据库类型 -h数据库主机 –u数据库用户名 –p数据库密码 –scm-host <strong>cm</strong>主机  数据库名称  用户名  密码</p>
-<p><img src="/images/ClouderaManager/clip_image021.jpg" alt="img"></p>
+<p><img data-src="/images/ClouderaManager/clip_image021.jpg" alt="img"></p>
 <h2 id="第十步：启动服务"><a href="#第十步：启动服务" class="headerlink" title="第十步：启动服务"></a>第十步：启动服务</h2><p>主节点启动clouderaManager Server与ClouderaManager  agent服务</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;opt&#x2F;cm-5.14.0&#x2F;etc&#x2F;init.d&#x2F;cloudera-scm-server start</span><br><span class="line"></span><br><span class="line">&#x2F;opt&#x2F;cm-5.14.0&#x2F;etc&#x2F;init.d&#x2F;cloudera-scm-agent start</span><br></pre></td></tr></table></figure>
 
-<p><img src="/images/ClouderaManager/clip_image023.jpg" alt="img"></p>
+<p><img data-src="/images/ClouderaManager/clip_image023.jpg" alt="img"></p>
 <p>从节点node02启动ClouderaManager agent服务</p>
 <h2 id="第十一步：浏览器页面访问"><a href="#第十一步：浏览器页面访问" class="headerlink" title="第十一步：浏览器页面访问"></a>第十一步：浏览器页面访问</h2><p><a target="_blank" rel="noopener" href="http://node01:7180/cmf/login">http://node01:7180/cmf/login</a></p>
 <p>默认用户名admin</p>
@@ -759,6 +760,9 @@
 
   
   <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="true"></script>
+  <script src="true"></script>
   <script src="/lib/velocity/velocity.min.js"></script>
   <script src="/lib/velocity/velocity.ui.min.js"></script>
 

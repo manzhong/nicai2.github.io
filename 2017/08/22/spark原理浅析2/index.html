@@ -14,12 +14,13 @@
 
 <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css">
   <script src="/lib/pace/pace.min.js"></script>
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":false,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":false,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="一 原理 1 spark部署情况 在 Spark 部分的底层执行逻辑开始之前, 还是要先认识一下 Spark 的部署情况, 根据部署情况, 从而理解如何调度.    针对于上图, 首先可以看到整体上在集群中运行的角色有如下几个:   * Master Daemon        负责管理 Master 节点, 协调资源的获取, 以及连接 Worker 节点来运行 Executor, 是 Spark">
@@ -310,7 +311,7 @@
 
       
         <h1 id="一-原理"><a href="#一-原理" class="headerlink" title="一 原理"></a>一 原理</h1><h2 id="1-spark部署情况"><a href="#1-spark部署情况" class="headerlink" title="1 spark部署情况"></a>1 spark部署情况</h2><p>在 <code>Spark</code> 部分的底层执行逻辑开始之前, 还是要先认识一下 <code>Spark</code> 的部署情况, 根据部署情况, 从而理解如何调度.</p>
-<p><img src="/images/sparkyl/dc1.png" alt="img"></p>
+<p><img data-src="/images/sparkyl/dc1.png" alt="img"></p>
 <p>针对于上图, 首先可以看到整体上在集群中运行的角色有如下几个:</p>
 <ul>
 <li><p><code>Master Daemon</code></p>
@@ -335,7 +336,7 @@
 </li>
 </ul>
 <h2 id="2-逻辑执行图-简述"><a href="#2-逻辑执行图-简述" class="headerlink" title="2 逻辑执行图  简述"></a>2 逻辑执行图  简述</h2><p><strong>描述数据如何流动,如何计算  实际并不存在,只是保存了rdd之间的关系</strong></p>
-<p><img src="/images/sparkyl/dc2.png" alt="img"></p>
+<p><img data-src="/images/sparkyl/dc2.png" alt="img"></p>
 <p>其实 RDD 并没有什么严格的逻辑执行图和物理执行图的概念, 这里也只是借用这个概念, 从而让整个 RDD 的原理可以解释, 好理解.</p>
 <p>对于 RDD 的逻辑执行图, 起始于第一个入口 RDD 的创建, 结束于 Action 算子执行之前, 主要的过程就是生成一组互相有依赖关系的 RDD, 其并不会真的执行, 只是表示 RDD 之间的关系, 数据的流转过程.</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rdd.toDebugString  预运行  结果就是一个逻辑执行图</span><br></pre></td></tr></table></figure>
@@ -343,7 +344,7 @@
 <h2 id="3-物理执行图-简述"><a href="#3-物理执行图-简述" class="headerlink" title="3 物理执行图 简述"></a>3 物理执行图 简述</h2><p>当触发 Action 执行的时候, 这一组互相依赖的 RDD 要被处理, 所以要转化为可运行的物理执行图, 调度到集群中执行.</p>
 <p>因为大部分 RDD 是不真正存放数据的, 只是数据从中流转, 所以, 不能直接在集群中运行 RDD, 要有一种 Pipeline 的思想, 需要将这组 RDD 转为 Stage 和 Task, 从而运行 Task, 优化整体执行速度.</p>
 <p>以上的逻辑执行图会生成如下的物理执行图, 这一切发生在 Action 操作被执行时.</p>
-<p><img src="/images/sparkyl/dc3.png" alt="img"></p>
+<p><img data-src="/images/sparkyl/dc3.png" alt="img"></p>
 <p>从上图可以总结如下几个点</p>
 <ul>
 <li>1 —&gt; 2–&gt;3在第一个 <code>Stage</code> 中, 每一个这样的执行流程是一个 <code>Task</code>, 也就是在同一个 Stage 中的所有 RDD 的对应分区, 在同一个 Task 中执行</li>
@@ -351,7 +352,7 @@
 </ul>
 <h2 id="4-逻辑执行图-详述"><a href="#4-逻辑执行图-详述" class="headerlink" title="4 逻辑执行图 详述"></a>4 逻辑执行图 详述</h2><h3 id="1-明确逻辑计划的边界"><a href="#1-明确逻辑计划的边界" class="headerlink" title="1 明确逻辑计划的边界"></a>1 明确逻辑计划的边界</h3><p>在 <code>Action</code> 调用之前, 会生成一系列的 <code>RDD</code>, 这些 <code>RDD</code> 之间的关系, 其实就是整个逻辑计划</p>
 <p> 如果生成逻辑计划的, 会生成如下一些 <code>RDD</code>, 这些 <code>RDD</code> 是相互关联的, 这些 <code>RDD</code> 之间, 其实本质上生成的就是一个 <strong>计算链</strong></p>
-<p><img src="/images/sparkyl/dc4.png" alt="img"></p>
+<p><img data-src="/images/sparkyl/dc4.png" alt="img"></p>
 <p>接下来, 采用迭代渐进式的方式, 一步一步的查看一下整体上的生成过程</p>
 <p>开始: 第一个rdd创建开始</p>
 <p>结束:  逻辑图到action算子执行之前及结束 </p>
@@ -362,7 +363,7 @@
 <p>源码:</p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">textFile</span></span>(</span><br><span class="line">      path: <span class="type">String</span>,</span><br><span class="line">      minPartitions: <span class="type">Int</span> = defaultMinPartitions): <span class="type">RDD</span>[<span class="type">String</span>] = withScope &#123;</span><br><span class="line">    assertNotStopped()</span><br><span class="line">    hadoopFile(path, classOf[<span class="type">TextInputFormat</span>], classOf[<span class="type">LongWritable</span>], classOf[<span class="type">Text</span>],</span><br><span class="line">      minPartitions).map(pair =&gt; pair._2.toString).setName(path)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hadoopFile</span></span>[<span class="type">K</span>, <span class="type">V</span>](</span><br><span class="line">      path: <span class="type">String</span>,</span><br><span class="line">      inputFormatClass: <span class="type">Class</span>[_ &lt;: <span class="type">InputFormat</span>[<span class="type">K</span>, <span class="type">V</span>]],</span><br><span class="line">      keyClass: <span class="type">Class</span>[<span class="type">K</span>],</span><br><span class="line">      valueClass: <span class="type">Class</span>[<span class="type">V</span>],</span><br><span class="line">      minPartitions: <span class="type">Int</span> = defaultMinPartitions): <span class="type">RDD</span>[(<span class="type">K</span>, <span class="type">V</span>)] = withScope &#123;</span><br><span class="line">    assertNotStopped()</span><br><span class="line"></span><br><span class="line">    <span class="comment">// This is a hack to enforce loading hdfs-site.xml.</span></span><br><span class="line">    <span class="comment">// See SPARK-11227 for details.</span></span><br><span class="line">    <span class="type">FileSystem</span>.getLocal(hadoopConfiguration)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// A Hadoop configuration can be about 10 KB, which is pretty big, so broadcast it.</span></span><br><span class="line">    <span class="keyword">val</span> confBroadcast = broadcast(<span class="keyword">new</span> <span class="type">SerializableConfiguration</span>(hadoopConfiguration))</span><br><span class="line">    <span class="keyword">val</span> setInputPathsFunc = (jobConf: <span class="type">JobConf</span>) =&gt; <span class="type">FileInputFormat</span>.setInputPaths(jobConf, path)</span><br><span class="line">    <span class="keyword">new</span> <span class="type">HadoopRDD</span>(</span><br><span class="line">      <span class="keyword">this</span>,</span><br><span class="line">      confBroadcast,</span><br><span class="line">      <span class="type">Some</span>(setInputPathsFunc),</span><br><span class="line">      inputFormatClass,</span><br><span class="line">      keyClass,</span><br><span class="line">      valueClass,</span><br><span class="line">      minPartitions).setName(path)</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
 
-<h4 id="2HadoopRDD-的-Partitions-对应了-HDFS-的-Blocks"><a href="#2HadoopRDD-的-Partitions-对应了-HDFS-的-Blocks" class="headerlink" title="2HadoopRDD 的 Partitions 对应了 HDFS 的 Blocks"></a>2<code>HadoopRDD</code> 的 <code>Partitions</code> 对应了 <code>HDFS</code> 的 <code>Blocks</code></h4><p><img src="/images/sparkyl/dc5.png" alt="img"></p>
+<h4 id="2HadoopRDD-的-Partitions-对应了-HDFS-的-Blocks"><a href="#2HadoopRDD-的-Partitions-对应了-HDFS-的-Blocks" class="headerlink" title="2HadoopRDD 的 Partitions 对应了 HDFS 的 Blocks"></a>2<code>HadoopRDD</code> 的 <code>Partitions</code> 对应了 <code>HDFS</code> 的 <code>Blocks</code></h4><p><img data-src="/images/sparkyl/dc5.png" alt="img"></p>
 <p>其实本质上每个 <code>HadoopRDD</code> 的 <code>Partition</code> 都是对应了一个 <code>Hadoop</code> 的 <code>Block</code>, 通过 <code>InputFormat</code> 来确定 <code>Hadoop</code> 中的 <code>Block</code> 的位置和边界, 从而可以供一些算子使用</p>
 <h4 id="3HadoopRDD-的-compute-函数就是在读取-HDFS-中的-Block"><a href="#3HadoopRDD-的-compute-函数就是在读取-HDFS-中的-Block" class="headerlink" title="3HadoopRDD 的 compute 函数就是在读取 HDFS 中的 Block"></a>3<code>HadoopRDD</code> 的 <code>compute</code> 函数就是在读取 <code>HDFS</code> 中的 <code>Block</code></h4><p>本质上, <code>compute</code> 还是依然使用 <code>InputFormat</code> 来读取 <code>HDFS</code> 中对应分区的 <code>Block</code></p>
 <h4 id="4textFile-这个算子生成的其实是一个-MapPartitionsRDD"><a href="#4textFile-这个算子生成的其实是一个-MapPartitionsRDD" class="headerlink" title="4textFile 这个算子生成的其实是一个 MapPartitionsRDD"></a>4<code>textFile</code> 这个算子生成的其实是一个 <code>MapPartitionsRDD</code></h4><p><code>textFile</code> 这个算子的作用是读取 <code>HDFS</code> 上的文件, 但是 <code>HadoopRDD</code> 中存放是一个元组, 其 <code>Key</code> 是行号, 其 <code>Value</code> 是 <code>Hadoop</code> 中定义的 <code>Text</code> 对象, 这一点和 <code>MapReduce</code> 程序中的行为是一致的</p>
@@ -410,7 +411,7 @@
 <p>所以如何计算 <code>RDD</code> 中的数据呢? 一定是通过其它的组件来计算的, 而计算的规则, 由 <code>RDD</code> 中的 <code>Compute</code> 函数来指定, 不同类型的 <code>RDD</code> 子类有不同的 <code>Compute</code> 函数</p>
 <h3 id="4-rdd之间的依赖关系"><a href="#4-rdd之间的依赖关系" class="headerlink" title="4 rdd之间的依赖关系"></a>4 rdd之间的依赖关系</h3><p>这个关系不是指rdd之间的关系,而是分区之间的关系   map 和flatMap这两个算子的关系是1 对1 </p>
 <p>有shuffle的不是一对一  而是多对一</p>
-<h4 id="4-1-什么是依赖"><a href="#4-1-什么是依赖" class="headerlink" title="4.1 什么是依赖"></a>4.1 什么是依赖</h4><p><img src="/images/sparkyl/dcy1.png" alt="img"></p>
+<h4 id="4-1-什么是依赖"><a href="#4-1-什么是依赖" class="headerlink" title="4.1 什么是依赖"></a>4.1 什么是依赖</h4><p><img data-src="/images/sparkyl/dcy1.png" alt="img"></p>
 <ul>
 <li><p>什么是关系(依赖关系) ?</p>
 <p>从算子视角上来看, <code>splitRDD</code> 通过 <code>map</code> 算子得到了 <code>tupleRDD</code>, 所以 <code>splitRDD</code> 和 <code>tupleRDD</code> 之间的关系是 <code>map</code></p>
@@ -424,13 +425,13 @@
 </ul>
 <p><strong><code>reduceByKey</code> 算子会生成 <code>ShuffledRDD</code></strong></p>
 <p><code>reduceByKey</code> 是由算子 <code>combineByKey</code> 来实现的, <code>combineByKey</code> 内部会创建 <code>ShuffledRDD</code> 返回, 而整个 <code>reduceByKey</code> 操作大致如下过程</p>
-<p><img src="/images/sparkyl/dcy2.png" alt="img"></p>
+<p><img data-src="/images/sparkyl/dcy2.png" alt="img"></p>
 <p>去掉两个 <code>reducer</code> 端的分区, 只留下一个的话, 如下</p>
-<p><img src="/images/sparkyl/dcy3.png" alt="img"></p>
+<p><img data-src="/images/sparkyl/dcy3.png" alt="img"></p>
 <p>所以, 对于 <code>reduceByKey</code> 这个 <code>Shuffle</code> 操作来说, <code>reducer</code> 端的一个分区, 会从多个 <code>mapper</code> 端的分区拿取数据, 是一个多对一的关系</p>
 <p>至此为止, 出现了两种分区见的关系了, 一种是一对一, 一种是多对一</p>
 <p>整体流程:</p>
-<p><img src="/images/sparkyl/dcy4.png" alt="img"></p>
+<p><img data-src="/images/sparkyl/dcy4.png" alt="img"></p>
 <h4 id="4-2-rdd之间依赖详解"><a href="#4-2-rdd之间依赖详解" class="headerlink" title="4.2 rdd之间依赖详解"></a>4.2 rdd之间依赖详解</h4><p>窄依赖  无shuffle的为窄依赖  </p>
 <p>宽依赖  有shuffle的为宽依赖    </p>
 <p>判断一个是什么依赖  只需看返回值是NarrowDependency 还是ShuffleDependency</p>
@@ -447,7 +448,7 @@
 <li><code>rddC</code> 有两个父 <code>RDD</code>, 分别为 <code>rddA</code> 和 <code>rddB</code></li>
 </ul>
 <p>对于 <code>cartesian</code> 来说, 依赖关系如下</p>
-<p><img src="/images/sparkyl/dcy5.png" alt="img"><br>  上述图形中清晰展示如下现象</p>
+<p><img data-src="/images/sparkyl/dcy5.png" alt="img"><br>  上述图形中清晰展示如下现象</p>
 <ol>
 <li><code>rddC</code> 中的分区数量是两个父 <code>RDD</code> 的分区数量之乘积</li>
 <li><code>rddA</code> 中每个分区对应 <code>rddC</code> 中的两个分区 (因为 <code>rddB</code> 中有两个分区), <code>rddB</code> 中的每个分区对应 <code>rddC</code> 中的三个分区 (因为 <code>rddA</code> 有三个分区)</li>
@@ -466,7 +467,7 @@
 <p>上面非常清楚的说道, 宽依赖就是 <code>Shuffle</code> 中的依赖关系, 换句话说, 只有 <code>Shuffle</code> 产生的地方才是宽依赖</p>
 <p>那么宽窄依赖的判断依据就非常简单明确了, <strong>是否有 Shuffle ?</strong></p>
 <p>举个 <code>reduceByKey</code> 的例子, <code>rddB = rddA.reduceByKey( (curr, agg) ⇒ curr + agg )</code> 会产生如下的依赖关系</p>
-<p><img src="/images/sparkyl/dcy6.png" alt="img"></p>
+<p><img data-src="/images/sparkyl/dcy6.png" alt="img"></p>
 <p>分区函数:  key.hashCode% rddb的分区数 = 1 或者2</p>
 <p>Hadoop.分区 =1  spark.分区=2</p>
 <ul>
@@ -480,21 +481,21 @@
 <p>其实 <code>RDD</code> 中默认的是 <code>OneToOneDependency</code>, 后被不同的 <code>RDD</code> 子类指定为其它的依赖类型, 常见的一对一依赖是 <code>map</code> 算子所产生的依赖, 例如 <code>rddB = rddA.map(…)</code><br>  每个分区之间一一对应, 所以叫做一对一窄依赖</p>
 <p><strong>Range 窄依赖</strong></p>
 <p><code>Range</code> 窄依赖其实也是一对一窄依赖, 但是保留了中间的分隔信息, 可以通过某个分区获取其父分区, 目前只有一个算子生成这种窄依赖, 就是 <code>union</code> 算子, 例如 <code>rddC = rddA.union(rddB)</code></p>
-<p><img src="/images/sparkyl/dcy7.png" alt="img"></p>
+<p><img data-src="/images/sparkyl/dcy7.png" alt="img"></p>
 <ul>
 <li><code>rddC</code> 其实就是 <code>rddA</code> 拼接 <code>rddB</code> 生成的, 所以 <code>rddC</code> 的 <code>p5</code> 和 <code>p6</code> 就是 <code>rddB</code> 的 <code>p1</code> 和 <code>p2</code></li>
 <li>所以需要有方式获取到 <code>rddC</code> 的 <code>p5</code> 其父分区是谁, 于是就需要记录一下边界, 其它部分和一对一窄依赖一样</li>
 </ul>
 <p><strong>多对一窄依赖</strong></p>
 <p>多对一窄依赖其图形和 <code>Shuffle</code> 依赖非常相似, 所以在遇到的时候, 要注意其 <code>RDD</code> 之间是否有 <code>Shuffle</code> 过程, 比较容易让人困惑, 常见的多对一依赖就是重分区算子 <code>coalesce</code>, 例如 <code>rddB = rddA.coalesce(2, shuffle = false)</code>, 但同时也要注意, 如果 <code>shuffle = true</code> 那就是完全不同的情况了</p>
-<p><img src="/images/sparkyl/dcy8.png" alt="img"></p>
+<p><img data-src="/images/sparkyl/dcy8.png" alt="img"></p>
 <p>因为没有 <code>Shuffle</code>, 所以这是一个窄依赖</p>
 <p><strong>再谈宽窄依赖的区别</strong></p>
 <p>宽窄依赖的区别非常重要, 因为涉及了一件非常重要的事情: <strong>如何计算 RDD ?</strong></p>
 <p>宽窄以来的核心区别是: <strong>窄依赖的 RDD 可以放在一个 Task 中运行</strong></p>
 <h2 id="5-物理图执行详解"><a href="#5-物理图执行详解" class="headerlink" title="5 物理图执行详解"></a>5 物理图执行详解</h2><h3 id="1物理图作用"><a href="#1物理图作用" class="headerlink" title="1物理图作用"></a>1物理图作用</h3><p><strong>问题一: 物理图的意义是什么?</strong></p>
 <p>物理图解决的其实就是 <code>RDD</code> 流程生成以后, 如何计算和运行的问题, 也就是如何把 RDD 放在集群中执行的问题</p>
-<p><img src="/images/sparkyl/dcw1.png" alt="img"></p>
+<p><img data-src="/images/sparkyl/dcw1.png" alt="img"></p>
 <p><strong>问题二: 如果要确定如何运行的问题, 则需要先确定集群中有什么组件</strong></p>
 <ul>
 <li>首先集群中物理元件就是一台一台的机器</li>
@@ -518,34 +519,34 @@
 </li>
 <li><p>问题二: 谁来计算 ?</p>
 <p>前面我们明确了两件事, <code>RDD</code> 在哪被计算? 在 <code>Executor</code> 中. <code>RDD</code> 是什么? 是一个数据集以及其如何计算的图纸.直接使用 <code>Executor</code> 也是不合适的, 因为一个计算的执行总是需要一个容器, 例如 <code>JVM</code> 是一个进程, 只有进程中才能有线程, 所以这个计算 <code>RDD</code> 的线程应该运行在一个进程中, 这个进程就是 <code>Exeutor</code>, <code>Executor</code> 有如下两个职责</p>
-<p>和 <code>Driver</code> 保持交互从而认领属于自己的任务<img src="/images/sparkyl/dcw2.png" alt="img"></p>
+<p>和 <code>Driver</code> 保持交互从而认领属于自己的任务<img data-src="/images/sparkyl/dcw2.png" alt="img"></p>
 <p>接受任务后, 运行任务</p>
-<p><img src="/images/sparkyl/dcw4.png" alt="img"></p>
+<p><img data-src="/images/sparkyl/dcw4.png" alt="img"></p>
 </li>
 </ul>
 <p>所以, 应该由一个线程来执行 <code>RDD</code> 的计算任务, 而 <code>Executor</code> 作为执行这个任务的容器, 也就是一个进程, 用于创建和执行线程, 这个执行具体计算任务的线程叫做 <code>Task</code></p>
 <h3 id="3-Task-该如何设计"><a href="#3-Task-该如何设计" class="headerlink" title="3 Task 该如何设计"></a>3 Task 该如何设计</h3><p>第一个想法是每个 <code>RDD</code> 都由一个 <code>Task</code> 来计算 第二个想法是一整个逻辑执行图中所有的 <code>RDD</code> 都由一组 <code>Task</code> 来执行 第三个想法是分阶段执行</p>
 <p>第一个想法: 为每个 RDD 的分区设置一组 Task</p>
-<p><img src="/images/sparkyl/dcw2.png" alt="img"></p>
+<p><img data-src="/images/sparkyl/dcw2.png" alt="img"></p>
 <p>大概就是每个 <code>RDD</code> 都有三个 <code>Task</code>, 每个 <code>Task</code> 对应一个 <code>RDD</code> 的分区, 执行一个分区的数据的计算</p>
 <p>但是这么做有一个非常难以解决的问题, 就是数据存储的问题, 例如 <code>Task 1, 4, 7, 10, 13, 16</code> 在同一个流程上, 但是这些 <code>Task</code> 之间需要交换数据, 因为这些 <code>Task</code> 可能被调度到不同的机器上上, 所以 <code>Task1</code> 执行完了数据以后需要暂存, 后交给 <code>Task4</code> 来获取</p>
 <p>这只是一个简单的逻辑图, 如果是一个复杂的逻辑图, 会有什么表现? 要存储多少数据? 无论是放在磁盘还是放在内存中, 是不是都是一种极大的负担?</p>
 <p>第二个想法: 让数据流动</p>
 <p>很自然的, 第一个想法的问题是数据需要存储和交换, 那不存储不就好了吗? 对, 可以让数据流动起来</p>
 <p>第一个要解决的问题就是, 要为数据创建管道(<code>Pipeline</code>), 有了管道, 就可以流动</p>
-<p><img src="/images/sparkyl/dcw5.png" alt="img"></p>
+<p><img data-src="/images/sparkyl/dcw5.png" alt="img"></p>
 <p>简单来说, 就是为所有的 <code>RDD</code> 有关联的分区使用同一个 <code>Task</code>, 但是就没问题了吗? 请关注红框部分</p>
-<p><img src="/images/sparkyl/dcw6.png" alt="img"></p>
+<p><img data-src="/images/sparkyl/dcw6.png" alt="img"></p>
 <p>这两个 <code>RDD</code> 之间是 <code>Shuffle</code> 关系, 也就是说, 右边的 <code>RDD</code> 的一个分区可能依赖左边 <code>RDD</code> 的所有分区, 这样的话, 数据在这个地方流不动了, 怎么办?</p>
 <p>第三个想法: 划分阶段</p>
 <p>既然在 <code>Shuffle</code> 处数据流不动了, 那就可以在这个地方中断一下, 后面 <code>Stage</code> 部分详解</p>
 <h3 id="4如何划分阶段"><a href="#4如何划分阶段" class="headerlink" title="4如何划分阶段 ?"></a>4<strong>如何划分阶段 ?</strong></h3><p>为了减少执行任务, 减少数据暂存和交换的机会, 所以需要创建管道, 让数据沿着管道流动, 其实也就是原先每个 <code>RDD</code> 都有一组 <code>Task</code>, 现在改为所有的 <code>RDD</code> 共用一组 <code>Task</code>, 但是也有问题, 问题如下</p>
-<p><img src="/images/sparkyl/dcw7.png" alt="img"></p>
+<p><img data-src="/images/sparkyl/dcw7.png" alt="img"></p>
 <p>就是说, 在 <code>Shuffle</code> 处, 必须断开管道, 进行数据交换, 交换过后, 继续流动, 所以整个流程可以变为如下样子</p>
-<p><img src="/images/sparkyl/dcw8.png" alt="img"></p>
+<p><img data-src="/images/sparkyl/dcw8.png" alt="img"></p>
 <p>把 <code>Task</code> 断开成两个部分, <code>Task4</code> 可以从 <code>Task 1, 2, 3</code> 中获取数据, 后 <code>Task4</code> 又作为管道, 继续让数据在其中流动</p>
 <p>但是还有一个问题, 说断开就直接断开吗? 不用打个招呼的呀? 这个断开即没有道理, 也没有规则, 所以可以为这个断开增加一个概念叫做阶段, 按照阶段断开, 阶段的英文叫做 <code>Stage</code>, 如下</p>
-<p><img src="/images/sparkyl/dcw9.png" alt="img"></p>
+<p><img data-src="/images/sparkyl/dcw9.png" alt="img"></p>
 <p>所以划分阶段的本身就是设置断开点的规则, 那么该如何划分阶段呢?</p>
 <ol>
 <li>第一步, 从最后一个 <code>RDD</code>, 也就是逻辑图中最右边的 <code>RDD</code> 开始, 向前滑动 <code>Stage</code> 的范围, 为 <code>Stage0</code></li>
@@ -558,22 +559,22 @@
 <h3 id="5-数据流动"><a href="#5-数据流动" class="headerlink" title="5 数据流动"></a>5 数据流动</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> sc = ...</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> textRDD = sc.parallelize(<span class="type">Seq</span>(<span class="string">&quot;Hadoop Spark&quot;</span>, <span class="string">&quot;Hadoop Flume&quot;</span>, <span class="string">&quot;Spark Sqoop&quot;</span>))</span><br><span class="line"><span class="keyword">val</span> splitRDD = textRDD.flatMap(_.split(<span class="string">&quot; &quot;</span>))</span><br><span class="line"><span class="keyword">val</span> tupleRDD = splitRDD.map((_, <span class="number">1</span>))</span><br><span class="line"><span class="keyword">val</span> reduceRDD = tupleRDD.reduceByKey(_ + _)</span><br><span class="line"><span class="keyword">val</span> strRDD = reduceRDD.map(item =&gt; <span class="string">s&quot;<span class="subst">$&#123;item._1&#125;</span>, <span class="subst">$&#123;item._2&#125;</span>&quot;</span>)</span><br><span class="line"></span><br><span class="line">strRDD.collect.foreach(item =&gt; println(item))</span><br></pre></td></tr></table></figure>
 
 <p>上述代码是这个章节我们一直使用的代码流程, 如下是其完整的逻辑执行图</p>
-<p><img src="/images/sparkyl/dcw10.png" alt="img"></p>
+<p><img data-src="/images/sparkyl/dcw10.png" alt="img"></p>
 <p>如果放在集群中运行, 通过 <code>WebUI</code> 可以查看到如下 <code>DAG</code> 结构</p>
-<p><img src="/images/sparkyl/dcw11.png" alt="img"><br>  Step 1: 从 <code>ResultStage</code> 开始执行</p>
+<p><img data-src="/images/sparkyl/dcw11.png" alt="img"><br>  Step 1: 从 <code>ResultStage</code> 开始执行</p>
 <p>最接近 <code>Result</code> 部分的 <code>Stage id</code> 为 0, 这个 <code>Stage</code> 被称之为 <code>ResultStage</code></p>
 <p>由代码可以知道, 最终调用 <code>Action</code> 促使整个流程执行的是最后一个 <code>RDD</code>, <code>strRDD.collect</code>, 所以当执行 <code>RDD</code> 的计算时候, 先计算的也是这个 <code>RDD</code></p>
 <p>Step 2: <code>RDD</code> 之间是有关联的</p>
 <p>前面已经知道, 最后一个 <code>RDD</code> 先得到执行机会, 先从这个 <code>RDD</code> 开始执行, 但是这个 <code>RDD</code> 中有数据吗 ? 如果没有数据, 它的计算是什么? 它的计算是从父 <code>RDD</code> 中获取数据, 并执行传入的算子的函数</p>
 <p>简单来说, 从产生 <code>Result</code> 的地方开始计算, 但是其 <code>RDD</code> 中是没数据的, 所以会找到父 <code>RDD</code> 来要数据, 父 <code>RDD</code> 也没有数据, 继续向上要, 所以, 计算从 <code>Result</code> 处调用, 但是从整个逻辑图中的最左边 <code>RDD</code> 开始, 类似一个递归的过程</p>
-<p><img src="/images/sparkyl/dcw12.png" alt="img"></p>
+<p><img data-src="/images/sparkyl/dcw12.png" alt="img"></p>
 <h3 id="6-调度过程"><a href="#6-调度过程" class="headerlink" title="6 调度过程"></a>6 调度过程</h3><h4 id="6-1-逻辑图调度"><a href="#6-1-逻辑图调度" class="headerlink" title="6.1 逻辑图调度"></a>6.1 逻辑图调度</h4><p>是什么 怎么生成 具体怎么生成</p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> textRDD = sc.parallelize(<span class="type">Seq</span>(<span class="string">&quot;Hadoop Spark&quot;</span>, <span class="string">&quot;Hadoop Flume&quot;</span>, <span class="string">&quot;Spark Sqoop&quot;</span>))</span><br><span class="line"><span class="keyword">val</span> splitRDD = textRDD.flatMap(_.split(<span class="string">&quot; &quot;</span>))</span><br><span class="line"><span class="keyword">val</span> tupleRDD = splitRDD.map((_, <span class="number">1</span>))</span><br><span class="line"><span class="keyword">val</span> reduceRDD = tupleRDD.reduceByKey(_ + _)</span><br><span class="line"><span class="keyword">val</span> strRDD = reduceRDD.map(item =&gt; <span class="string">s&quot;<span class="subst">$&#123;item._1&#125;</span>, <span class="subst">$&#123;item._2&#125;</span>&quot;</span>)</span><br></pre></td></tr></table></figure>
 
 <ul>
 <li><p>逻辑图如何生成</p>
 <p>上述代码在 <code>Spark Application</code> 的 <code>main</code> 方法中执行, 而 <code>Spark Application</code> 在 <code>Driver</code> 中执行, 所以上述代码在 <code>Driver</code> 中被执行, 那么这段代码执行的结果是什么呢?一段 <code>Scala</code> 代码的执行结果就是最后一行的执行结果, 所以上述的代码, 从逻辑上执行结果就是最后一个 <code>RDD</code>, 最后一个 <code>RDD</code>也可以认为就是逻辑执行图, 为什么呢?例如 <code>rdd2 = rdd1.map(…)</code> 中, 其实本质上 <code>rdd2</code> 是一个类型为 <code>MapPartitionsRDD</code> 的对象, 而创建这个对象的时候, 会通过构造函数传入当前 <code>RDD</code> 对象, 也就是父 <code>RDD</code>, 也就是调用 <code>map</code> 算子的 <code>rdd1</code>, <code>rdd1</code> 是 <code>rdd2</code> 的父 <code>RDD</code></p>
-<p><img src="/images/sparkyl/dcw13.png" alt="img"></p>
+<p><img data-src="/images/sparkyl/dcw13.png" alt="img"></p>
 <p>一个 <code>RDD</code> 依赖另外一个 <code>RDD</code>, 这个 <code>RDD</code> 又依赖另外的 <code>RDD</code>, 一个 <code>RDD</code> 可以通过 <code>getDependency</code> 获得其父 <code>RDD</code>, 这种环环相扣的关系, 最终从最后一个 <code>RDD</code> 就可以推演出前面所有的 <code>RDD</code></p>
 </li>
 <li><p>逻辑图是什么, 干啥用</p>
@@ -602,7 +603,7 @@
 <h4 id="6-4-job-与Stage的关系"><a href="#6-4-job-与Stage的关系" class="headerlink" title="6.4 job 与Stage的关系"></a>6.4 job 与Stage的关系</h4><p><strong>一个job有多个Stage   stage之间是串行的   左侧的接近起始Stage的最先执行,从左向右执行</strong></p>
 <p><code>Job</code> 是一个最大的调度单位, 也就是说 <code>DAGScheduler</code> 会首先创建一个 <code>Job</code> 的相关信息, 后去调度 <code>Job</code>, 但是没办法直接调度 <code>Job</code>, 比如说现在要做一盘手撕包菜, 不可能直接去炒一整颗包菜, 要切好撕碎, 再去炒</p>
 <p><strong>为什么</strong> <code>Job</code> <strong>需要切分 ?</strong></p>
-<p><img src="/images/sparkyl/dcw14.png" alt="img"></p>
+<p><img data-src="/images/sparkyl/dcw14.png" alt="img"></p>
 <ul>
 <li><p>因为 <code>Job</code> 的含义是对整个 <code>RDD</code> 血统求值, 但是 <code>RDD</code> 之间可能会有一些宽依赖</p>
 </li>
@@ -634,7 +635,7 @@
 </ul>
 <h4 id="6-5-Stage-和-Task-的关系"><a href="#6-5-Stage-和-Task-的关系" class="headerlink" title="6.5 Stage 和 Task 的关系"></a>6.5 <code>Stage</code> <strong>和</strong> <code>Task</code> <strong>的关系</strong></h4><p><strong>rdd本身不存储数据,数据存储在分区中</strong></p>
 <p><strong>一个task对应一个分区,一个Stage 中有几个task(分区) 由Stage中的最后一个rdd决定 一个stage就是一个TaskSet  一个TaskSet就是一组task</strong></p>
-<p><img src="/images/sparkyl/dcw15.png" alt="img"></p>
+<p><img data-src="/images/sparkyl/dcw15.png" alt="img"></p>
 <p>前面我们说到 <code>Job</code> 无法直接执行, 需要先划分为多个 <code>Stage</code>, 去执行 <code>Stage</code>, 那么 <code>Stage</code> 可以直接执行吗?</p>
 <ul>
 <li><p>第一点: <code>Stage</code> 中的 <code>RDD</code> 之间是窄依赖</p>
@@ -663,18 +664,18 @@
 <li>一个 <code>Stage</code> 有一个 <code>TaskSet</code></li>
 <li><code>TaskSet</code> 中 <code>Task</code> 的个数由 <code>Stage</code> 中的最大分区数决定</li>
 </ul>
-<h4 id="6-7-整体流程"><a href="#6-7-整体流程" class="headerlink" title="6.7 整体流程"></a>6.7 整体流程</h4><p><img src="/images/sparkyl/dcw16.png" alt="img"></p>
+<h4 id="6-7-整体流程"><a href="#6-7-整体流程" class="headerlink" title="6.7 整体流程"></a>6.7 整体流程</h4><p><img data-src="/images/sparkyl/dcw16.png" alt="img"></p>
 <h4 id="6-8-shuffle过程"><a href="#6-8-shuffle过程" class="headerlink" title="6.8 shuffle过程"></a>6.8 shuffle过程</h4><h5 id="6-8-1Shuffle-过程的组件结构"><a href="#6-8-1Shuffle-过程的组件结构" class="headerlink" title="6.8.1Shuffle 过程的组件结构"></a>6.8.1<code>Shuffle</code> <strong>过程的组件结构</strong></h5><p>从整体视角上来看, <code>Shuffle</code> 发生在两个 <code>Stage</code> 之间, 一个 <code>Stage</code> 把数据计算好, 整理好, 等待另外一个 <code>Stage</code> 来拉取</p>
-<p><img src="/images/sparkyl/dcw17.png" alt="img"></p>
+<p><img data-src="/images/sparkyl/dcw17.png" alt="img"></p>
 <p>放大视角, 会发现, 其实 <code>Shuffle</code> 发生在 <code>Task</code> 之间, 一个 <code>Task</code> 把数据整理好, 等待 <code>Reducer</code> 端的 <code>Task</code> 来拉取</p>
-<p><img src="/images/sparkyl/dcw18.png" alt="img"></p>
+<p><img data-src="/images/sparkyl/dcw18.png" alt="img"></p>
 <p>如果更细化一下, <code>Task</code> 之间如何进行数据拷贝的呢? 其实就是一方 <code>Task</code> 把文件生成好, 然后另一方 <code>Task</code> 来拉取</p>
-<p><img src="/images/sparkyl/dcw19.png" alt="img"></p>
+<p><img data-src="/images/sparkyl/dcw19.png" alt="img"></p>
 <p>现在是一个 <code>Reducer</code> 的情况, 如果有多个 <code>Reducer</code> 呢? 如果有多个 <code>Reducer</code> 的话, 就可以在每个 <code>Mapper</code> 为所有的 <code>Reducer</code> 生成各一个文件, 这种叫做 <code>Hash base shuffle</code>, 这种 <code>Shuffle</code> 的方式问题大家也知道, 就是生成中间文件过多, 而且生成文件的话需要缓冲区, 占用内存过大</p>
-<p><img src="/images/sparkyl/dcw20.png" alt="img"></p>
+<p><img data-src="/images/sparkyl/dcw20.png" alt="img"></p>
 <p>那么可以把这些文件合并起来, 生成一个文件返回, 这种 <code>Shuffle</code> 方式叫做 <code>Sort base shuffle</code>, 每个 <code>Reducer</code> 去文件的不同位置拿取数据</p>
-<p><img src="/images/sparkyl/dcw21.png" alt="img"><br>  如果再细化一下, 把参与这件事的组件也放置进去, 就会是如下这样</p>
-<p><img src="/images/sparkyl/dcw22.png" alt="img"></p>
+<p><img data-src="/images/sparkyl/dcw21.png" alt="img"><br>  如果再细化一下, 把参与这件事的组件也放置进去, 就会是如下这样</p>
+<p><img data-src="/images/sparkyl/dcw22.png" alt="img"></p>
 <p><strong>有哪些 <code>ShuffleWriter</code> ?</strong></p>
 <p>大致上有三个 <code>ShufflWriter</code>, <code>Spark</code> 会按照一定的规则去使用这三种不同的 <code>Writer</code></p>
 <ul>
@@ -698,7 +699,7 @@
 </li>
 </ul>
 <p><strong><code>SortShuffleWriter</code> 的执行过程</strong></p>
-<p><img src="/images/sparkyl/dcw23.png" alt="img"></p>
+<p><img data-src="/images/sparkyl/dcw23.png" alt="img"></p>
 <p>整个 <code>SortShuffleWriter</code> 如上述所说, 大致有如下几步</p>
 <ol>
 <li>首先 <code>SortShuffleWriter</code> 在 <code>write</code> 方法中回去写文件, 这个方法中创建了 <code>ExternalSorter</code></li>
@@ -744,7 +745,7 @@
 <p>​    </p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyClass</span> </span>&#123;</span><br><span class="line">  <span class="keyword">val</span> field = <span class="string">&quot;Hello&quot;</span></span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">doStuff</span></span>(rdd: <span class="type">RDD</span>[<span class="type">String</span>]): <span class="type">RDD</span>[<span class="type">String</span>] = &#123;</span><br><span class="line">    rdd.map(x =&gt; field + x)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;       </span><br><span class="line"><span class="comment">// rdd.map(x =&gt; field + x)引用了MyClass 对象中的一个成员变量 说明其可以访问MyClass这个类的作用域</span></span><br><span class="line"><span class="comment">//也是一个闭包  封闭的是MyClass这个作用域</span></span><br></pre></td></tr></table></figure>
 
-<p><img src="/images/sparkyl/bb.jpg" alt="img"></p>
+<p><img data-src="/images/sparkyl/bb.jpg" alt="img"></p>
 <p><strong>总结</strong></p>
 <ol>
 <li>闭包就是一个封闭的作用域, 也是一个对象</li>
@@ -766,7 +767,7 @@
 <li>只能在 Driver 中才能调用 <code>value</code> 来获取数值</li>
 </ul>
 <p>在 WebUI 中关于 Job 部分也可以看到 Accumulator 的信息, 以及其运行的情况</p>
-<p><img src="/images/sparkyl/ljq.png" alt="img"></p>
+<p><img data-src="/images/sparkyl/ljq.png" alt="img"></p>
 <p><strong>累计器件还有两个小特性</strong></p>
 <p> 第一, 累加器能保证在 Spark 任务出现问题被重启的时候不会出现重复计算. </p>
 <p>第二, 累加器只有在 Action 执行的时候才会被触发.</p>
@@ -794,7 +795,7 @@
 <li>每一个 Task, 一个 Task 是一个 Stage 中的最小处理单元, 一个 Executor 中可以有多个 Stage, 每个 Stage 有多个 Task</li>
 </ul>
 <p>所以在需要跨多个 Stage 的多个 Task 中使用相同数据的情况下, 广播特别的有用</p>
-<p><img src="/images/sparkyl/sgb.png" alt="img"></p>
+<p><img data-src="/images/sparkyl/sgb.png" alt="img"></p>
 <p><strong>广播变量的API</strong></p>
 <table>
 <thead>
@@ -1146,6 +1147,9 @@
 
   
   <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="true"></script>
+  <script src="true"></script>
   <script src="/lib/velocity/velocity.min.js"></script>
   <script src="/lib/velocity/velocity.ui.min.js"></script>
 

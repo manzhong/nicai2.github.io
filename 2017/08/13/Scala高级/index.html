@@ -14,12 +14,13 @@
 
 <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css">
   <script src="/lib/pace/pace.min.js"></script>
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":false,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":false,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="Scala高级 一 高阶函数 scala 混合了面向对象和函数式的特性，在函数式编程语言中，函数是“头等公民”，它和Int、String、Class等其他类型处于同等的地位，可以像其他类型的变量一样被传递和操作。  高阶函数包含   * 作为值的函数  * 匿名函数  * 闭包  * 柯里化等等  1作为值得函数 在scala中，函数就像和数字、字符串一样，可以将函数传递给一个方法。我们可以对算法">
@@ -302,9 +303,9 @@
 <h3 id="3-柯里化"><a href="#3-柯里化" class="headerlink" title="3 柯里化"></a>3 柯里化</h3><p>在scala和spark的源代码中，大量使用到了柯里化。为了后续方便阅读源代码，我们需要来了解下柯里化。  </p>
 <p>定义:</p>
 <p>柯里化（Currying）是指将原先接受多个参数的方法转换为多个只有一个参数的参数列表的过程。</p>
-<p><img src="/images/scala/klh.png" alt="img"></p>
+<p><img data-src="/images/scala/klh.png" alt="img"></p>
 <p><strong>柯里化过程解析</strong></p>
-<p><img src="/images/scala/klhgcjx.png" alt="img">    </p>
+<p><img data-src="/images/scala/klhgcjx.png" alt="img">    </p>
 <p><strong>例子</strong></p>
 <p><strong>示例说明</strong></p>
 <ul>
@@ -400,11 +401,11 @@
 <li><p>Message Dispatcher将MailBox放到一个线程中</p>
 </li>
 <li><p>MailBox按照顺序取出消息，最终将它递给TeacherActor接受的方法中</p>
-<p><img src="/images/scala/akka.png" alt="img"></p>
+<p><img data-src="/images/scala/akka.png" alt="img"></p>
 </li>
 </ol>
 <h3 id="4-入门案例"><a href="#4-入门案例" class="headerlink" title="4 入门案例"></a>4 入门案例</h3><p>基于Akka创建两个Actor，Actor之间可以互相发送消息。</p>
-<p><img src="/images/scala/akkabf.png" alt="img"></p>
+<p><img data-src="/images/scala/akkabf.png" alt="img"></p>
 <h2 id="实现步骤"><a href="#实现步骤" class="headerlink" title="实现步骤"></a>实现步骤</h2><ol>
 <li>创建Maven模块</li>
 <li>创建并加载Actor</li>
@@ -493,7 +494,7 @@
 <li>需要导入隐式参数<code>import actorSystem.dispatcher</code>才能启动定时任务</li>
 </ol>
 <h3 id="6-实现两个进程间的通信-master实现"><a href="#6-实现两个进程间的通信-master实现" class="headerlink" title="6 实现两个进程间的通信  master实现"></a>6 实现两个进程间的通信  master实现</h3><p>基于Akka实现在两个<strong>进程</strong>间发送、接收消息。Worker启动后去连接Master，并发送消息，Master接收到消息后，再回复Worker消息。 </p>
-<p><img src="/images/scala/jctx.png" alt="img"></p>
+<p><img data-src="/images/scala/jctx.png" alt="img"></p>
 <h2 id="1-Worker实现"><a href="#1-Worker实现" class="headerlink" title="1. Worker实现"></a>1. Worker实现</h2><p><strong>步骤</strong></p>
 <ol>
 <li><p>创建一个Maven模块，导入依赖和配置文件</p>
@@ -551,7 +552,7 @@
 </ul>
 </li>
 </ul>
-<p><img src="/images/scala/spark.png" alt="img"></p>
+<p><img data-src="/images/scala/spark.png" alt="img"></p>
 <p><strong>实现思路</strong></p>
 <ol>
 <li>构建Master、Worker阶段<ul>
@@ -962,6 +963,9 @@
 
   
   <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="true"></script>
+  <script src="true"></script>
   <script src="/lib/velocity/velocity.min.js"></script>
   <script src="/lib/velocity/velocity.ui.min.js"></script>
 

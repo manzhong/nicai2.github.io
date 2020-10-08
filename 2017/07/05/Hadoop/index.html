@@ -14,12 +14,13 @@
 
 <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css">
   <script src="/lib/pace/pace.min.js"></script>
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":false,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":false,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="Hadoop 一概述 狭义上来说Hadoop就是:   * HDFS ：分布式文件系统  * MapReduce : 分布式计算系统  * Yarn：分布式样集群资源管理   广义上来说:  Hadoop指代大数据的一个生态圈,包括很多其他软件:    历史版本与发行公司  2.1 Hadoop历史版本  1.x版本系列：hadoop版本当中的第二代开源版本，主要修复0.x版本的一些bug等  2">
@@ -275,7 +276,7 @@
 </ul>
 <p>广义上来说:</p>
 <p>Hadoop指代大数据的一个生态圈,包括很多其他软件:</p>
-<p><img src="/images/hadoop/1558225014064.png" alt="img"></p>
+<p><img data-src="/images/hadoop/1558225014064.png" alt="img"></p>
 <h3 id="历史版本与发行公司"><a href="#历史版本与发行公司" class="headerlink" title="历史版本与发行公司"></a>历史版本与发行公司</h3><p> 2.1 Hadoop历史版本</p>
 <p>1.x版本系列：hadoop版本当中的第二代开源版本，主要修复0.x版本的一些bug等</p>
 <p>2.x版本系列：架构产生重大变化，引入了yarn平台等许多新特性</p>
@@ -298,7 +299,7 @@
 </ul>
 <p><a target="_blank" rel="noopener" href="https://www.cloudera.com/">https://www.cloudera.com/</a></p>
 <p>cloudera主要是美国一家大数据公司在apache开源hadoop的版本上，通过自己公司内部的各种补丁，实现版本之间的稳定运行，大数据生态圈的各个版本的软件都提供了对应的版本，解决了版本的升级困难，版本兼容性等各种问题</p>
-<h2 id="二架构"><a href="#二架构" class="headerlink" title="二架构"></a>二架构</h2><h4 id="1-x的版本架构模型介绍"><a href="#1-x的版本架构模型介绍" class="headerlink" title="1.x的版本架构模型介绍"></a>1.x的版本架构模型介绍</h4><p><img src="/images/hadoop/1558232908565.png" alt="img">    </p>
+<h2 id="二架构"><a href="#二架构" class="headerlink" title="二架构"></a>二架构</h2><h4 id="1-x的版本架构模型介绍"><a href="#1-x的版本架构模型介绍" class="headerlink" title="1.x的版本架构模型介绍"></a>1.x的版本架构模型介绍</h4><p><img data-src="/images/hadoop/1558232908565.png" alt="img">    </p>
 <p>文件系统核心模块：</p>
 <p>NameNode：集群当中的主节点，管理元数据(文件的大小，文件的位置，文件的权限)，主要用于管理集群当中的各种数据</p>
 <p>secondaryNameNode：主要能用于hadoop当中元数据信息的辅助管理</p>
@@ -308,7 +309,7 @@
 <p>TaskTracker：负责执行主节点JobTracker分配的任务</p>
 <h4 id="2-x的版本架构模型介绍"><a href="#2-x的版本架构模型介绍" class="headerlink" title="2.x的版本架构模型介绍"></a>2.x的版本架构模型介绍</h4><p>引入了yarn,其中MapReduce运行在yarn中</p>
 <p><strong>第一种：NameNode与ResourceManager单节点架构模型</strong></p>
-<p><img src="/images/hadoop/1558232924095.png" alt="img">    </p>
+<p><img data-src="/images/hadoop/1558232924095.png" alt="img">    </p>
 <p>文件系统核心模块：</p>
 <p>NameNode：集群当中的主节点，主要用于管理集群当中的各种数据</p>
 <p>secondaryNameNode：主要能用于hadoop当中元数据信息的辅助管理                                                                                                </p>
@@ -317,7 +318,7 @@
 <p>ResourceManager：接收用户的计算请求任务，并负责集群的资源分配</p>
 <p>NodeManager：负责执行主节点APPmaster分配的任务</p>
 <p><strong>第二种：NameNode单节点与ResourceManager高可用架构模型</strong></p>
-<p><img src="/images/hadoop/1558232966712.png" alt="img">    </p>
+<p><img data-src="/images/hadoop/1558232966712.png" alt="img">    </p>
 <p>文件系统核心模块：</p>
 <p>NameNode：集群当中的主节点，主要用于管理集群当中的各种数据</p>
 <p>secondaryNameNode：主要能用于hadoop当中元数据信息的辅助管理</p>
@@ -326,7 +327,7 @@
 <p>ResourceManager：接收用户的计算请求任务，并负责集群的资源分配，以及计算任务的划分，通过zookeeper实现ResourceManager的高可用</p>
 <p>NodeManager：负责执行主节点ResourceManager分配的任务</p>
 <p><strong>第三种：NameNode高可用与ResourceManager单节点架构模型</strong></p>
-<p><img src="/images/hadoop/1558232980575.png" alt="img">    </p>
+<p><img data-src="/images/hadoop/1558232980575.png" alt="img">    </p>
 <p>文件系统核心模块：</p>
 <p>NameNode：集群当中的主节点，主要用于管理集群当中的各种数据，其中nameNode可以有两个，形成高可用状态</p>
 <p>DataNode：集群当中的从节点，主要用于存储集群当中的各种数据</p>
@@ -335,7 +336,7 @@
 <p>ResourceManager：接收用户的计算请求任务，并负责集群的资源分配，以及计算任务的划分</p>
 <p>NodeManager：负责执行主节点ResourceManager分配的任务</p>
 <p><strong>第四种：NameNode高可用与ResourceManager高可用架构模型</strong></p>
-<p><img src="/images/hadoop/1558232995675.png" alt="img">    </p>
+<p><img data-src="/images/hadoop/1558232995675.png" alt="img">    </p>
 <p>文件系统核心模块：</p>
 <p>NameNode：集群当中的主节点，主要用于管理集群当中的各种数据，一般都是使用两个，实现HA高可用</p>
 <p>JournalNode：元数据信息管理进程，一般都是奇数个</p>
@@ -703,6 +704,9 @@
 
   
   <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="true"></script>
+  <script src="true"></script>
   <script src="/lib/velocity/velocity.min.js"></script>
   <script src="/lib/velocity/velocity.ui.min.js"></script>
 

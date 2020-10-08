@@ -14,12 +14,13 @@
 
 <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css">
   <script src="/lib/pace/pace.min.js"></script>
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":false,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":false,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="一 深入RDDS 先来个小demo  1 需求 在访问日志中,统计独立IP数量,TOP10  2 明确数据结构 IP,时间戳,http method,URL……  1 2   1&#x2F;Nov&#x2F;2017:00:00:15 +0000] &quot;GET &#x2F;axis2&#x2F;services&#x2F;WebFilteringService&#x2F;getCategoryByUrl?app&#x3D;chrome_antiporn&amp;ver&#x3D;0.1">
@@ -298,7 +299,7 @@
 <li>需要一个总体上的协作机制来进行调度</li>
 </ul>
 <p><strong>3 如果放在集群中的话, 可能要对整个计算任务进行分解, 如何分解?</strong></p>
-<p><img src="/images/spark/sfj.png" alt="img"></p>
+<p><img data-src="/images/spark/sfj.png" alt="img"></p>
 <p>概述</p>
 <ul>
 <li>对于 HDFS 中的文件, 是分为不同的 Block 的</li>
@@ -310,10 +311,10 @@
 <li><code>RDD</code> 至少是需要可以 <strong>分片</strong> 的, 因为HDFS中的文件就是分片的, <code>RDD</code> 分片的意义在于表示对源数据集每个分片的计算, <code>RDD</code> 可以分片也意味着 <strong>可以并行计算</strong></li>
 </ul>
 <p><strong>4 移动数据不如移动计算是一个基础的优化, 如何做到?</strong></p>
-<p><img src="/images/spark/yj.png" alt="img"></p>
+<p><img data-src="/images/spark/yj.png" alt="img"></p>
 <p>每一个计算单元需要记录其存储单元的位置, 尽量调度过去</p>
 <p><strong>5 在集群中运行, 需要很多节点之间配合, 出错的概率也更高, 出错了怎么办?</strong></p>
-<p><img src="/images/spark/rc.png" alt="img"></p>
+<p><img data-src="/images/spark/rc.png" alt="img"></p>
 <p>RDD1 → RDD2 → RDD3 这个过程中, RDD2 出错了, 有两种办法可以解决</p>
 <ol>
 <li>缓存 RDD2 的数据, 直接恢复 RDD2, 类似 HDFS 的备份机制</li>
@@ -326,18 +327,18 @@
 <li>当 RDD2 计算出错的时候, 可以通过父级 RDD 和计算函数来恢复 RDD2</li>
 </ol>
 <p><strong>6 假如任务特别复杂, 流程特别长, 有很多 RDD 之间有依赖关系, 如何优化?</strong></p>
-<p><img src="/images/spark/yh.png" alt="img"></p>
+<p><img data-src="/images/spark/yh.png" alt="img"></p>
 <p>上面提到了可以使用依赖关系来进行容错, 但是如果依赖关系特别长的时候, 这种方式其实也比较低效, 这个时候就应该使用另外一种方式, 也就是记录数据集的状态</p>
 <ul>
 <li>在 Spark 中有两个手段可以做到</li>
 <li>缓存Checkpoint</li>
 </ul>
 <h2 id="5-rdd出现解决了什么问题"><a href="#5-rdd出现解决了什么问题" class="headerlink" title="5 rdd出现解决了什么问题"></a>5 rdd出现解决了什么问题</h2><p><strong>在 RDD 出现之前, 当时 MapReduce 是比较主流的, 而 MapReduce 如何执行迭代计算的任务呢?</strong></p>
-<p><img src="/images/spark/mr.png" alt="img"></p>
+<p><img data-src="/images/spark/mr.png" alt="img"></p>
 <p>多个 MapReduce 任务之间没有基于内存的数据共享方式, 只能通过磁盘来进行共享</p>
 <p>这种方式明显比较低效</p>
 <p><strong>rdd 执行迭代计算任务</strong></p>
-<p><img src="/images/spark/rddd.png" alt="img"></p>
+<p><img data-src="/images/spark/rddd.png" alt="img"></p>
 <p>在 Spark 中, 其实最终 Job3 从逻辑上的计算过程是: <code>Job3 = (Job1.map).filter</code>, 整个过程是共享内存的, 而不需要将中间结果存放在可靠的分布式文件系统中</p>
 <p>这种方式可以在保证容错的前提下, 提供更多的灵活, 更快的执行速度, RDD 在执行迭代型任务时候的表现可以通过下面代码体现</p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 线性回归</span></span><br><span class="line"><span class="keyword">val</span> points = sc.textFile(...)</span><br><span class="line">	.map(...)</span><br><span class="line">	.persist(...)</span><br><span class="line"><span class="keyword">val</span> w = randomValue</span><br><span class="line"><span class="keyword">for</span> (i &lt;- <span class="number">1</span> to <span class="number">10000</span>) &#123;</span><br><span class="line">    <span class="keyword">val</span> gradient = points.map(p =&gt; p.x * (<span class="number">1</span> / (<span class="number">1</span> + exp(-p.y * (w dot p.x))) - <span class="number">1</span>) * p.y)</span><br><span class="line">    	.reduce(_ + _)</span><br><span class="line">    w -= gradient</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -350,7 +351,7 @@
 <li>Action 动作操作, 例如 <code>reduce</code> <code>collect</code> <code>show</code> 等</li>
 </ul>
 <p>执行 RDD 的时候, 在执行到转换操作的时候, 并不会立刻执行, 直到遇见了 Action 操作, 才会触发真正的执行, 这个特点叫做 <strong>惰性求值</strong></p>
-<h3 id="rdd可以分区"><a href="#rdd可以分区" class="headerlink" title="rdd可以分区"></a>rdd可以分区</h3><p><img src="/images/spark/rddfq.png" alt="img"></p>
+<h3 id="rdd可以分区"><a href="#rdd可以分区" class="headerlink" title="rdd可以分区"></a>rdd可以分区</h3><p><img data-src="/images/spark/rddfq.png" alt="img"></p>
 <p>RDD 是一个分布式计算框架, 所以, 一定是要能够进行分区计算的, 只有分区了, 才能利用集群的并行计算能力</p>
 <p>同时, RDD 不需要始终被具体化, 也就是说: RDD 中可以没有数据, 只要有足够的信息知道自己是从谁计算得来的就可以, 这是一种非常高效的容错方式</p>
 <h3 id="rdd是只读的"><a href="#rdd是只读的" class="headerlink" title="rdd是只读的"></a>rdd是只读的</h3><p>RDD 是只读的, 不允许任何形式的修改. 虽说不能因为 RDD 和 HDFS 是只读的, 就认为分布式存储系统必须设计为只读的. 但是设计为只读的, 会显著降低问题的复杂度, 因为 RDD 需要可以容错, 可以惰性求值, 可以移动计算, 所以很难支持修改.</p>
@@ -593,7 +594,7 @@
 <li><code>groupByKey</code>, <code>reduceByKey</code> 的底层都是 <code>combineByKey</code></li>
 </ul>
 <p>例子:</p>
-<p><img src="/images/spark/cbk.png" alt="img"></p>
+<p><img data-src="/images/spark/cbk.png" alt="img"></p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">combineByKeyDemo</span></span>(): <span class="type">Unit</span> =&#123;</span><br><span class="line">    <span class="comment">//创建数据</span></span><br><span class="line">    <span class="keyword">val</span> rdd = context.parallelize(<span class="type">Seq</span>(</span><br><span class="line">      (<span class="string">&quot;zhangsan&quot;</span>, <span class="number">99.0</span>),</span><br><span class="line">      (<span class="string">&quot;zhangsan&quot;</span>, <span class="number">96.0</span>),</span><br><span class="line">      (<span class="string">&quot;lisi&quot;</span>, <span class="number">97.0</span>),</span><br><span class="line">      (<span class="string">&quot;lisi&quot;</span>, <span class="number">98.0</span>),</span><br><span class="line">      (<span class="string">&quot;zhangsan&quot;</span>, <span class="number">97.0</span>))</span><br><span class="line">    )</span><br><span class="line">    <span class="comment">//处理数据</span></span><br><span class="line">    <span class="keyword">val</span> rdd3 = rdd.combineByKey(</span><br><span class="line">      <span class="comment">//结果   (&quot;zhangsan&quot;, (99.0,1))</span></span><br><span class="line">      createCombiner = (item: <span class="type">Double</span>) =&gt; (item, <span class="number">1</span>),</span><br><span class="line">      <span class="comment">//结果  (&quot;zhangsan&quot;, (99.0+96.0,1+1))  分区上的聚合</span></span><br><span class="line">      mergeValue = (c: (<span class="type">Double</span>, <span class="type">Int</span>), newi: <span class="type">Double</span>) =&gt; ((c._1 + newi), c._2 + <span class="number">1</span>),</span><br><span class="line">      <span class="comment">//结果   把分区上的结果再次聚合 形成最终结果</span></span><br><span class="line">      mergeCombiners = (cuur: (<span class="type">Double</span>, <span class="type">Int</span>), agg: (<span class="type">Double</span>, <span class="type">Int</span>)) =&gt; ((cuur._1 + agg._1), (cuur._2 + agg._2))</span><br><span class="line"></span><br><span class="line">    )</span><br><span class="line">    rdd3.collect().foreach(println(_))</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
 
 <h3 id="12-foldByKey-zeroValue-V-V-⇒-V"><a href="#12-foldByKey-zeroValue-V-V-⇒-V" class="headerlink" title="12 foldByKey(zeroValue)((V, V) ⇒ V)"></a>12 foldByKey(zeroValue)((V, V) ⇒ V)</h3><p>作用</p>
@@ -659,7 +660,7 @@
 <li>Join 有点类似于 SQL 中的内连接, 只会再结果中包含能够连接到的 Key</li>
 <li>Join 的结果是一个笛卡尔积形式, 例如<code>&quot;a&quot;, 1), (&quot;a&quot;, 2</code>和<code>&quot;a&quot;, 10), (&quot;a&quot;, 11</code>的 Join 结果集是 <code>&quot;a&quot;, 1, 10), (&quot;a&quot;, 1, 11), (&quot;a&quot;, 2, 10), (&quot;a&quot;, 2, 11</code></li>
 </ul>
-<p><img src="/images/spark/join.png" alt="img"></p>
+<p><img data-src="/images/spark/join.png" alt="img"></p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//join</span></span><br><span class="line">  <span class="comment">//同key 时才参与join</span></span><br><span class="line">  <span class="meta">@Test</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">joinDemo</span></span>(): <span class="type">Unit</span> =&#123;</span><br><span class="line">    <span class="keyword">val</span> rdd1 = context.parallelize(<span class="type">Seq</span>((<span class="string">&quot;a&quot;</span>, <span class="number">1</span>), (<span class="string">&quot;a&quot;</span>, <span class="number">2</span>), (<span class="string">&quot;b&quot;</span>, <span class="number">1</span>)))</span><br><span class="line">    <span class="keyword">val</span> rdd2 = context.parallelize(<span class="type">Seq</span>((<span class="string">&quot;a&quot;</span>, <span class="number">10</span>), (<span class="string">&quot;a&quot;</span>, <span class="number">11</span>), (<span class="string">&quot;a&quot;</span>, <span class="number">12</span>)))</span><br><span class="line">    rdd1.join(rdd2).collect().foreach(println(_))</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
 
 <h3 id="15-sortBy和sortByKey"><a href="#15-sortBy和sortByKey" class="headerlink" title="15 sortBy和sortByKey"></a>15 sortBy和sortByKey</h3><p>作用</p>
@@ -727,7 +728,7 @@
 <li><p>对 RDD1, RDD2, RDD3 进行 cogroup, 结果中就一定会有三个 List, 如果没有 Value 则是空 List, 这一点类似于 SQL 的全连接, 返回所有结果, 即使没有关联上</p>
 </li>
 <li><p>CoGroup 是一个需要 Shuffled 的操作</p>
-<p><img src="/images/spark/ccc.png" alt="img"></p>
+<p><img data-src="/images/spark/ccc.png" alt="img"></p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> rdd1 = sc.parallelize(<span class="type">Seq</span>((<span class="string">&quot;a&quot;</span>, <span class="number">1</span>), (<span class="string">&quot;a&quot;</span>, <span class="number">2</span>), (<span class="string">&quot;a&quot;</span>, <span class="number">5</span>), (<span class="string">&quot;b&quot;</span>, <span class="number">2</span>), (<span class="string">&quot;b&quot;</span>, <span class="number">6</span>), (<span class="string">&quot;c&quot;</span>, <span class="number">3</span>), (<span class="string">&quot;d&quot;</span>, <span class="number">2</span>)))</span><br><span class="line"><span class="keyword">val</span> rdd2 = sc.parallelize(<span class="type">Seq</span>((<span class="string">&quot;a&quot;</span>, <span class="number">10</span>), (<span class="string">&quot;b&quot;</span>, <span class="number">1</span>), (<span class="string">&quot;d&quot;</span>, <span class="number">3</span>)))</span><br><span class="line"><span class="keyword">val</span> rdd3 = sc.parallelize(<span class="type">Seq</span>((<span class="string">&quot;b&quot;</span>, <span class="number">10</span>), (<span class="string">&quot;a&quot;</span>, <span class="number">1</span>)))</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> result1 = rdd1.cogroup(rdd2).collect()</span><br><span class="line"><span class="keyword">val</span> result2 = rdd1.cogroup(rdd2, rdd3).collect()</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">执行结果:</span></span><br><span class="line"><span class="comment">Array(</span></span><br><span class="line"><span class="comment">  (d,(CompactBuffer(2),CompactBuffer(3))),</span></span><br><span class="line"><span class="comment">  (a,(CompactBuffer(1, 2, 5),CompactBuffer(10))),</span></span><br><span class="line"><span class="comment">  (b,(CompactBuffer(2, 6),CompactBuffer(1))),</span></span><br><span class="line"><span class="comment">  (c,(CompactBuffer(3),CompactBuffer()))</span></span><br><span class="line"><span class="comment">)</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">println(result1)</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">执行结果:</span></span><br><span class="line"><span class="comment">Array(</span></span><br><span class="line"><span class="comment">  (d,(CompactBuffer(2),CompactBuffer(3),CompactBuffer())),</span></span><br><span class="line"><span class="comment">  (a,(CompactBuffer(1, 2, 5),CompactBuffer(10),CompactBuffer(1))),</span></span><br><span class="line"><span class="comment">  (b,(CompactBuffer(2, 6),CompactBuffer(1),Co...</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">println(result2)</span><br></pre></td></tr></table></figure>
 
 
@@ -735,7 +736,7 @@
 </ul>
 <p><strong>总结</strong></p>
 <p>所有的转换操作的算子都是惰性的,在执行的时候并不会真的去调度运行,求得结果,而是只是生成了对应的RDD,只有在Action时,才会真的运行求得结果</p>
-<p><img src="/images/spark/tz.jpg" alt="img"></p>
+<p><img data-src="/images/spark/tz.jpg" alt="img"></p>
 <h2 id="2-Action-算子"><a href="#2-Action-算子" class="headerlink" title="2 Action 算子"></a>2 Action 算子</h2><h3 id="1-reduce-T-T-⇒-U-不是一个shuffle操作"><a href="#1-reduce-T-T-⇒-U-不是一个shuffle操作" class="headerlink" title="1 reduce( (T, T) ⇒ U )     不是一个shuffle操作"></a>1 reduce( (T, T) ⇒ U )     不是一个shuffle操作</h3><p>作用</p>
 <ul>
 <li>对整个结果集规约, 最终生成一条数据, 是整个数据集的汇总</li>
@@ -821,7 +822,7 @@
 <p>键值型数据本质上就是一个二元元组, 键值对类型的 RDD 表示为 <code>RDD[(K, V)]</code></p>
 <p>RDD 对键值对的额外支持是通过隐式支持来完成的, 一个 <code>RDD[(K, V)]</code>, 可以被隐式转换为一个 <code>PairRDDFunctions</code> 对象, 从而调用其中的方法.</p>
 <p>源码:</p>
-<p><img src="/images/spark/spkv.jpg" alt="img"></p>
+<p><img data-src="/images/spark/spkv.jpg" alt="img"></p>
 <p><strong>既然对键值对的支持是通过</strong> <code>PairRDDFunctions</code> <strong>提供的, 那么从</strong> <code>PairRDDFunctions</code> <strong>中就可以看到这些支持有什么</strong></p>
 <table>
 <thead>
@@ -902,7 +903,7 @@
 <p>以年月为基础,统计北京东四地区的PM值</p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.nicai.demo</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.commons.lang3.<span class="type">StringUtils</span></span><br><span class="line"><span class="keyword">import</span> org.apache.spark.rdd.<span class="type">RDD</span></span><br><span class="line"><span class="keyword">import</span> org.apache.spark.&#123;<span class="type">SparkConf</span>, <span class="type">SparkContext</span>&#125;</span><br><span class="line"><span class="keyword">import</span> org.junit.<span class="type">Test</span></span><br><span class="line"><span class="comment">//需求  以年月为基础,统计北京东四地区的PM值</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">PmCount</span> </span>&#123;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">val</span> conf: <span class="type">SparkConf</span> = <span class="keyword">new</span> <span class="type">SparkConf</span>().setMaster(<span class="string">&quot;local[5]&quot;</span>).setAppName(<span class="string">&quot;Bj-pm-count&quot;</span>)</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">val</span> context = <span class="keyword">new</span> <span class="type">SparkContext</span>(conf)</span><br><span class="line">  <span class="meta">@Test</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">pmCount</span></span>(): <span class="type">Unit</span> =&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//读取数据 一次一行</span></span><br><span class="line">   <span class="keyword">var</span> data: <span class="type">RDD</span>[<span class="type">String</span>] = context.textFile(<span class="string">&quot;G:\\develop\\data\\BeijingPM20100101_20151231_noheader.csv&quot;</span>)</span><br><span class="line">    <span class="comment">//清洗数据</span></span><br><span class="line">    <span class="comment">//以年月为key ,pm 值为value</span></span><br><span class="line">    data.map(item =&gt; (item.split(<span class="string">&quot;,&quot;</span>))).map(items =&gt; ((items(<span class="number">1</span>), items(<span class="number">2</span>)), items(<span class="number">6</span>)))</span><br><span class="line">      .filter(it =&gt; <span class="type">StringUtils</span>.isNoneEmpty(it._2) &amp;&amp; !<span class="string">&quot;NA&quot;</span>.equalsIgnoreCase(it._2))</span><br><span class="line">      .map(it =&gt; (it._1, it._2.toInt))</span><br><span class="line">      .reduceByKey((curr, agg) =&gt; curr + agg)</span><br><span class="line">      .take(<span class="number">10</span>)</span><br><span class="line">      .foreach(println(_))</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
-<p><img src="/images/spark/z.png" alt="img"></p>
+<p><img data-src="/images/spark/z.png" alt="img"></p>
 
     </div>
 
@@ -1167,6 +1168,9 @@
 
   
   <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="true"></script>
+  <script src="true"></script>
   <script src="/lib/velocity/velocity.min.js"></script>
   <script src="/lib/velocity/velocity.ui.min.js"></script>
 

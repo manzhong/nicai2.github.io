@@ -30,7 +30,7 @@
 <meta property="og:description" content="一 pandas概述 ​ Pandas 是 Python 的核心数据分析支持库，提供了快速、灵活、明确的数据结构，旨在简单、直观地处理关系型、标记型数据,   Pandas 适用于处理以下类型的数据：   * 与 SQL 或 Excel 表类似的，含异构列的表格数据;  * 有序和无序（非固定频率）的时间序列数据;  * 带行列标签的矩阵数据，包括同构或异构型数据;  * 任意其它形式的观测、统计">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-11-22T12:50:44.000Z">
-<meta property="article:modified_time" content="2021-03-07T11:43:56.792Z">
+<meta property="article:modified_time" content="2021-03-17T14:24:54.925Z">
 <meta property="article:author" content="HF">
 <meta property="article:tag" content="数据分析与可视化">
 <meta property="article:tag" content="Python">
@@ -226,7 +226,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-03-07 19:43:56" itemprop="dateModified" datetime="2021-03-07T19:43:56+08:00">2021-03-07</time>
+                <time title="修改时间：2021-03-17 22:24:54" itemprop="dateModified" datetime="2021-03-17T22:24:54+08:00">2021-03-17</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -270,46 +270,47 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <script src=/js/crypto-js.js></script>
-<script>
-function doDecrypt (pwd, onError) {
-	console.log('in doDecrypt');
-	const txt = document.getElementById('enc_content').innerHTML;
-	let plantext;
-	try {
-		const bytes = CryptoJS.AES.decrypt(txt, pwd);
-		var plaintext = bytes.toString(CryptoJS.enc.Utf8);
-	} catch(err) {
-		if(onError) {
-			onError(err);
-		}
-		return;
-	}
-	document.getElementById('enc_content').innerHTML = plaintext;
-	document.getElementById('enc_content').style.display = 'block';
-	document.getElementById('enc_passwd').style.display = 'none';
-	if(typeof MathJax !== 'undefined') {
-		MathJax.Hub.Queue(
-			['resetEquationNumbers', MathJax.InputJax.TeX],
-			['PreProcess', MathJax.Hub],
-			['Reprocess', MathJax.Hub]
-		);
-	}
-}
-</script>
-<div id="enc_content" style="display:none">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</div>
-<div id="enc_passwd"> <input id="enc_pwd_input" type="password" style="border-radius: 5px;border-style: groove;height: 30px;width: 50%;cursor: auto;font-size: 102%;color: currentColor;outline: none;text-overflow: initial;padding-left: 5px;" onkeydown="if (event.keyCode == 13) { decrypt(); return false;}"> <input type="submit" value="解&nbsp;密" onclick="decrypt()" style="width: 58px;height: 34px;border-radius: 5px;background-color: white;border-style: solid;color: currentColor;"><div id="enc_error" style="display: inline-block;color: #d84527;margin-left: 10px"></div>
-<script>
-var onError = function(error) {
-	document.getElementById("enc_error").innerHTML = "password error!"
-};
-function decrypt() {
-var passwd = document.getElementById("enc_pwd_input").value;
-console.log(passwd);
-doDecrypt(passwd, onError);
-}
-</script>
-</div>
+        <h2 id="一-pandas概述"><a href="#一-pandas概述" class="headerlink" title="一 pandas概述"></a>一 pandas概述</h2><p>​    <strong>Pandas</strong> 是 <a target="_blank" rel="noopener" href="https://www.python.org/">Python</a> 的核心数据分析支持库，提供了快速、灵活、明确的数据结构，旨在简单、直观地处理关系型、标记型数据,</p>
+<p>   Pandas 适用于处理以下类型的数据：</p>
+<ul>
+<li>与 SQL 或 Excel 表类似的，含异构列的表格数据;</li>
+<li>有序和无序（非固定频率）的时间序列数据;</li>
+<li>带行列标签的矩阵数据，包括同构或异构型数据;</li>
+<li>任意其它形式的观测、统计数据集, 数据转入 Pandas 数据结构时不必事先标记。</li>
+</ul>
+<p>​     Pandas 的主要数据结构是 <a target="_blank" rel="noopener" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html#pandas.Series">Series</a>（一维数据）与 <a target="_blank" rel="noopener" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame">DataFrame</a>（二维数据），这两种数据结构足以处理金融、统计、社会科学、工程等领域里的大多数典型用例</p>
+<p>   Pandas 基于 <a target="_blank" rel="noopener" href="https://www.numpy.org/">NumPy</a> 开发，可以与其它第三方科学计算支持库完美集成。</p>
+<p>优点:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">1.处理浮点与非浮点数据里的缺失数据，表示为 NaN；</span><br><span class="line">2.大小可变：插入或删除 DataFrame 等多维对象的列；</span><br><span class="line">3.自动、显式数据对齐：显式地将对象与一组标签对齐，也可以忽略标签，在 Series、DataFrame 计算时自动与数据对齐；</span><br><span class="line">4.强大、灵活的分组（group by）功能：拆分-应用-组合数据集，聚合、转换数据；</span><br><span class="line">5.把 Python 和 NumPy 数据结构里不规则、不同索引的数据轻松地转换为 DataFrame 对象；</span><br><span class="line">6.基于智能标签，对大型数据集进行切片、花式索引、子集分解等操作；</span><br><span class="line">7.直观地合并（merge）、**连接（join）**数据集；</span><br><span class="line">8.灵活地重塑（reshape）、**透视（pivot）**数据集；</span><br><span class="line">9.轴支持结构化标签：一个刻度支持多个标签；</span><br><span class="line">10.成熟的 IO 工具：读取文本文件（CSV 等支持分隔符的文件）、Excel 文件、数据库等来源的数据，利用超快的 HDF5 格式保存 &#x2F; 加载数据；</span><br><span class="line">11.时间序列：支持日期范围生成、频率转换、移动窗口统计、移动窗口线性回归、日期位移等时间序列功能。</span><br></pre></td></tr></table></figure>
+
+<p>处理数据一般分为几个阶段：数据整理与清洗、数据分析与建模、数据可视化与制表，Pandas 是处理数据的理想工具。</p>
+<h2 id="二-数据结构"><a href="#二-数据结构" class="headerlink" title="二 数据结构"></a>二 数据结构</h2><table>
+<thead>
+<tr>
+<th>维数</th>
+<th>名称</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>Series</td>
+<td>带标签的一维同构数组</td>
+</tr>
+<tr>
+<td>2</td>
+<td>DataFrame</td>
+<td>带标签的，大小可变的，二维异构表格</td>
+</tr>
+</tbody></table>
+<p>​    Pandas 数据结构就像是低维数据的容器。比如，DataFrame 是 Series 的容器，Series 则是标量的容器。使用这种方式，可以在容器中以字典的形式插入或删除对象。</p>
+<p>​    此外，通用 API 函数的默认操作要顾及时间序列与截面数据集的方向。多维数组存储二维或三维数据时，编写函数要注意数据集的方向，这对用户来说是一种负担；如果不考虑 C 或 Fortran 中连续性对性能的影响，一般情况下，不同的轴在程序里其实没有什么区别。Pandas 里，轴的概念主要是为了给数据赋予更直观的语义，即用“更恰当”的方式表示数据集的方向。这样做可以让用户编写数据转换函数时，少费点脑子。</p>
+<p>​    处理 DataFrame 等表格数据时，<strong>index</strong>（行）或 <strong>columns</strong>（列）比 <strong>axis 0</strong> 和 <strong>axis 1</strong> 更直观。用这种方式迭代 DataFrame 的列，代码更易读易懂：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> col <span class="keyword">in</span> df.columns:</span><br><span class="line">    series = df[col]</span><br><span class="line">    <span class="comment"># do something with series</span></span><br></pre></td></tr></table></figure>
+
+<p>Pandas 所有数据结构的值都是可变的，但数据结构的大小并非都是可变的，比如，Series 的长度不可改变，但 DataFrame 里就可以插入列。</p>
+<p>Pandas 里，绝大多数方法都不改变原始的输入数据，而是复制数据，生成新的对象。 一般来说，原始输入数据<strong>不变</strong>更稳妥。</p>
+<h2 id="三-基本使用"><a href="#三-基本使用" class="headerlink" title="三 基本使用"></a>三 基本使用</h2>
     </div>
 
     
@@ -410,6 +411,7 @@ doDecrypt(passwd, onError);
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80-pandas%E6%A6%82%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">一 pandas概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C-%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="nav-number">2.</span> <span class="nav-text">二 数据结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89-%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8"><span class="nav-number">3.</span> <span class="nav-text">三 基本使用</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -425,20 +427,20 @@ doDecrypt(passwd, onError);
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">79</span>
+          <span class="site-state-item-count">78</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">37</span>
+        <span class="site-state-item-count">38</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-count">39</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -740,7 +742,7 @@ if(canvas.getContext){
         <h3 class="widget-title">Tag Cloud</h3>
         <div id="myCanvasContainer" class="widget tagcloud">
             <canvas width="250" height="250" id="resCanvas" style="width=100%">
-                <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Ai/" rel="tag">Ai</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Azkaban/" rel="tag">Azkaban</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Blog/" rel="tag">Blog</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ClouderaManager/" rel="tag">ClouderaManager</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ElSearch/" rel="tag">ElSearch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flink/" rel="tag">Flink</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flume/" rel="tag">Flume</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/" rel="tag">Hadoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hbase/" rel="tag">Hbase</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hdfs/" rel="tag">Hdfs</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hexo/" rel="tag">Hexo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hive/" rel="tag">Hive</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hue/" rel="tag">Hue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Impala/" rel="tag">Impala</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/" rel="tag">Java</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jvm/" rel="tag">Jvm</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kafka/" rel="tag">Kafka</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kettle/" rel="tag">Kettle</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kudu/" rel="tag">Kudu</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/" rel="tag">Linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Livy/" rel="tag">Livy</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MapReduce/" rel="tag">MapReduce</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mysql/" rel="tag">Mysql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Oozie/" rel="tag">Oozie</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redis/" rel="tag">Redis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scala/" rel="tag">Scala</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Shell/" rel="tag">Shell</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spark/" rel="tag">Spark</a><span class="tag-list-count">15</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Sqoop/" rel="tag">Sqoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web/" rel="tag">Web</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Yarn/" rel="tag">Yarn</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ZK/" rel="tag">ZK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96/" rel="tag">数据分析与可视化</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E6%8C%96%E6%8E%98%E4%B8%8E%E5%88%86%E6%9E%90/" rel="tag">数据挖掘与分析</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" rel="tag">数据结构与算法</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">机器学习与深度学习</a><span class="tag-list-count">2</span></li></ul>
+                <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Ai/" rel="tag">Ai</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Azkaban/" rel="tag">Azkaban</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Blog/" rel="tag">Blog</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ClouderaManager/" rel="tag">ClouderaManager</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ElSearch/" rel="tag">ElSearch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flink/" rel="tag">Flink</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flume/" rel="tag">Flume</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Git/" rel="tag">Git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/" rel="tag">Hadoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hbase/" rel="tag">Hbase</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hdfs/" rel="tag">Hdfs</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hexo/" rel="tag">Hexo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hive/" rel="tag">Hive</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hue/" rel="tag">Hue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Impala/" rel="tag">Impala</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/" rel="tag">Java</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jvm/" rel="tag">Jvm</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kafka/" rel="tag">Kafka</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kettle/" rel="tag">Kettle</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kudu/" rel="tag">Kudu</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/" rel="tag">Linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Livy/" rel="tag">Livy</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MapReduce/" rel="tag">MapReduce</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mysql/" rel="tag">Mysql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Oozie/" rel="tag">Oozie</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redis/" rel="tag">Redis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scala/" rel="tag">Scala</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Shell/" rel="tag">Shell</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spark/" rel="tag">Spark</a><span class="tag-list-count">14</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Sqoop/" rel="tag">Sqoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web/" rel="tag">Web</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Yarn/" rel="tag">Yarn</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ZK/" rel="tag">ZK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96/" rel="tag">数据分析与可视化</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E6%8C%96%E6%8E%98%E4%B8%8E%E5%88%86%E6%9E%90/" rel="tag">数据挖掘与分析</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" rel="tag">数据结构与算法</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">机器学习与深度学习</a><span class="tag-list-count">2</span></li></ul>
             </canvas>
         </div>
     </div>
@@ -779,7 +781,7 @@ if(canvas.getContext){
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">18:12</span>
+    <span title="站点阅读时长">18:17</span>
 </div>
 
   <!-- 网站运行时间的设置 -->

@@ -30,7 +30,7 @@
 <meta property="og:description" content="数仓中常用的优化及函数 一 常用函数 ​ hive提供了很多函数,可以使用命令show functions罗列所有的函数,会发现这些函数名大部分与mysql相同,可以通过describe function functionName 查看函数的使用方法  1 行转列,列转行 1.1 列转行 1 2 3   collect_list() --不去重 collect_set() --去重   --两者都">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-05-02T14:36:20.000Z">
-<meta property="article:modified_time" content="2020-09-29T01:04:08.594Z">
+<meta property="article:modified_time" content="2021-03-17T14:18:15.331Z">
 <meta property="article:author" content="HF">
 <meta property="article:tag" content="Hive">
 <meta name="twitter:card" content="summary">
@@ -225,7 +225,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-09-29 09:04:08" itemprop="dateModified" datetime="2020-09-29T09:04:08+08:00">2020-09-29</time>
+                <time title="修改时间：2021-03-17 22:18:15" itemprop="dateModified" datetime="2021-03-17T22:18:15+08:00">2021-03-17</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -269,46 +269,18 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <script src=/js/crypto-js.js></script>
-<script>
-function doDecrypt (pwd, onError) {
-	console.log('in doDecrypt');
-	const txt = document.getElementById('enc_content').innerHTML;
-	let plantext;
-	try {
-		const bytes = CryptoJS.AES.decrypt(txt, pwd);
-		var plaintext = bytes.toString(CryptoJS.enc.Utf8);
-	} catch(err) {
-		if(onError) {
-			onError(err);
-		}
-		return;
-	}
-	document.getElementById('enc_content').innerHTML = plaintext;
-	document.getElementById('enc_content').style.display = 'block';
-	document.getElementById('enc_passwd').style.display = 'none';
-	if(typeof MathJax !== 'undefined') {
-		MathJax.Hub.Queue(
-			['resetEquationNumbers', MathJax.InputJax.TeX],
-			['PreProcess', MathJax.Hub],
-			['Reprocess', MathJax.Hub]
-		);
-	}
-}
-</script>
-<div id="enc_content" style="display:none">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</div>
-<div id="enc_passwd"> <input id="enc_pwd_input" type="password" style="border-radius: 5px;border-style: groove;height: 30px;width: 50%;cursor: auto;font-size: 102%;color: currentColor;outline: none;text-overflow: initial;padding-left: 5px;" onkeydown="if (event.keyCode == 13) { decrypt(); return false;}"> <input type="submit" value="解&nbsp;密" onclick="decrypt()" style="width: 58px;height: 34px;border-radius: 5px;background-color: white;border-style: solid;color: currentColor;"><div id="enc_error" style="display: inline-block;color: #d84527;margin-left: 10px"></div>
-<script>
-var onError = function(error) {
-	document.getElementById("enc_error").innerHTML = "password error!"
-};
-function decrypt() {
-var passwd = document.getElementById("enc_pwd_input").value;
-console.log(passwd);
-doDecrypt(passwd, onError);
-}
-</script>
-</div>
+        <h1 id="数仓中常用的优化及函数"><a href="#数仓中常用的优化及函数" class="headerlink" title="数仓中常用的优化及函数"></a>数仓中常用的优化及函数</h1><h1 id="一-常用函数"><a href="#一-常用函数" class="headerlink" title="一 常用函数"></a>一 常用函数</h1><p>​    hive提供了很多函数,可以使用命令show functions罗列所有的函数,会发现这些函数名大部分与mysql相同,可以通过describe function functionName 查看函数的使用方法</p>
+<h2 id="1-行转列-列转行"><a href="#1-行转列-列转行" class="headerlink" title="1 行转列,列转行"></a>1 行转列,列转行</h2><h3 id="1-1-列转行"><a href="#1-1-列转行" class="headerlink" title="1.1 列转行"></a>1.1 列转行</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">collect_list() <span class="comment">--不去重</span></span><br><span class="line">collect_set() <span class="comment">--去重  </span></span><br><span class="line"><span class="comment">--两者都是无需序,col都是string</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--多列转为一行并排序</span></span><br><span class="line">sort_array(</span><br><span class="line">	split(</span><br><span class="line">    	concat_ws(&#x27;,&#x27;,collect_list(sleep_time),collect_list(awaking_time)),&#x27;,&#x27;</span><br><span class="line">    )</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<pre><code>                                                                                                                                                                                                                                                                                                                                                               ### 1.2行转列</code></pre>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lateral view explode(array) a as name</span><br></pre></td></tr></table></figure>
+
+<p>例子:</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> user_id,order_value,order_id</span><br><span class="line"><span class="keyword">from</span> lie_col</span><br><span class="line"><span class="keyword">lateral</span> <span class="keyword">view</span> <span class="keyword">explode</span>(<span class="keyword">split</span>(order_value,<span class="string">&#x27;,&#x27;</span>)) <span class="keyword">num</span> <span class="keyword">as</span> order_id</span><br><span class="line"><span class="keyword">limit</span> <span class="number">10</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-分位函数"><a href="#2-分位函数" class="headerlink" title="2 分位函数"></a>2 分位函数</h2>
     </div>
 
     
@@ -408,6 +380,7 @@ doDecrypt(passwd, onError);
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%B0%E4%BB%93%E4%B8%AD%E5%B8%B8%E7%94%A8%E7%9A%84%E4%BC%98%E5%8C%96%E5%8F%8A%E5%87%BD%E6%95%B0"><span class="nav-number">1.</span> <span class="nav-text">数仓中常用的优化及函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%80-%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0"><span class="nav-number">2.</span> <span class="nav-text">一 常用函数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E8%A1%8C%E8%BD%AC%E5%88%97-%E5%88%97%E8%BD%AC%E8%A1%8C"><span class="nav-number">2.1.</span> <span class="nav-text">1 行转列,列转行</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E5%88%97%E8%BD%AC%E8%A1%8C"><span class="nav-number">2.1.1.</span> <span class="nav-text">1.1 列转行</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%88%86%E4%BD%8D%E5%87%BD%E6%95%B0"><span class="nav-number">2.2.</span> <span class="nav-text">2 分位函数</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -423,20 +396,20 @@ doDecrypt(passwd, onError);
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">79</span>
+          <span class="site-state-item-count">78</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">37</span>
+        <span class="site-state-item-count">38</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-count">39</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -738,7 +711,7 @@ if(canvas.getContext){
         <h3 class="widget-title">Tag Cloud</h3>
         <div id="myCanvasContainer" class="widget tagcloud">
             <canvas width="250" height="250" id="resCanvas" style="width=100%">
-                <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Ai/" rel="tag">Ai</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Azkaban/" rel="tag">Azkaban</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Blog/" rel="tag">Blog</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ClouderaManager/" rel="tag">ClouderaManager</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ElSearch/" rel="tag">ElSearch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flink/" rel="tag">Flink</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flume/" rel="tag">Flume</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/" rel="tag">Hadoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hbase/" rel="tag">Hbase</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hdfs/" rel="tag">Hdfs</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hexo/" rel="tag">Hexo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hive/" rel="tag">Hive</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hue/" rel="tag">Hue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Impala/" rel="tag">Impala</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/" rel="tag">Java</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jvm/" rel="tag">Jvm</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kafka/" rel="tag">Kafka</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kettle/" rel="tag">Kettle</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kudu/" rel="tag">Kudu</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/" rel="tag">Linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Livy/" rel="tag">Livy</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MapReduce/" rel="tag">MapReduce</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mysql/" rel="tag">Mysql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Oozie/" rel="tag">Oozie</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redis/" rel="tag">Redis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scala/" rel="tag">Scala</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Shell/" rel="tag">Shell</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spark/" rel="tag">Spark</a><span class="tag-list-count">15</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Sqoop/" rel="tag">Sqoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web/" rel="tag">Web</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Yarn/" rel="tag">Yarn</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ZK/" rel="tag">ZK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96/" rel="tag">数据分析与可视化</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E6%8C%96%E6%8E%98%E4%B8%8E%E5%88%86%E6%9E%90/" rel="tag">数据挖掘与分析</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" rel="tag">数据结构与算法</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">机器学习与深度学习</a><span class="tag-list-count">2</span></li></ul>
+                <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Ai/" rel="tag">Ai</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Azkaban/" rel="tag">Azkaban</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Blog/" rel="tag">Blog</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ClouderaManager/" rel="tag">ClouderaManager</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ElSearch/" rel="tag">ElSearch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flink/" rel="tag">Flink</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flume/" rel="tag">Flume</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Git/" rel="tag">Git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/" rel="tag">Hadoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hbase/" rel="tag">Hbase</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hdfs/" rel="tag">Hdfs</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hexo/" rel="tag">Hexo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hive/" rel="tag">Hive</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hue/" rel="tag">Hue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Impala/" rel="tag">Impala</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/" rel="tag">Java</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jvm/" rel="tag">Jvm</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kafka/" rel="tag">Kafka</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kettle/" rel="tag">Kettle</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kudu/" rel="tag">Kudu</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/" rel="tag">Linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Livy/" rel="tag">Livy</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MapReduce/" rel="tag">MapReduce</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mysql/" rel="tag">Mysql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Oozie/" rel="tag">Oozie</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redis/" rel="tag">Redis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scala/" rel="tag">Scala</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Shell/" rel="tag">Shell</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spark/" rel="tag">Spark</a><span class="tag-list-count">14</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Sqoop/" rel="tag">Sqoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web/" rel="tag">Web</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Yarn/" rel="tag">Yarn</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ZK/" rel="tag">ZK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96/" rel="tag">数据分析与可视化</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E6%8C%96%E6%8E%98%E4%B8%8E%E5%88%86%E6%9E%90/" rel="tag">数据挖掘与分析</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" rel="tag">数据结构与算法</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">机器学习与深度学习</a><span class="tag-list-count">2</span></li></ul>
             </canvas>
         </div>
     </div>
@@ -777,7 +750,7 @@ if(canvas.getContext){
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">18:12</span>
+    <span title="站点阅读时长">18:17</span>
 </div>
 
   <!-- 网站运行时间的设置 -->

@@ -30,7 +30,7 @@
 <meta property="og:description" content="一、概述 操作 excel 是程序员经常要遇到的场景。因为产品、运营的数据都是以这种格式存储。所以，当程序员拿到这些数据肯定要解析，甚至需要把结果输出成 excel 文件。  下面就介绍如果用 Python 方面的读、写 excel 文件。  二、openpyxl A Python library to read&#x2F;write Excel 2010 xlsx&#x2F;xlsm files  借助 Pytho">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-06-01T15:14:07.000Z">
-<meta property="article:modified_time" content="2020-09-29T01:04:08.590Z">
+<meta property="article:modified_time" content="2021-03-17T14:24:27.771Z">
 <meta property="article:author" content="HF">
 <meta property="article:tag" content="Python">
 <meta name="twitter:card" content="summary">
@@ -225,7 +225,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-09-29 09:04:08" itemprop="dateModified" datetime="2020-09-29T09:04:08+08:00">2020-09-29</time>
+                <time title="修改时间：2021-03-17 22:24:27" itemprop="dateModified" datetime="2021-03-17T22:24:27+08:00">2021-03-17</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -269,46 +269,34 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <script src=/js/crypto-js.js></script>
-<script>
-function doDecrypt (pwd, onError) {
-	console.log('in doDecrypt');
-	const txt = document.getElementById('enc_content').innerHTML;
-	let plantext;
-	try {
-		const bytes = CryptoJS.AES.decrypt(txt, pwd);
-		var plaintext = bytes.toString(CryptoJS.enc.Utf8);
-	} catch(err) {
-		if(onError) {
-			onError(err);
-		}
-		return;
-	}
-	document.getElementById('enc_content').innerHTML = plaintext;
-	document.getElementById('enc_content').style.display = 'block';
-	document.getElementById('enc_passwd').style.display = 'none';
-	if(typeof MathJax !== 'undefined') {
-		MathJax.Hub.Queue(
-			['resetEquationNumbers', MathJax.InputJax.TeX],
-			['PreProcess', MathJax.Hub],
-			['Reprocess', MathJax.Hub]
-		);
-	}
-}
-</script>
-<div id="enc_content" style="display:none">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</div>
-<div id="enc_passwd"> <input id="enc_pwd_input" type="password" style="border-radius: 5px;border-style: groove;height: 30px;width: 50%;cursor: auto;font-size: 102%;color: currentColor;outline: none;text-overflow: initial;padding-left: 5px;" onkeydown="if (event.keyCode == 13) { decrypt(); return false;}"> <input type="submit" value="解&nbsp;密" onclick="decrypt()" style="width: 58px;height: 34px;border-radius: 5px;background-color: white;border-style: solid;color: currentColor;"><div id="enc_error" style="display: inline-block;color: #d84527;margin-left: 10px"></div>
-<script>
-var onError = function(error) {
-	document.getElementById("enc_error").innerHTML = "password error!"
-};
-function decrypt() {
-var passwd = document.getElementById("enc_pwd_input").value;
-console.log(passwd);
-doDecrypt(passwd, onError);
-}
-</script>
-</div>
+        <h2 id="一、概述"><a href="#一、概述" class="headerlink" title="一、概述"></a>一、概述</h2><p>操作 excel 是程序员经常要遇到的场景。因为产品、运营的数据都是以这种格式存储。所以，当程序员拿到这些数据肯定要解析，甚至需要把结果输出成 excel 文件。</p>
+<p>下面就介绍如果用 Python 方面的读、写 excel 文件。</p>
+<h2 id="二、openpyxl"><a href="#二、openpyxl" class="headerlink" title="二、openpyxl"></a>二、openpyxl</h2><blockquote>
+<p>A Python library to read/write Excel 2010 xlsx/xlsm files</p>
+</blockquote>
+<p>借助 Python 的三方库 <code>openpyxl</code> ，让操作 excel 变得简单。</p>
+<ol>
+<li>安装：<code>pip install openpyxl</code></li>
+<li>文档：<a target="_blank" rel="noopener" href="https://openpyxl.readthedocs.io/en/stable/">官方文档</a></li>
+<li>示例代码：</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># coding=utf-8</span></span><br><span class="line"><span class="keyword">from</span> openpyxl <span class="keyword">import</span> Workbook</span><br><span class="line">wb = Workbook()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 选择 sheet</span></span><br><span class="line">ws = wb.active</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置值到某一个单元格（cells）</span></span><br><span class="line">ws[<span class="string">&#x27;A1&#x27;</span>] = <span class="number">42</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Python 的数据类型可以自动转换</span></span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line">ws[<span class="string">&#x27;A2&#x27;</span>] = datetime.datetime.now()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 存储文件</span></span><br><span class="line">wb.save(<span class="string">&quot;sample.xlsx&quot;</span>) <span class="comment"># 默认保存到当前目录下。文件名称为 sample.xlsx</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="读数据"><a href="#读数据" class="headerlink" title="读数据"></a>读数据</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> openpyxl <span class="keyword">import</span> load_workbook</span><br><span class="line"></span><br><span class="line">wb = load_workbook(<span class="string">&#x27;sample.xlsx&#x27;</span>) <span class="comment"># 读取文件</span></span><br><span class="line">sheet = wb.get_sheet_by_name(<span class="string">&quot;Sheet&quot;</span>) <span class="comment"># 根据 sheet 名称获取，返回 Worksheet 对象</span></span><br><span class="line">columns = sheet[<span class="string">&#x27;A&#x27;</span>] <span class="comment"># 选择一列</span></span><br><span class="line"><span class="keyword">for</span> fi_column <span class="keyword">in</span> columns:</span><br><span class="line">    <span class="comment"># 遍历这列的所有行</span></span><br><span class="line">    <span class="keyword">print</span> fi_column.value <span class="comment"># 每一个fi_column是 Cell 对象</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="写数据"><a href="#写数据" class="headerlink" title="写数据"></a>写数据</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> openpyxl <span class="keyword">import</span> Workbook</span><br><span class="line">wb = Workbook()</span><br><span class="line"><span class="comment"># 选择 sheet</span></span><br><span class="line">ws = wb.create_sheet()</span><br><span class="line"><span class="comment"># result_list -&gt;[[第一行数据], [第二行数据], ...]</span></span><br><span class="line"><span class="keyword">for</span> fi_result <span class="keyword">in</span> result_list:</span><br><span class="line">    ws.append(fi_result) <span class="comment"># 每行的数据</span></span><br><span class="line"><span class="comment"># 存储文件</span></span><br><span class="line">wb.save(<span class="string">&quot;test.xlsx&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<h2 id="更多-API"><a href="#更多-API" class="headerlink" title="更多 API"></a>更多 API</h2><ul>
+<li>Worksheet.columns()：获取 sheet 所有列</li>
+<li>Worksheet.iter_cols()：通过列截断</li>
+<li>Worksheet.rows()：获取 sheet 所有行</li>
+<li>Worksheet.iter_rows()：通过行截断</li>
+<li>Worksheet.cell()：操作单元格</li>
+<li>Workbook.save()：存储文件</li>
+<li>workbook.Workbook.create_sheet()：创建新的 sheet</li>
+<li>Workbook.sheetnames()：获取 sheet 名称</li>
+</ul>
+
     </div>
 
     
@@ -343,8 +331,8 @@ doDecrypt(passwd, onError);
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2020/05/31/SparkGraphx/" rel="prev" title="SparkGraphx">
-      <i class="fa fa-chevron-left"></i> SparkGraphx
+    <a href="/2020/05/31/Livy/" rel="prev" title="Livy">
+      <i class="fa fa-chevron-left"></i> Livy
     </a></div>
       <div class="post-nav-item">
     <a href="/2020/06/07/Hive%E7%9A%84%E8%87%AA%E5%AE%9A%E4%B9%89%E5%87%BD%E6%95%B0/" rel="next" title="Hive的自定义函数">
@@ -408,6 +396,7 @@ doDecrypt(passwd, onError);
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E6%A6%82%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">一、概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81openpyxl"><span class="nav-number">2.</span> <span class="nav-text">二、openpyxl</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E6%95%B0%E6%8D%AE"><span class="nav-number">3.</span> <span class="nav-text">读数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%99%E6%95%B0%E6%8D%AE"><span class="nav-number">4.</span> <span class="nav-text">写数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9B%B4%E5%A4%9A-API"><span class="nav-number">5.</span> <span class="nav-text">更多 API</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -423,20 +412,20 @@ doDecrypt(passwd, onError);
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">79</span>
+          <span class="site-state-item-count">78</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">37</span>
+        <span class="site-state-item-count">38</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-count">39</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -738,7 +727,7 @@ if(canvas.getContext){
         <h3 class="widget-title">Tag Cloud</h3>
         <div id="myCanvasContainer" class="widget tagcloud">
             <canvas width="250" height="250" id="resCanvas" style="width=100%">
-                <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Ai/" rel="tag">Ai</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Azkaban/" rel="tag">Azkaban</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Blog/" rel="tag">Blog</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ClouderaManager/" rel="tag">ClouderaManager</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ElSearch/" rel="tag">ElSearch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flink/" rel="tag">Flink</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flume/" rel="tag">Flume</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/" rel="tag">Hadoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hbase/" rel="tag">Hbase</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hdfs/" rel="tag">Hdfs</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hexo/" rel="tag">Hexo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hive/" rel="tag">Hive</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hue/" rel="tag">Hue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Impala/" rel="tag">Impala</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/" rel="tag">Java</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jvm/" rel="tag">Jvm</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kafka/" rel="tag">Kafka</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kettle/" rel="tag">Kettle</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kudu/" rel="tag">Kudu</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/" rel="tag">Linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Livy/" rel="tag">Livy</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MapReduce/" rel="tag">MapReduce</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mysql/" rel="tag">Mysql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Oozie/" rel="tag">Oozie</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redis/" rel="tag">Redis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scala/" rel="tag">Scala</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Shell/" rel="tag">Shell</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spark/" rel="tag">Spark</a><span class="tag-list-count">15</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Sqoop/" rel="tag">Sqoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web/" rel="tag">Web</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Yarn/" rel="tag">Yarn</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ZK/" rel="tag">ZK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96/" rel="tag">数据分析与可视化</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E6%8C%96%E6%8E%98%E4%B8%8E%E5%88%86%E6%9E%90/" rel="tag">数据挖掘与分析</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" rel="tag">数据结构与算法</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">机器学习与深度学习</a><span class="tag-list-count">2</span></li></ul>
+                <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Ai/" rel="tag">Ai</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Azkaban/" rel="tag">Azkaban</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Blog/" rel="tag">Blog</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ClouderaManager/" rel="tag">ClouderaManager</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ElSearch/" rel="tag">ElSearch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flink/" rel="tag">Flink</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flume/" rel="tag">Flume</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Git/" rel="tag">Git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/" rel="tag">Hadoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hbase/" rel="tag">Hbase</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hdfs/" rel="tag">Hdfs</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hexo/" rel="tag">Hexo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hive/" rel="tag">Hive</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hue/" rel="tag">Hue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Impala/" rel="tag">Impala</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/" rel="tag">Java</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jvm/" rel="tag">Jvm</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kafka/" rel="tag">Kafka</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kettle/" rel="tag">Kettle</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kudu/" rel="tag">Kudu</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/" rel="tag">Linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Livy/" rel="tag">Livy</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MapReduce/" rel="tag">MapReduce</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mysql/" rel="tag">Mysql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Oozie/" rel="tag">Oozie</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redis/" rel="tag">Redis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scala/" rel="tag">Scala</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Shell/" rel="tag">Shell</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spark/" rel="tag">Spark</a><span class="tag-list-count">14</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Sqoop/" rel="tag">Sqoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web/" rel="tag">Web</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Yarn/" rel="tag">Yarn</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ZK/" rel="tag">ZK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96/" rel="tag">数据分析与可视化</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E6%8C%96%E6%8E%98%E4%B8%8E%E5%88%86%E6%9E%90/" rel="tag">数据挖掘与分析</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" rel="tag">数据结构与算法</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">机器学习与深度学习</a><span class="tag-list-count">2</span></li></ul>
             </canvas>
         </div>
     </div>
@@ -777,7 +766,7 @@ if(canvas.getContext){
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">18:12</span>
+    <span title="站点阅读时长">18:17</span>
 </div>
 
   <!-- 网站运行时间的设置 -->

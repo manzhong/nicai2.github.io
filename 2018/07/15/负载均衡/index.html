@@ -29,11 +29,17 @@
 <meta property="og:site_name" content="春雨里洗过的太阳">
 <meta property="og:description" content="一 网络 浏览器端口数 65535 网页服务器端口固定80  linux 命令 netstat -natp 查看端口IP占用情况 n把ip转为逻辑名称 a 是所有 p 是打印  TCP&#x2F;IP协议 OSI七层模型  1 应用层 7 NGINX七层 (是封装的协议 若做具体的事 一层一层向下 然后一层一层的阻塞) 分层意义解耦  http SMTP ssh   2 表示层6  3 会话层5  4 传输">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/images/fzjh/ly.jpg">
+<meta property="og:image" content="http://example.com/images/fzjh/arp.jpg">
+<meta property="og:image" content="http://example.com/images/fzjh/arp2.jpg">
+<meta property="og:image" content="http://example.com/images/fzjh/xf.jpg">
+<meta property="og:image" content="http://example.com/images/fzjh/l1.jpg">
 <meta property="article:published_time" content="2018-07-15T13:36:12.000Z">
-<meta property="article:modified_time" content="2020-12-13T12:57:10.588Z">
+<meta property="article:modified_time" content="2021-03-17T14:19:17.361Z">
 <meta property="article:author" content="HF">
 <meta property="article:tag" content="Web">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/fzjh/ly.jpg">
 
 <link rel="canonical" href="http://example.com/2018/07/15/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/">
 
@@ -225,7 +231,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-12-13 20:57:10" itemprop="dateModified" datetime="2020-12-13T20:57:10+08:00">2020-12-13</time>
+                <time title="修改时间：2021-03-17 22:19:17" itemprop="dateModified" datetime="2021-03-17T22:19:17+08:00">2021-03-17</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -269,46 +275,74 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <script src=/js/crypto-js.js></script>
-<script>
-function doDecrypt (pwd, onError) {
-	console.log('in doDecrypt');
-	const txt = document.getElementById('enc_content').innerHTML;
-	let plantext;
-	try {
-		const bytes = CryptoJS.AES.decrypt(txt, pwd);
-		var plaintext = bytes.toString(CryptoJS.enc.Utf8);
-	} catch(err) {
-		if(onError) {
-			onError(err);
-		}
-		return;
-	}
-	document.getElementById('enc_content').innerHTML = plaintext;
-	document.getElementById('enc_content').style.display = 'block';
-	document.getElementById('enc_passwd').style.display = 'none';
-	if(typeof MathJax !== 'undefined') {
-		MathJax.Hub.Queue(
-			['resetEquationNumbers', MathJax.InputJax.TeX],
-			['PreProcess', MathJax.Hub],
-			['Reprocess', MathJax.Hub]
-		);
-	}
-}
-</script>
-<div id="enc_content" style="display:none">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</div>
-<div id="enc_passwd"> <input id="enc_pwd_input" type="password" style="border-radius: 5px;border-style: groove;height: 30px;width: 50%;cursor: auto;font-size: 102%;color: currentColor;outline: none;text-overflow: initial;padding-left: 5px;" onkeydown="if (event.keyCode == 13) { decrypt(); return false;}"> <input type="submit" value="解&nbsp;密" onclick="decrypt()" style="width: 58px;height: 34px;border-radius: 5px;background-color: white;border-style: solid;color: currentColor;"><div id="enc_error" style="display: inline-block;color: #d84527;margin-left: 10px"></div>
-<script>
-var onError = function(error) {
-	document.getElementById("enc_error").innerHTML = "password error!"
-};
-function decrypt() {
-var passwd = document.getElementById("enc_pwd_input").value;
-console.log(passwd);
-doDecrypt(passwd, onError);
-}
-</script>
-</div>
+        <h1 id="一-网络"><a href="#一-网络" class="headerlink" title="一 网络"></a>一 网络</h1><p><strong>浏览器端口数 65535</strong>  网页服务器端口固定80</p>
+<p>linux 命令  netstat  -natp   查看端口IP占用情况   n把ip转为逻辑名称   a 是所有  p 是打印</p>
+<p>TCP/IP协议  OSI七层模型</p>
+<p><strong>1  应用层</strong>  7 NGINX七层  (是封装的协议 若做具体的事  一层一层向下 然后一层一层的阻塞)  分层意义解耦</p>
+<p>http   SMTP   ssh  </p>
+<p><strong>2  表示层</strong>6</p>
+<p><strong>3  会话层</strong>5</p>
+<p><strong>4  传输控制层</strong>4 (只是控制但不管 数据的发送)   lvs  四层 内核        TCP    三次握手   &gt; 传输数据  &gt;  四次分手  这个过程是基于 IP :prot  到 IP: prot的 具有唯一性</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">为什么有三次握手   A 客户端  B 服务器</span><br><span class="line">流程 A向B 发送连接包(sync) </span><br><span class="line">B 收到 后 向A 发送 我已收到连接(sync+ack)</span><br><span class="line">A 收到后  向B 发送确认包 (ack)           因为连接是双向的 若是两次 只有A 能确认 我发出去的B一定能接到 而 B 只是确定我发出去了 但不确定 A 收到没有  所以有了第三次</span><br><span class="line"></span><br><span class="line">四次分手</span><br><span class="line">客户端 向服务器发送 断开连接(fin)  服务器收到后 回复确认(只是一个确认 不是我也想断开)  </span><br><span class="line">然后服务器又再去向客户端发送  断开连接(fin)  客户端收到后 回复 确认</span><br><span class="line">因为断开 必须 双方都同意才能断开</span><br><span class="line"></span><br><span class="line">若是两台服务器b,c 三次握手    a向b 发送  连接  b回复 然后 a向c 发送确认 则B 服务器则会一直等待 会出问题</span><br></pre></td></tr></table></figure>
+
+
+
+<p>tcp (面向连接的可靠的协议)  udp (不可靠的不是面向连接的协议)   socket</p>
+<p><strong>5  网络层</strong> 3  IP   ICmp</p>
+<p>linux上查看 路由表  route  -n    这个表是 网络层的核心</p>
+<p><img src="/images/fzjh/ly.jpg" alt="img"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">若是ping  www.baidu.com   的包是哪个网卡发的   会拿着www.baidu.com解析的IP 与上表中的 子网掩码  一个一个按位与  余出来的值与Destination(网络号)  的值相同 则由这个 网卡发  最终基本都由 0.0.0.0  发   </span><br><span class="line"></span><br><span class="line">所以0.0.0.0  很特殊  是一个默认网关的子网掩码和网络号  </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">tcp&#x2F;ip 协议是基于一跳一跳(route)传输的  就是我只管发出 而不管 你下一个发给谁 只要最终到达目的地即可</span><br><span class="line">如 三次握手 第一次我发出信息 会通过路由表 解析出谁发 就是找出路由出口 </span><br><span class="line"></span><br><span class="line">如家里局域网上网 路由器就是下一跳  与路由器的距离就是吓一跳  所有发出的信息网关就是吓一跳</span><br></pre></td></tr></table></figure>
+
+
+
+<p>子网掩码  ip与子网掩码  按位与得到是网络号  </p>
+<p>网关</p>
+<p>三次握手的每一次发送 都会被这一层 阻塞</p>
+<p><strong>6  链路层</strong>2</p>
+<p>以太网 Ethernet  : MAC (物理地址)</p>
+<p><strong>ARP 协议   地址解析协议</strong></p>
+<p>有一个ARP表    <strong>linux 查看  arp -a</strong>  </p>
+<p><img src="/images/fzjh/arp.jpg" alt="img"></p>
+<p>这个地址  是自己电脑的地址   at  物理地址</p>
+<p>在ping  <a target="_blank" rel="noopener" href="http://www.baidu.com/">www.baidu.com</a>  之后</p>
+<p><img src="/images/fzjh/arp2.jpg" alt="img"></p>
+<p>会多出一个 网关地址 at  MAC </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">当一个 计算机A想 请求另外一个节点的硬件地址的时候 他会封一个arp包 值是全F   发给路由器  路由器会把他的物理地址</span><br><span class="line">学习  并把这个包进行广播  则目标节点 会把自己的物理地址 传给路由 路由把地址转发给A  最后路由也学了 两台不同的地址</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>7  物理层</strong>1</p>
+<p>总结</p>
+<p>最终七层过后这个信封要填满:</p>
+<p><img src="/images/fzjh/xf.jpg" alt="img"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">应用层发 请求  被阻塞  因为传输控制层要建立连接   产生第一个发送的包 但不能发出去 因为网络层 要知道下一跳是谁</span><br><span class="line">去路由表 找到下一跳 之后 但不知道 对方的MAC地址 所以来到链路层</span><br></pre></td></tr></table></figure>
+
+<p><strong>1整个互联网是建立在下一跳的模式下</strong></p>
+<p>IP是逻辑的两个端点</p>
+<p>Mac是物理上连接的两个节点</p>
+<p>在每一跳的时候会修改源Mac地址  和目标Mac地址</p>
+<p><strong>2端点间 tcp 传输过程</strong></p>
+<p>确认机制</p>
+<p>状态机制</p>
+<p>不可分割   三次握手和  四次分手是不可分割的</p>
+<p><strong>3 解析数据包是需要成本的</strong></p>
+<p>交换机 两层  只关心Mac地址</p>
+<p>​        学习机制</p>
+<p>路由器   三层  只关心IP的路由表</p>
+<p>LVS服务器    :   在四层   只关心PORT  ,状态   并不需要和客户端进行握手连接 他只需要拿到四层的状态取查看状态 快速转发出去即可  四层可以很快的进行负载  效率高  但是瞎子负载  不知道客户端请求的是啥  因为是基于包的  不是基于面向连接的  不能根据资源进行很好的负载</p>
+<p>NGINX   :  七层  关心socket  对应关系   是必须先和客户端进行三次握手开辟资源之后才能做负载的   速度慢  但可以知道请求的是什么    可以做更好的资源转发</p>
+<p>最终 可以四层  和七层联合使用    先使用 四层 承受大量的并发  在四层后面 放大量的七层  然后经七层  转发给不同的服务器   淘宝就是这样做的</p>
+<h1 id="二-LVS负载均衡"><a href="#二-LVS负载均衡" class="headerlink" title="二 LVS负载均衡"></a>二 LVS负载均衡</h1><h2 id="1-四层拓补图"><a href="#1-四层拓补图" class="headerlink" title="1 四层拓补图"></a>1 四层拓补图</h2><p><img src="/images/fzjh/l1.jpg" alt="img"></p>
+<p>lvs不做三次握手和四次分手  他只是转发消息到其他的服务器  并且保证 三次握手和四次分手 都是针对同一个服务器</p>
+<p>且当第一次 三四  和第二次三四   请求的资源是一样的   就是页面是一样的  (只针对静态资源)   就是lvs服务器后面的服务器都是镜像部署</p>
+<p><strong>上网流程分析</strong></p>
+<p>公网IP   如百度等   在互联网中是惟一的</p>
+<p>私网IP    如局域网中的都是    私网IP发出的消息  是不会在公网IP中进行下一跳</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">路由器会有一个公网IP    比如局域网中 192.168.80.12:21214 发送请求到百度  在路由器(18.11.18.22)中 会将对这个用户产生一个端口 最终(18.11.18.22:223  192.168.80.12:21214)  去发送消息给百度  </span><br><span class="line">这个过程是S_NET 地址转换  S_net  是修改源地址的IP  D_NET 是修改目标的IP地址</span><br></pre></td></tr></table></figure>
+
+
     </div>
 
     
@@ -408,6 +442,7 @@ doDecrypt(passwd, onError);
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%80-%E7%BD%91%E7%BB%9C"><span class="nav-number">1.</span> <span class="nav-text">一 网络</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%8C-LVS%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1"><span class="nav-number">2.</span> <span class="nav-text">二 LVS负载均衡</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%9B%9B%E5%B1%82%E6%8B%93%E8%A1%A5%E5%9B%BE"><span class="nav-number">2.1.</span> <span class="nav-text">1 四层拓补图</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -423,20 +458,20 @@ doDecrypt(passwd, onError);
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">79</span>
+          <span class="site-state-item-count">78</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">37</span>
+        <span class="site-state-item-count">38</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-count">39</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -738,7 +773,7 @@ if(canvas.getContext){
         <h3 class="widget-title">Tag Cloud</h3>
         <div id="myCanvasContainer" class="widget tagcloud">
             <canvas width="250" height="250" id="resCanvas" style="width=100%">
-                <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Ai/" rel="tag">Ai</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Azkaban/" rel="tag">Azkaban</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Blog/" rel="tag">Blog</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ClouderaManager/" rel="tag">ClouderaManager</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ElSearch/" rel="tag">ElSearch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flink/" rel="tag">Flink</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flume/" rel="tag">Flume</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/" rel="tag">Hadoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hbase/" rel="tag">Hbase</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hdfs/" rel="tag">Hdfs</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hexo/" rel="tag">Hexo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hive/" rel="tag">Hive</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hue/" rel="tag">Hue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Impala/" rel="tag">Impala</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/" rel="tag">Java</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jvm/" rel="tag">Jvm</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kafka/" rel="tag">Kafka</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kettle/" rel="tag">Kettle</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kudu/" rel="tag">Kudu</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/" rel="tag">Linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Livy/" rel="tag">Livy</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MapReduce/" rel="tag">MapReduce</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mysql/" rel="tag">Mysql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Oozie/" rel="tag">Oozie</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redis/" rel="tag">Redis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scala/" rel="tag">Scala</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Shell/" rel="tag">Shell</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spark/" rel="tag">Spark</a><span class="tag-list-count">15</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Sqoop/" rel="tag">Sqoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web/" rel="tag">Web</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Yarn/" rel="tag">Yarn</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ZK/" rel="tag">ZK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96/" rel="tag">数据分析与可视化</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E6%8C%96%E6%8E%98%E4%B8%8E%E5%88%86%E6%9E%90/" rel="tag">数据挖掘与分析</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" rel="tag">数据结构与算法</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">机器学习与深度学习</a><span class="tag-list-count">2</span></li></ul>
+                <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Ai/" rel="tag">Ai</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Azkaban/" rel="tag">Azkaban</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Blog/" rel="tag">Blog</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ClouderaManager/" rel="tag">ClouderaManager</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ElSearch/" rel="tag">ElSearch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flink/" rel="tag">Flink</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flume/" rel="tag">Flume</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Git/" rel="tag">Git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/" rel="tag">Hadoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hbase/" rel="tag">Hbase</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hdfs/" rel="tag">Hdfs</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hexo/" rel="tag">Hexo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hive/" rel="tag">Hive</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hue/" rel="tag">Hue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Impala/" rel="tag">Impala</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/" rel="tag">Java</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jvm/" rel="tag">Jvm</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kafka/" rel="tag">Kafka</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kettle/" rel="tag">Kettle</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kudu/" rel="tag">Kudu</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/" rel="tag">Linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Livy/" rel="tag">Livy</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MapReduce/" rel="tag">MapReduce</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mysql/" rel="tag">Mysql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Oozie/" rel="tag">Oozie</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redis/" rel="tag">Redis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scala/" rel="tag">Scala</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Shell/" rel="tag">Shell</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spark/" rel="tag">Spark</a><span class="tag-list-count">14</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Sqoop/" rel="tag">Sqoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web/" rel="tag">Web</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Yarn/" rel="tag">Yarn</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ZK/" rel="tag">ZK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96/" rel="tag">数据分析与可视化</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E6%8C%96%E6%8E%98%E4%B8%8E%E5%88%86%E6%9E%90/" rel="tag">数据挖掘与分析</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" rel="tag">数据结构与算法</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">机器学习与深度学习</a><span class="tag-list-count">2</span></li></ul>
             </canvas>
         </div>
     </div>
@@ -777,7 +812,7 @@ if(canvas.getContext){
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">18:12</span>
+    <span title="站点阅读时长">18:17</span>
 </div>
 
   <!-- 网站运行时间的设置 -->

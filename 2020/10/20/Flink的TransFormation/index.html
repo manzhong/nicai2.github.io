@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":false,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="一 简介 Flink 应用程序结构:  1、Source: 数据源，Flink 在流处理和批处理上的 source 大概有 4 类：基于本地集合的 source、基于文件的 source、基于网络套接字的 source、自定义的 source。自定义的 source 常见的有 Apache kafka、Amazon Kinesis Streams、RabbitMQ、Twitter Streamin">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Flink的TransFormation">
+<meta property="og:url" content="http://example.com/2020/10/20/Flink%E7%9A%84TransFormation/index.html">
+<meta property="og:site_name" content="春雨里洗过的太阳">
+<meta property="og:description" content="一 简介 Flink 应用程序结构:  1、Source: 数据源，Flink 在流处理和批处理上的 source 大概有 4 类：基于本地集合的 source、基于文件的 source、基于网络套接字的 source、自定义的 source。自定义的 source 常见的有 Apache kafka、Amazon Kinesis Streams、RabbitMQ、Twitter Streamin">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-10-20T11:22:30.000Z">
+<meta property="article:modified_time" content="2021-05-09T14:39:10.614Z">
+<meta property="article:author" content="HF">
+<meta property="article:tag" content="Flink">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2020/10/20/Flink%E7%9A%84TransFormation/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<link rel="stylesheet" type="text/css" href="/css/injector.css" />
+  <title>Flink的TransFormation | 春雨里洗过的太阳</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">春雨里洗过的太阳</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">世间所有的相遇，都是久别重逢</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/10/20/Flink%E7%9A%84TransFormation/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/hexo.jpg">
+      <meta itemprop="name" content="HF">
+      <meta itemprop="description" content="第二名就是头号输家">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="春雨里洗过的太阳">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Flink的TransFormation
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-10-20 19:22:30" itemprop="dateCreated datePublished" datetime="2020-10-20T19:22:30+08:00">2020-10-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-05-09 22:39:10" itemprop="dateModified" datetime="2021-05-09T22:39:10+08:00">2021-05-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Flink/" itemprop="url" rel="index"><span itemprop="name">Flink</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>11k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>10 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="一-简介"><a href="#一-简介" class="headerlink" title="一 简介"></a>一 简介</h2><p>Flink 应用程序结构:</p>
+<p>1、Source: 数据源，Flink 在流处理和批处理上的 source 大概有 4 类：基于本地集合的 source、基于文件的 source、基于网络套接字的 source、自定义的 source。自定义的 source 常见的有 Apache kafka、Amazon Kinesis Streams、RabbitMQ、Twitter Streaming API、Apache NiFi 等，当然你也可以定义自己的 source。</p>
+<p>2、Transformation：数据转换的各种操作，有 Map / FlatMap / Filter / KeyBy / Reduce / Fold / Aggregations / Window / WindowAll / Union / Window join / Split / Select / Project 等，操作很多，可以将数据转换计算成你想要的数据。</p>
+<p>3、Sink：接收器，Flink 将转换计算后的数据发送的地点 ，你可能需要存储下来，Flink 常见的 Sink 大概有如下几类：写入文件、打印出来、写入 socket 、自定义的 sink 。自定义的 sink 常见的有 Apache kafka、RabbitMQ、MySQL、ElasticSearch、Apache Cassandra、Hadoop FileSystem 等，同理你也可以定义自己的 Sink。</p>
+<p>总体分为这三块,source 和sink之前已经说过,接下来介绍一下Transformation</p>
+<h2 id="二-Transformation-转换"><a href="#二-Transformation-转换" class="headerlink" title="二 Transformation(转换)"></a>二 Transformation(转换)</h2><table>
+<thead>
+<tr>
+<th>Transformation</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Map</strong> DataStream → DataStream</td>
+<td><code>dataStream.map &#123; x =&gt; x * 2 &#125;</code></td>
+</tr>
+<tr>
+<td><strong>FlatMap</strong> DataStream → DataStream</td>
+<td><code>dataStream.flatMap &#123; x =&gt; x.split(&quot;,&quot;) &#125;</code></td>
+</tr>
+<tr>
+<td><strong>Filter</strong> DataStream → DataStream</td>
+<td><code>dataStream.filter &#123; _ != 0 &#125;</code></td>
+</tr>
+<tr>
+<td><strong>KeyBy</strong> DataStream → KeyedStream</td>
+<td>将一个流分为不相交的区, 可以按照名称指定Key, 也可以按照角标来指定 `dataStream.keyBy(“key”</td>
+</tr>
+<tr>
+<td><strong>Reduce</strong> KeyedStream → DataStream</td>
+<td><strong>滚动</strong>Reduce, 合并当前值和历史结果, 并发出新的结果值 <code>keyedStream.reduce &#123; _ + _ &#125;</code></td>
+</tr>
+<tr>
+<td><strong>Fold</strong> KeyedStream → DataStream</td>
+<td>按照初始值进行<strong>滚动</strong>折叠 <code>keyedStream.fold(&quot;start&quot;)((str, i) =&gt; &#123; str + &quot;-&quot; + i &#125;)</code></td>
+</tr>
+<tr>
+<td><strong>Aggregations</strong> KeyedStream → DataStream</td>
+<td><strong>滚动</strong>聚合, <code>sum</code>, <code>min</code>, <code>max</code>等 <code>keyedStream.sum(0)</code></td>
+</tr>
+<tr>
+<td><strong>Window</strong> KeyedStream → DataStream</td>
+<td>窗口函数, 根据一些特点对数据进行分组, 注意: 有可能是非并行的, 所有记录可能在一个任务中收集 <code>.window(TumblingEventTimeWindows.of(Time.seconds(5)))</code></td>
+</tr>
+<tr>
+<td><strong>WindowAll</strong> DataStream → AllWindowedStream</td>
+<td>窗口函数, 根据一些特点对数据进行分组, 和window函数的主要区别在于可以不按照Key分组 <code>dataStream.windowAll (TumblingEventTimeWindows.of(Time.seconds(5)))</code></td>
+</tr>
+<tr>
+<td><strong>WindowApply</strong> WindowedStream → DataStream</td>
+<td>将一个函数作用于整个窗口 <code>windowedStream.apply &#123; WindowFunction &#125;</code></td>
+</tr>
+<tr>
+<td><strong>WindowReduce</strong> WindowedStream → DataStream</td>
+<td>在整个窗口上做一次reduce <code>windowedStream.reduce &#123; _ + _ &#125;</code></td>
+</tr>
+<tr>
+<td><strong>WindowFold</strong> WindowedStream → DataStream</td>
+<td>在整个窗口上做一次fold <code>windowedStream.fold(&quot;start&quot;, (str, i) =&gt; &#123; str + &quot;-&quot; + i &#125;)</code></td>
+</tr>
+<tr>
+<td><strong>Aggregations on windows</strong> WindowedStream → DataStream</td>
+<td>在窗口上统计, <code>sub</code>, <code>max</code>, <code>min</code> <code>windowedStream.sum(10)</code></td>
+</tr>
+<tr>
+<td><strong>Union</strong> DataStream* → DataStream</td>
+<td>合并多个流 <code>dataStream.union(dataStream1, dataStream2, ...)</code></td>
+</tr>
+<tr>
+<td><strong>Window Join</strong> DataStream → DataStream</td>
+<td><code>dataStream.join(otherStream).where(...).equalTo(...) .window(TumblingEventTimeWindows.of(Time.seconds(3))).apply&#123;..&#125;</code></td>
+</tr>
+<tr>
+<td><strong>Window CoGroup</strong> DataStream, DataStream → DataStream</td>
+<td><code>dataStream.coGroup(otherStream).where(0).equalTo(1).window(...).apply&#123;...&#125;</code></td>
+</tr>
+<tr>
+<td><strong>Connect</strong> DataStream, DataStream → DataStream</td>
+<td>连接两个流, 并且保留各自的数据类型, 在这个连接中可以共享状态 <code>someStream.connect(otherStream)</code></td>
+</tr>
+<tr>
+<td><strong>Split</strong> DataStream → SplitStream</td>
+<td>将一个流切割为多个流 <code>someDataStream.split((x: Int) =&gt; x match ...)</code></td>
+</tr>
+</tbody></table>
+<h3 id="1-map"><a href="#1-map" class="headerlink" title="1 map"></a>1 map</h3><p>和spark中的map并无区别,这是最简单的转换之一，其中输入是一个数据流，输出的也是一个数据流：</p>
+<p>基础用法:</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> env: <span class="type">ExecutionEnvironment</span> = <span class="type">ExecutionEnvironment</span>.getExecutionEnvironment </span><br><span class="line"><span class="keyword">val</span> dataSet: <span class="type">DataSet</span>[<span class="type">String</span>] = env.fromElements(<span class="string">&quot;hello&quot;</span>, <span class="string">&quot;world&quot;</span>, <span class="string">&quot;java&quot;</span>, <span class="string">&quot;hello&quot;</span>, <span class="string">&quot;java&quot;</span>) </span><br><span class="line"> dataSet.map(line =&gt; (line, <span class="number">1</span>)).print()</span><br><span class="line"> <span class="comment">/*(hello,1)</span></span><br><span class="line"><span class="comment">(world,1)</span></span><br><span class="line"><span class="comment">(java,1)</span></span><br><span class="line"><span class="comment">(hello,1)</span></span><br><span class="line"><span class="comment">(java,1)*/</span></span><br></pre></td></tr></table></figure>
+
+<p>重写map方法:</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">Student</span>(<span class="params">id:<span class="type">Int</span>,name:<span class="type">String</span>,password:<span class="type">String</span>,age:<span class="type">Int</span></span>)</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">val</span> <span class="title">env</span></span>: <span class="type">StreamExecutionEnvironment</span> = <span class="type">StreamExecutionEnvironment</span>.getExecutionEnvironment</span><br><span class="line"><span class="keyword">val</span> stu: <span class="type">DataStream</span>[<span class="type">Student</span>] = env.fromElements(<span class="keyword">new</span> <span class="type">Student</span>(<span class="number">1</span>,<span class="string">&quot;s&quot;</span>,<span class="string">&quot;123&quot;</span>,<span class="number">23</span>))</span><br><span class="line">stu.map(<span class="keyword">new</span> <span class="type">MapFunction</span>[<span class="type">Student</span>,<span class="type">Student</span>] &#123;</span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">map</span></span>(value: <span class="type">Student</span>): <span class="type">Student</span> = &#123;</span><br><span class="line">    <span class="comment">//将每人年龄加5</span></span><br><span class="line">    <span class="keyword">val</span> student = <span class="keyword">new</span> <span class="type">Student</span>(value.id,value.name,value.password,value.age+<span class="number">5</span>)</span><br><span class="line">    <span class="keyword">return</span> student</span><br><span class="line">  &#125;</span><br><span class="line">&#125;).print()</span><br><span class="line">env.execute()</span><br><span class="line"><span class="comment">//result: Student(1,s,123,28)</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-flatmap"><a href="#2-flatmap" class="headerlink" title="2 flatmap"></a>2 flatmap</h3><p>FlatMap 采用一条记录并输出零个，一个或多个记录</p>
+<p>基础用法</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//wc.txt:  wq hello flink hello flink</span></span><br><span class="line"><span class="keyword">val</span> env: <span class="type">ExecutionEnvironment</span> = <span class="type">ExecutionEnvironment</span>.getExecutionEnvironment</span><br><span class="line"><span class="keyword">val</span> ds: <span class="type">DataSet</span>[<span class="type">String</span>] = env.readTextFile(<span class="string">&quot;path/wc.txt&quot;</span>)</span><br><span class="line"><span class="keyword">val</span> value: <span class="type">DataSet</span>[<span class="type">String</span>] = ds.flatMap(_.split(<span class="string">&quot; &quot;</span>))</span><br></pre></td></tr></table></figure>
+
+<p>自定义用法:</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">Student</span>(<span class="params">id:<span class="type">Int</span>,name:<span class="type">String</span>,password:<span class="type">String</span>,age:<span class="type">Int</span></span>)</span></span><br><span class="line"><span class="class"><span class="title">val</span> <span class="title">env</span></span>: <span class="type">StreamExecutionEnvironment</span> = <span class="type">StreamExecutionEnvironment</span>.getExecutionEnvironment</span><br><span class="line">    <span class="keyword">val</span> stu: <span class="type">DataStream</span>[<span class="type">Student</span>] = env.fromElements(<span class="type">Student</span>(<span class="number">1</span>,<span class="string">&quot;s&quot;</span>,<span class="string">&quot;123&quot;</span>,<span class="number">23</span>),<span class="type">Student</span>(<span class="number">2</span>,<span class="string">&quot;s2&quot;</span>,<span class="string">&quot;1232&quot;</span>,<span class="number">24</span>)) stu.flatMap(<span class="keyword">new</span> <span class="type">FlatMapFunction</span>[<span class="type">Student</span>, <span class="type">Student</span>] &#123;</span><br><span class="line">      <span class="comment">//将id为偶数的取出</span></span><br><span class="line">      <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">flatMap</span></span>(value: <span class="type">Student</span>, out: <span class="type">Collector</span>[<span class="type">Student</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">        <span class="keyword">if</span> (value.id % <span class="number">2</span> == <span class="number">0</span>) &#123;</span><br><span class="line">          out.collect(value)</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line"> &#125;).print()</span><br><span class="line"> env.execute()</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-Filter"><a href="#3-Filter" class="headerlink" title="3 Filter"></a>3 Filter</h3><p>Filter 函数根据条件判断出结果。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">Student</span>(<span class="params">id:<span class="type">Int</span>,name:<span class="type">String</span>,password:<span class="type">String</span>,age:<span class="type">Int</span></span>)</span></span><br><span class="line"><span class="class"><span class="title">val</span> <span class="title">env</span></span>: <span class="type">StreamExecutionEnvironment</span> = <span class="type">StreamExecutionEnvironment</span>.getExecutionEnvironment</span><br><span class="line"><span class="keyword">val</span> stu: <span class="type">DataStream</span>[<span class="type">Student</span>] =        env.fromElements(<span class="type">Student</span>(<span class="number">1</span>,<span class="string">&quot;s&quot;</span>,<span class="string">&quot;123&quot;</span>,<span class="number">23</span>),<span class="type">Student</span>(<span class="number">2</span>,<span class="string">&quot;s2&quot;</span>,<span class="string">&quot;1232&quot;</span>,<span class="number">24</span>))</span><br><span class="line">stu.filter(<span class="keyword">new</span> <span class="type">FilterFunction</span>[<span class="type">Student</span>] &#123;</span><br><span class="line">  <span class="comment">//只取出id=2 的过滤出来，然后打印出来。</span></span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">filter</span></span>(value: <span class="type">Student</span>): <span class="type">Boolean</span> = &#123;</span><br><span class="line">    <span class="keyword">if</span>(value.id==<span class="number">2</span>)&#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">    &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;).print()</span><br><span class="line">env.execute()</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">//函数式</span></span><br><span class="line"><span class="keyword">val</span> env: <span class="type">StreamExecutionEnvironment</span> = <span class="type">StreamExecutionEnvironment</span>.getExecutionEnvironment</span><br><span class="line">    <span class="keyword">val</span> stu: <span class="type">DataStream</span>[<span class="type">Student</span>] = env.fromElements(<span class="type">Student</span>(<span class="number">1</span>,<span class="string">&quot;s&quot;</span>,<span class="string">&quot;123&quot;</span>,<span class="number">23</span>),<span class="type">Student</span>(<span class="number">2</span>,<span class="string">&quot;s2&quot;</span>,<span class="string">&quot;1232&quot;</span>,<span class="number">24</span>),<span class="type">Student</span>(<span class="number">3</span>,<span class="string">&quot;s2&quot;</span>,<span class="string">&quot;1232&quot;</span>,<span class="number">24</span>))</span><br><span class="line">    <span class="keyword">val</span> value1: <span class="type">DataStream</span>[<span class="type">Student</span>] = stu.filter(x =&gt; x.id==<span class="number">2</span>)</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="3-keyby"><a href="#3-keyby" class="headerlink" title="3 keyby"></a>3 keyby</h3><p> KeyBy 在逻辑上是基于 key 对流进行分区。在内部，它使用 hash 函数对流进行分区。它返回 KeyedDataStream 数据流。keyby后一般跟随聚合算子</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">min,sum,max(&#39;值取出最大值,其他的取第一条&#39;),minBy(&#39;取出最小值对应的那一行数据&#39;),maxBy(&#39;取出最大值对应的那一行数据&#39;)</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">val</span> env: <span class="type">StreamExecutionEnvironment</span> = <span class="type">StreamExecutionEnvironment</span>.getExecutionEnvironment</span><br><span class="line">    <span class="keyword">val</span> stu: <span class="type">DataStream</span>[<span class="type">Student</span>] =    env.fromElements(<span class="type">Student</span>(<span class="number">1</span>,<span class="string">&quot;s&quot;</span>,<span class="string">&quot;123&quot;</span>,<span class="number">23</span>),<span class="type">Student</span>(<span class="number">2</span>,<span class="string">&quot;s2&quot;</span>,<span class="string">&quot;1232&quot;</span>,<span class="number">24</span>),<span class="type">Student</span>(<span class="number">3</span>,<span class="string">&quot;s2&quot;</span>,<span class="string">&quot;1232&quot;</span>,<span class="number">24</span>))</span><br><span class="line">    stu.keyBy(<span class="keyword">new</span> <span class="type">KeySelector</span>[<span class="type">Student</span>,<span class="type">Int</span>] &#123;</span><br><span class="line">     <span class="comment">//对student 的 age 做 KeyBy 操作分区</span></span><br><span class="line">      <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">getKey</span></span>(value: <span class="type">Student</span>): <span class="type">Int</span> = &#123;</span><br><span class="line">        <span class="keyword">return</span> value.age</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;).print()</span><br><span class="line">    env.execute() </span><br><span class="line"><span class="comment">//函数式</span></span><br><span class="line">   <span class="comment">// stu.keyBy(x =&gt; x.age)</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="4-reduce"><a href="#4-reduce" class="headerlink" title="4 reduce"></a>4 reduce</h3><p>  Reduce 返回单个的结果值，并且 reduce 操作每处理一个元素总是创建一个新值。常用的方法有 average, sum, min, max, count，使用 reduce 方法都可实现。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">    <span class="keyword">val</span> env: <span class="type">StreamExecutionEnvironment</span> = <span class="type">StreamExecutionEnvironment</span>.getExecutionEnvironment</span><br><span class="line">    <span class="keyword">val</span> stu: <span class="type">DataStream</span>[<span class="type">Student</span>] = env.fromElements(<span class="type">Student</span>(<span class="number">1</span>,<span class="string">&quot;s&quot;</span>,<span class="string">&quot;123&quot;</span>,<span class="number">23</span>),<span class="type">Student</span>(<span class="number">2</span>,<span class="string">&quot;s2&quot;</span>,<span class="string">&quot;1232&quot;</span>,<span class="number">24</span>),<span class="type">Student</span>(<span class="number">3</span>,<span class="string">&quot;s2&quot;</span>,<span class="string">&quot;1232&quot;</span>,<span class="number">24</span>))</span><br><span class="line">stu.keyBy(<span class="keyword">new</span> <span class="type">KeySelector</span>[<span class="type">Student</span>,<span class="type">Int</span>] &#123;</span><br><span class="line">      <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">getKey</span></span>(value: <span class="type">Student</span>): <span class="type">Int</span> = &#123;</span><br><span class="line">        <span class="keyword">return</span> value.age</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;).reduce(<span class="keyword">new</span> <span class="type">ReduceFunction</span>[<span class="type">Student</span>] &#123;</span><br><span class="line">      <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">reduce</span></span>(value1: <span class="type">Student</span>, value2: <span class="type">Student</span>): <span class="type">Student</span> = &#123;</span><br><span class="line">        <span class="keyword">import</span> mz.flinktransformtion.<span class="type">Student</span></span><br><span class="line">        <span class="type">Student</span>((value1.id + value2.id) / <span class="number">2</span>,value1.name + value2.name,</span><br><span class="line">          value1.password + value2.password,(value1.age + value2.age) / <span class="number">2</span></span><br><span class="line">        )</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;).print()</span><br><span class="line">    env.execute()</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">1&gt; Student(2,s2,1232,24)</span></span><br><span class="line"><span class="comment">4&gt; Student(1,s,123,23)</span></span><br><span class="line"><span class="comment">1&gt; Student(2,s2s2,12321232,24)</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="comment">//函数时</span></span><br><span class="line">  stu.keyBy(x =&gt; x.age).reduce( (curd,newD) =&gt;</span><br><span class="line">     <span class="type">Student</span>(curd.id,newD.name,curd.password,curd.age)</span><br><span class="line">    )</span><br></pre></td></tr></table></figure>
+
+<p>上面先将数据流进行 keyby 操作，因为执行 reduce 操作只能是 KeyedStream，然后将 student 对象的 age 做了一个求平均值的操作。</p>
+<h3 id="5-Fold"><a href="#5-Fold" class="headerlink" title="5 Fold"></a>5 Fold</h3><p>Fold 通过将最后一个文件夹流与当前记录组合来推出 KeyedStream。 它会发回数据流。可以定制初始值的算子</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">KeyedStream.fold(<span class="string">&quot;1&quot;</span>, <span class="keyword">new</span> FoldFunction&lt;Integer, String&gt;() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">fold</span><span class="params">(String accumulator, Integer value)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> accumulator + <span class="string">&quot;=&quot;</span> + value;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)</span><br><span class="line"> <span class="comment">/*输入 (1,2,3,4,5)  输出:&quot;1=1&quot;,&quot;1=1=2&quot;,&quot;1=1=2=3&quot;...</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="6-Aggregations"><a href="#6-Aggregations" class="headerlink" title="6 Aggregations"></a>6 Aggregations</h3><p>DataStream API 支持各种聚合，例如 min，max，sum 等。 这些函数可以应用于 KeyedStream 以获得 Aggregations 聚合。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">KeyedStream</span>.sum(<span class="number">0</span>) </span><br><span class="line"><span class="type">KeyedStream</span>.sum(<span class="string">&quot;key&quot;</span>) </span><br><span class="line"><span class="type">KeyedStream</span>.min(<span class="number">0</span>) </span><br><span class="line"><span class="type">KeyedStream</span>.min(<span class="string">&quot;key&quot;</span>) </span><br><span class="line"><span class="type">KeyedStream</span>.max(<span class="number">0</span>) </span><br><span class="line"><span class="type">KeyedStream</span>.max(<span class="string">&quot;key&quot;</span>) </span><br><span class="line"><span class="type">KeyedStream</span>.minBy(<span class="number">0</span>) </span><br><span class="line"><span class="type">KeyedStream</span>.minBy(<span class="string">&quot;key&quot;</span>) </span><br><span class="line"><span class="type">KeyedStream</span>.maxBy(<span class="number">0</span>) </span><br><span class="line"><span class="type">KeyedStream</span>.maxBy(<span class="string">&quot;key&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="7-window"><a href="#7-window" class="headerlink" title="7 window"></a>7 window</h3><p>Window 函数允许按时间或其他条件对现有 KeyedStream 进行分组。 以下是以 10 秒的时间窗口聚合：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">inputStream.keyBy(<span class="number">0</span>).window(<span class="type">Time</span>.seconds(<span class="number">10</span>));</span><br></pre></td></tr></table></figure>
+
+<p>Flink 定义数据片段以便（可能）处理无限数据流。 这些切片称为窗口。 此切片有助于通过应用转换处理数据块。 要对流进行窗口化，我们需要分配一个可以进行分发的键和一个描述要对窗口化流执行哪些转换的函数</p>
+<p>要将流切片到窗口，我们可以使用 Flink 自带的窗口分配器。 我们有选项，如 tumbling windows, sliding windows, global 和 session windows。 Flink 还允许您通过扩展 WindowAssginer 类来编写自定义窗口分配器,这一块请参看我其他文章</p>
+<h3 id="8-windowAll"><a href="#8-windowAll" class="headerlink" title="8 windowAll"></a>8 windowAll</h3><p>windowAll 函数允许对常规数据流进行分组。 通常，这是非并行数据转换，因为它在非分区数据流上运行。</p>
+<p>与常规数据流功能类似，我们也有窗口数据流功能。 唯一的区别是它们处理窗口数据流。 所以窗口缩小就像 Reduce 函数一样，Window fold 就像 Fold 函数一样，并且还有聚合。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">inputStream.keyBy(<span class="number">0</span>).windowAll(<span class="type">Time</span>.seconds(<span class="number">10</span>));</span><br></pre></td></tr></table></figure>
+
+<h3 id="9-Window-join"><a href="#9-Window-join" class="headerlink" title="9 Window join"></a>9 Window join</h3><p>我们可以通过一些 key 将同一个 window 的两个数据流 join 起来。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">inputStream.join(inputStream1)</span><br><span class="line">           .where(<span class="number">0</span>).equalTo(<span class="number">1</span>)</span><br><span class="line">           .window(<span class="type">Time</span>.seconds(<span class="number">5</span>))     </span><br><span class="line">           .apply (<span class="keyword">new</span> <span class="type">JoinFunction</span> () &#123;...&#125;);</span><br><span class="line"><span class="comment">//以上示例是在 5 秒的窗口中连接两个流，其中第一个流的第一个属性的连接条件等于另一个流的第二个属性。</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="10-Split-和select"><a href="#10-Split-和select" class="headerlink" title="10 Split 和select"></a>10 Split 和select</h3><p>此功能根据条件将流拆分为两个或多个流。 当您获得混合流并且您可能希望单独处理每个数据流时，可以使用此方法。</p>
+<p>此方法并没有真正的将流分割,进行split后得到SplitStream, 只是在一个流里做了一个分类.若要得到两个流,要用到select</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">SplitStream</span>&lt;<span class="type">Integer</span>&gt; split = inputStream.split(<span class="keyword">new</span> <span class="type">OutputSelector</span>&lt;<span class="type">Integer</span>&gt;() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    public <span class="type">Iterable</span>&lt;<span class="type">String</span>&gt; select(<span class="type">Integer</span> value) &#123;</span><br><span class="line">        <span class="type">List</span>&lt;<span class="type">String</span>&gt; output = <span class="keyword">new</span> <span class="type">ArrayList</span>&lt;<span class="type">String</span>&gt;(); </span><br><span class="line">        <span class="keyword">if</span> (value % <span class="number">2</span> == <span class="number">0</span>) &#123;</span><br><span class="line">            output.add(<span class="string">&quot;even&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            output.add(<span class="string">&quot;odd&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> output;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>此功能允许您从拆分流中选择特定流。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">SplitStream</span>&lt;<span class="type">Integer</span>&gt; split;</span><br><span class="line"><span class="keyword">val</span> even:<span class="type">DataStream</span>[<span class="type">Int</span>] = split.select(<span class="string">&quot;even&quot;</span>); </span><br><span class="line"><span class="keyword">val</span> add:<span class="type">DataStream</span>[<span class="type">Int</span>] = split.select(<span class="string">&quot;odd&quot;</span>); </span><br><span class="line"><span class="keyword">val</span> all:<span class="type">DataStream</span>[<span class="type">Int</span>] = split.select(<span class="string">&quot;even&quot;</span>,<span class="string">&quot;odd&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> env: <span class="type">StreamExecutionEnvironment</span> = <span class="type">StreamExecutionEnvironment</span>.getExecutionEnvironment</span><br><span class="line">    <span class="keyword">val</span> stu: <span class="type">DataStream</span>[<span class="type">Student</span>] = env.fromElements(<span class="type">Student</span>(<span class="number">1</span>,<span class="string">&quot;s&quot;</span>,<span class="string">&quot;123&quot;</span>,<span class="number">23</span>),<span class="type">Student</span>(<span class="number">2</span>,<span class="string">&quot;s2&quot;</span>,<span class="string">&quot;1232&quot;</span>,<span class="number">24</span>),<span class="type">Student</span>(<span class="number">3</span>,<span class="string">&quot;s2&quot;</span>,<span class="string">&quot;1232&quot;</span>,<span class="number">24</span>))</span><br><span class="line"><span class="keyword">val</span> st:<span class="type">SplitStream</span>[<span class="type">Student</span>] = stu.split(st =&gt; &#123;</span><br><span class="line">  <span class="keyword">if</span> (st.age &gt; <span class="number">30</span>) <span class="type">Seq</span>(<span class="string">&quot;中年以上&quot;</span>) <span class="keyword">else</span> <span class="type">Seq</span>(<span class="string">&quot;青年&quot;</span>)</span><br><span class="line">&#125;)</span><br><span class="line"><span class="keyword">val</span> dd2: <span class="type">DataStream</span>[<span class="type">Student</span>] = st.select(<span class="string">&quot;中年以上&quot;</span>) </span><br><span class="line"><span class="keyword">val</span> dd3: <span class="type">DataStream</span>[<span class="type">Student</span>] = st.select(<span class="string">&quot;青年&quot;</span>) </span><br><span class="line"><span class="keyword">val</span> dd4: <span class="type">DataStream</span>[<span class="type">Student</span>] = st.select(<span class="string">&quot;青年&quot;</span>,<span class="string">&quot;中年以上&quot;</span> ) </span><br></pre></td></tr></table></figure>
+
+<p>split已经不推荐使用,推荐使用 side output instead </p>
+<h3 id="11-合流操作"><a href="#11-合流操作" class="headerlink" title="11 合流操作"></a>11 合流操作</h3><h4 id="1-connect和comap"><a href="#1-connect和comap" class="headerlink" title="1 connect和comap"></a>1 connect和comap</h4><p>连接(两个)类型的流,合并后,只是放在同一个流中,内部依然保持各自的形式和数据不变,两个流相互独立,</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//comap和coflatmap</span></span><br><span class="line">作用于connectedStream上,功能与map和flatmap一致,对connectedStream中的每一个流分别进行map和flatmap,后转为<span class="type">DataStream</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> st:<span class="type">SplitStream</span>[<span class="type">Student</span>] = stu.split(st =&gt; &#123;</span><br><span class="line">  <span class="keyword">if</span> (st.age &gt; <span class="number">30</span>) <span class="type">Seq</span>(<span class="string">&quot;中年以上&quot;</span>) <span class="keyword">else</span> <span class="type">Seq</span>(<span class="string">&quot;青年&quot;</span>)</span><br><span class="line">&#125;)</span><br><span class="line"><span class="keyword">val</span> da1: <span class="type">DataStream</span>[<span class="type">Student</span>] = st.select(<span class="string">&quot;青年&quot;</span>)</span><br><span class="line"><span class="keyword">val</span> da2: <span class="type">DataStream</span>[<span class="type">Student</span>] = st.select(<span class="string">&quot;中年以上&quot;</span>)</span><br><span class="line"><span class="keyword">val</span> conStream: <span class="type">ConnectedStreams</span>[<span class="type">Student</span>, <span class="type">Student</span>] = da1.connect(da2)</span><br><span class="line"><span class="comment">//用comap对数据进行分别处理</span></span><br><span class="line"><span class="keyword">val</span> result: <span class="type">DataStream</span>[<span class="type">String</span>] = conStream.map(da1 =&gt;</span><br><span class="line">  da1.password</span><br><span class="line">  , da2 =&gt; da2.name)</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-union"><a href="#2-union" class="headerlink" title="2 union"></a>2 union</h4><p>Union 函数将两个或多个数据流结合在一起。 这样就可以并行地组合数据流。 如果我们将一个流与自身组合，那么它会输出每个记录两次。(<strong>要求两个流必须是相同的数据类型</strong>)</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//inputStream.union(inputStream1, inputStream2, ...)</span></span><br><span class="line"> <span class="keyword">val</span> st:<span class="type">SplitStream</span>[<span class="type">Student</span>] = stu.split(st =&gt; &#123;</span><br><span class="line">   <span class="keyword">if</span> (st.age &gt; <span class="number">30</span>) <span class="type">Seq</span>(<span class="string">&quot;中年以上&quot;</span>) <span class="keyword">else</span> <span class="type">Seq</span>(<span class="string">&quot;青年&quot;</span>)</span><br><span class="line"> &#125;)</span><br><span class="line"> <span class="keyword">val</span> da1: <span class="type">DataStream</span>[<span class="type">Student</span>] = st.select(<span class="string">&quot;青年&quot;</span>)</span><br><span class="line"> <span class="keyword">val</span> da2: <span class="type">DataStream</span>[<span class="type">Student</span>] = st.select(<span class="string">&quot;中年以上&quot;</span>)</span><br><span class="line"> <span class="keyword">val</span> unionStream: <span class="type">DataStream</span>[<span class="type">Student</span>] = da1.union(da2)</span><br></pre></td></tr></table></figure>
+
+<h3 id="12-Project"><a href="#12-Project" class="headerlink" title="12 Project"></a>12 Project</h3><p>Project 函数允许您从事件流中选择属性子集，并仅将所选元素发送到下一个处理流。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">DataStream&lt;Tuple4&lt;Integer, Double, String, String&gt;&gt; in = <span class="comment">// [...] </span></span><br><span class="line">DataStream&lt;Tuple2&lt;String, String&gt;&gt; out = in.project(<span class="number">3</span>,<span class="number">2</span>);</span><br></pre></td></tr></table></figure>
+
+<p>上述函数从给定记录中选择属性号 2 和 3。 以下是示例输入和输出记录：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(<span class="number">1</span>,<span class="number">10.0</span>,A,B)=&gt; (B,A)</span><br><span class="line">(<span class="number">2</span>,<span class="number">20.0</span>,C,D)=&gt; (D,C)</span><br></pre></td></tr></table></figure>
+
+<h3 id="富函数"><a href="#富函数" class="headerlink" title="富函数"></a>富函数</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//富函数可以获取运行时上下文,还有生命周期</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyRichMapper</span> <span class="keyword">extends</span> <span class="title">RichMapFunction</span>[<span class="type">Student</span>,<span class="type">String</span>] </span>&#123;</span><br><span class="line">  <span class="comment">//重写map</span></span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">map</span></span>(value: <span class="type">Student</span>): <span class="type">String</span> = ???</span><br><span class="line"><span class="comment">//关闭</span></span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">close</span></span>(): <span class="type">Unit</span> = <span class="keyword">super</span>.close()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>​         </p>
+<p>​    本文主要介绍了 Flink Data 的常用转换方式：Map、FlatMap、Filter、KeyBy、Reduce、Fold、Aggregations、Window、WindowAll、Union、Window Join、Split、Select、Project 等。并用了点简单的 demo 介绍了如何使用，具体在项目中该如何将数据流转换成我们想要的格式，还需要根据实际情况对待。</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>HF
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://example.com/2020/10/20/Flink%E7%9A%84TransFormation/" title="Flink的TransFormation">http://example.com/2020/10/20/Flink的TransFormation/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Flink/" rel="tag"># Flink</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/10/14/Flink%E7%9A%84Sink/" rel="prev" title="Flink的Sink">
+      <i class="fa fa-chevron-left"></i> Flink的Sink
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/10/29/Flink%E7%9A%84Stream-Window/" rel="next" title="Flink的Stream_Window">
+      Flink的Stream_Window <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80-%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">一 简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C-Transformation-%E8%BD%AC%E6%8D%A2"><span class="nav-number">2.</span> <span class="nav-text">二 Transformation(转换)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-map"><span class="nav-number">2.1.</span> <span class="nav-text">1 map</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-flatmap"><span class="nav-number">2.2.</span> <span class="nav-text">2 flatmap</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Filter"><span class="nav-number">2.3.</span> <span class="nav-text">3 Filter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-keyby"><span class="nav-number">2.4.</span> <span class="nav-text">3 keyby</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-reduce"><span class="nav-number">2.5.</span> <span class="nav-text">4 reduce</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-Fold"><span class="nav-number">2.6.</span> <span class="nav-text">5 Fold</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-Aggregations"><span class="nav-number">2.7.</span> <span class="nav-text">6 Aggregations</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-window"><span class="nav-number">2.8.</span> <span class="nav-text">7 window</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-windowAll"><span class="nav-number">2.9.</span> <span class="nav-text">8 windowAll</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-Window-join"><span class="nav-number">2.10.</span> <span class="nav-text">9 Window join</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#10-Split-%E5%92%8Cselect"><span class="nav-number">2.11.</span> <span class="nav-text">10 Split 和select</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#11-%E5%90%88%E6%B5%81%E6%93%8D%E4%BD%9C"><span class="nav-number">2.12.</span> <span class="nav-text">11 合流操作</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-connect%E5%92%8Ccomap"><span class="nav-number">2.12.1.</span> <span class="nav-text">1 connect和comap</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-union"><span class="nav-number">2.12.2.</span> <span class="nav-text">2 union</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#12-Project"><span class="nav-number">2.13.</span> <span class="nav-text">12 Project</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%8C%E5%87%BD%E6%95%B0"><span class="nav-number">2.14.</span> <span class="nav-text">富函数</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="HF"
+      src="/images/hexo.jpg">
+  <p class="site-author-name" itemprop="name">HF</p>
+  <div class="site-description" itemprop="description">第二名就是头号输家</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">87</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      推荐阅读
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="http://www.54tianzhisheng.cn/tags/Flink/" title="http:&#x2F;&#x2F;www.54tianzhisheng.cn&#x2F;tags&#x2F;Flink&#x2F;" rel="noopener" target="_blank">Flink</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://nginxconfig.io/" title="https:&#x2F;&#x2F;nginxconfig.io&#x2F;" rel="noopener" target="_blank">Nginxconfig</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://linux.51yip.com/" title="http:&#x2F;&#x2F;linux.51yip.com&#x2F;" rel="noopener" target="_blank">Linux命令手册</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://echarts.baidu.com/index.html" title="https:&#x2F;&#x2F;echarts.baidu.com&#x2F;index.html" rel="noopener" target="_blank">echarts可视化库</a>
+        </li>
+    </ul>
+  </div>
+<div style="">
+  <canvas id="canvas" style="width:60%;">当前浏览器不支持canvas，请更换浏览器后再试</canvas>
+</div>
+<script>
+(function(){
+
+   var digit=
+    [
+        [
+            [0,0,1,1,1,0,0],
+            [0,1,1,0,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,0,1,1,0],
+            [0,0,1,1,1,0,0]
+        ],//0
+        [
+            [0,0,0,1,1,0,0],
+            [0,1,1,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [1,1,1,1,1,1,1]
+        ],//1
+        [
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,0,1,1,0,0,0],
+            [0,1,1,0,0,0,0],
+            [1,1,0,0,0,0,0],
+            [1,1,0,0,0,1,1],
+            [1,1,1,1,1,1,1]
+        ],//2
+        [
+            [1,1,1,1,1,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//3
+        [
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,1,0],
+            [0,0,1,1,1,1,0],
+            [0,1,1,0,1,1,0],
+            [1,1,0,0,1,1,0],
+            [1,1,1,1,1,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,1,1]
+        ],//4
+        [
+            [1,1,1,1,1,1,1],
+            [1,1,0,0,0,0,0],
+            [1,1,0,0,0,0,0],
+            [1,1,1,1,1,1,0],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//5
+        [
+            [0,0,0,0,1,1,0],
+            [0,0,1,1,0,0,0],
+            [0,1,1,0,0,0,0],
+            [1,1,0,0,0,0,0],
+            [1,1,0,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//6
+        [
+            [1,1,1,1,1,1,1],
+            [1,1,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,1,1,0,0,0],
+            [0,0,1,1,0,0,0],
+            [0,0,1,1,0,0,0],
+            [0,0,1,1,0,0,0]
+        ],//7
+        [
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//8
+        [
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,1,1,0,0,0,0]
+        ],//9
+        [
+            [0,0,0,0,0,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,0,0,0,0,0]
+        ]//:
+    ];
+
+var canvas = document.getElementById('canvas');
+
+if(canvas.getContext){
+    var cxt = canvas.getContext('2d');
+    //声明canvas的宽高
+    var H = 100,W = 700;
+    canvas.height = H;
+    canvas.width = W;
+    cxt.fillStyle = '#f00';
+    cxt.fillRect(10,10,50,50);
+
+    //存储时间数据
+    var data = [];
+    //存储运动的小球
+    var balls = [];
+    //设置粒子半径
+    var R = canvas.height/20-1;
+    (function(){
+        var temp = /(\d)(\d):(\d)(\d):(\d)(\d)/.exec(new Date());
+        //存储时间数字，由十位小时、个位小时、冒号、十位分钟、个位分钟、冒号、十位秒钟、个位秒钟这7个数字组成
+        data.push(temp[1],temp[2],10,temp[3],temp[4],10,temp[5],temp[6]);
+    })();
+
+    /*生成点阵数字*/
+    function renderDigit(index,num){
+        for(var i = 0; i < digit[num].length; i++){
+            for(var j = 0; j < digit[num][i].length; j++){
+                if(digit[num][i][j] == 1){
+                    cxt.beginPath();
+                    cxt.arc(14*(R+2)*index + j*2*(R+1)+(R+1),i*2*(R+1)+(R+1),R,0,2*Math.PI);
+                    cxt.closePath();
+                    cxt.fill();
+                }
+            }
+        }
+    }
+
+    /*更新时钟*/
+    function updateDigitTime(){
+        var changeNumArray = [];
+        var temp = /(\d)(\d):(\d)(\d):(\d)(\d)/.exec(new Date());
+        var NewData = [];
+        NewData.push(temp[1],temp[2],10,temp[3],temp[4],10,temp[5],temp[6]);
+        for(var i = data.length-1; i >=0 ; i--){
+            //时间发生变化
+            if(NewData[i] !== data[i]){
+                //将变化的数字值和在data数组中的索引存储在changeNumArray数组中
+                changeNumArray.push(i+'_'+(Number(data[i])+1)%10);
+            }
+        }
+        //增加小球
+        for(var i = 0; i< changeNumArray.length; i++){
+            addBalls.apply(this,changeNumArray[i].split('_'));
+        }
+        data = NewData.concat();
+    }
+
+    /*更新小球状态*/
+    function updateBalls(){
+        for(var i = 0; i < balls.length; i++){
+            balls[i].stepY += balls[i].disY;
+            balls[i].x += balls[i].stepX;
+            balls[i].y += balls[i].stepY;
+            if(balls[i].x > W + R || balls[i].y > H + R){
+                balls.splice(i,1);
+                i--;
+            }
+        }
+    }
+
+    /*增加要运动的小球*/
+    function addBalls(index,num){
+        var numArray = [1,2,3];
+        var colorArray =  ["#3BE","#09C","#A6C","#93C","#9C0","#690","#FB3","#F80","#F44","#C00"];
+        for(var i = 0; i < digit[num].length; i++){
+            for(var j = 0; j < digit[num][i].length; j++){
+                if(digit[num][i][j] == 1){
+                    var ball = {
+                        x:14*(R+2)*index + j*2*(R+1)+(R+1),
+                        y:i*2*(R+1)+(R+1),
+                        stepX:Math.floor(Math.random() * 4 -2),
+                        stepY:-2*numArray[Math.floor(Math.random()*numArray.length)],
+                        color:colorArray[Math.floor(Math.random()*colorArray.length)],
+                        disY:1
+                    };
+                    balls.push(ball);
+                }
+            }
+        }
+    }
+
+    /*渲染*/
+    function render(){
+        //重置画布宽度，达到清空画布的效果
+        canvas.height = 100;
+        //渲染时钟
+        for(var i = 0; i < data.length; i++){
+            renderDigit(i,data[i]);
+        }
+        //渲染小球
+        for(var i = 0; i < balls.length; i++){
+            cxt.beginPath();
+            cxt.arc(balls[i].x,balls[i].y,R,0,2*Math.PI);
+            cxt.fillStyle = balls[i].color;
+            cxt.closePath();
+            cxt.fill();
+        }
+    }
+
+    clearInterval(oTimer);
+    var oTimer = setInterval(function(){
+        //更新时钟
+        updateDigitTime();
+        //更新小球状态
+        updateBalls();
+        //渲染
+        render();
+    },50);
+}
+
+})();
+</script>
+      </div>
+
+    
+          <script type="text/javascript" charset="utf-8" src="/js/tagcloud.js"></script>
+         <script type="text/javascript" charset="utf-8" src="/js/tagcanvas.js"></script>
+           <div class="widget-wrap">
+        <h3 class="widget-title">Tag Cloud</h3>
+        <div id="myCanvasContainer" class="widget tagcloud">
+            <canvas width="250" height="250" id="resCanvas" style="width=100%">
+                <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Ai/" rel="tag">Ai</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Azkaban/" rel="tag">Azkaban</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Blog/" rel="tag">Blog</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ClouderaManager/" rel="tag">ClouderaManager</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ElSearch/" rel="tag">ElSearch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flink/" rel="tag">Flink</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flume/" rel="tag">Flume</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Git/" rel="tag">Git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/" rel="tag">Hadoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hbase/" rel="tag">Hbase</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hdfs/" rel="tag">Hdfs</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hexo/" rel="tag">Hexo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hive/" rel="tag">Hive</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hue/" rel="tag">Hue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Impala/" rel="tag">Impala</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/" rel="tag">Java</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jvm/" rel="tag">Jvm</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kafka/" rel="tag">Kafka</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kettle/" rel="tag">Kettle</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kudu/" rel="tag">Kudu</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/" rel="tag">Linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Livy/" rel="tag">Livy</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MapReduce/" rel="tag">MapReduce</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mysql/" rel="tag">Mysql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Oozie/" rel="tag">Oozie</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redis/" rel="tag">Redis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scala/" rel="tag">Scala</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Shell/" rel="tag">Shell</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spark/" rel="tag">Spark</a><span class="tag-list-count">14</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Sqoop/" rel="tag">Sqoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web/" rel="tag">Web</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Yarn/" rel="tag">Yarn</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ZK/" rel="tag">ZK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96/" rel="tag">数据分析与可视化</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E6%8C%96%E6%8E%98%E4%B8%8E%E5%88%86%E6%9E%90/" rel="tag">数据挖掘与分析</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" rel="tag">数据结构与算法</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag">机器学习与深度学习</a><span class="tag-list-count">2</span></li></ul>
+            </canvas>
+        </div>
+    </div>
+    
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright" style=" text-align:center;">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HF</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">1.3m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">19:42</span>
+</div>
+
+  <!-- 网站运行时间的设置 -->
+<div class="run_time" style=" text-align:center;">
+  <span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+  <script>
+    var now = new Date(); 
+    function createtime() { 
+        var grt= new Date("07/23/2017 10:00:00");//此处修改你的建站时间或者网站上线时间 
+        now.setTime(now.getTime()+250); 
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days); 
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours); 
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum); 
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;} 
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum); 
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;} 
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 "; 
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒"; 
+    } 
+    setInterval("createtime()",250);
+  </script>
+</div>
+        
+<div class="busuanzi-count" style=" text-align:center;">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      我的第 <span class="busuanzi-value" id="busuanzi_value_site_uv"></span> 位朋友，
+    </span>
+  
+
+
+
+  
+    <span class="site-pv">
+      历经 <span class="busuanzi-value" id="busuanzi_value_site_pv"></span> 次回眸才与你相遇
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div class="moon-menu-item" onclick="back2bottom()">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div class="moon-menu-item" onclick="back2top()">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/clicklove.js"></script>
+<!-- 雪花特效 -->
+<script type="text/javascript" src="/js/jquery.js"></script>
+<script type="text/javascript" src="/js/jquery.min.js"></script>
+<script type="text/javascript" src="/js/snow.js"></script>

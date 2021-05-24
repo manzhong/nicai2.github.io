@@ -376,46 +376,15 @@ pip3 install numpy scipy matplotlib -i https://pypi.tuna.tsinghua.edu.cn/simple
     <div class="post-body" itemprop="articleBody">
 
       
-          <script src=/js/crypto-js.js></script>
-<script>
-function doDecrypt (pwd, onError) {
-	console.log('in doDecrypt');
-	const txt = document.getElementById('enc_content').innerHTML;
-	let plantext;
-	try {
-		const bytes = CryptoJS.AES.decrypt(txt, pwd);
-		var plaintext = bytes.toString(CryptoJS.enc.Utf8);
-	} catch(err) {
-		if(onError) {
-			onError(err);
-		}
-		return;
-	}
-	document.getElementById('enc_content').innerHTML = plaintext;
-	document.getElementById('enc_content').style.display = 'block';
-	document.getElementById('enc_passwd').style.display = 'none';
-	if(typeof MathJax !== 'undefined') {
-		MathJax.Hub.Queue(
-			['resetEquationNumbers', MathJax.InputJax.TeX],
-			['PreProcess', MathJax.Hub],
-			['Reprocess', MathJax.Hub]
-		);
-	}
-}
-</script>
-<div id="enc_content" style="display:none">U2FsdGVkX1+WdkZAuC4KA4mMQmBo6FXbdoBkUVeHnD4=</div>
-<div id="enc_passwd"> <input id="enc_pwd_input" type="password" style="border-radius: 5px;border-style: groove;height: 30px;width: 50%;cursor: auto;font-size: 102%;color: currentColor;outline: none;text-overflow: initial;padding-left: 5px;" onkeydown="if (event.keyCode == 13) { decrypt(); return false;}"> <input type="submit" value="解&nbsp;密" onclick="decrypt()" style="width: 58px;height: 34px;border-radius: 5px;background-color: white;border-style: solid;color: currentColor;"><div id="enc_error" style="display: inline-block;color: #d84527;margin-left: 10px"></div>
-<script>
-var onError = function(error) {
-	document.getElementById("enc_error").innerHTML = "password error!"
-};
-function decrypt() {
-var passwd = document.getElementById("enc_pwd_input").value;
-console.log(passwd);
-doDecrypt(passwd, onError);
-}
-</script>
-</div>
+          U2FsdGVkX1/Ug99bq+4xzeU5etvtEvKvsT69ui5+TNQ=
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/11/23/%E6%8C%96%E6%8E%98%E5%BB%BA%E6%A8%A1/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -502,46 +471,15 @@ doDecrypt(passwd, onError);
     <div class="post-body" itemprop="articleBody">
 
       
-          <script src=/js/crypto-js.js></script>
-<script>
-function doDecrypt (pwd, onError) {
-	console.log('in doDecrypt');
-	const txt = document.getElementById('enc_content').innerHTML;
-	let plantext;
-	try {
-		const bytes = CryptoJS.AES.decrypt(txt, pwd);
-		var plaintext = bytes.toString(CryptoJS.enc.Utf8);
-	} catch(err) {
-		if(onError) {
-			onError(err);
-		}
-		return;
-	}
-	document.getElementById('enc_content').innerHTML = plaintext;
-	document.getElementById('enc_content').style.display = 'block';
-	document.getElementById('enc_passwd').style.display = 'none';
-	if(typeof MathJax !== 'undefined') {
-		MathJax.Hub.Queue(
-			['resetEquationNumbers', MathJax.InputJax.TeX],
-			['PreProcess', MathJax.Hub],
-			['Reprocess', MathJax.Hub]
-		);
-	}
-}
-</script>
-<div id="enc_content" style="display:none">U2FsdGVkX1+/5n4wXVBYZhYSRqH4O0tnpEKw4RJiGfE=</div>
-<div id="enc_passwd"> <input id="enc_pwd_input" type="password" style="border-radius: 5px;border-style: groove;height: 30px;width: 50%;cursor: auto;font-size: 102%;color: currentColor;outline: none;text-overflow: initial;padding-left: 5px;" onkeydown="if (event.keyCode == 13) { decrypt(); return false;}"> <input type="submit" value="解&nbsp;密" onclick="decrypt()" style="width: 58px;height: 34px;border-radius: 5px;background-color: white;border-style: solid;color: currentColor;"><div id="enc_error" style="display: inline-block;color: #d84527;margin-left: 10px"></div>
-<script>
-var onError = function(error) {
-	document.getElementById("enc_error").innerHTML = "password error!"
-};
-function decrypt() {
-var passwd = document.getElementById("enc_pwd_input").value;
-console.log(passwd);
-doDecrypt(passwd, onError);
-}
-</script>
-</div>
+          U2FsdGVkX19w91vMmDwi3WA6bYYW26qxZgf3fJWcpdY=
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/11/23/%E6%95%B0%E6%8D%AE%E9%A2%84%E5%A4%84%E7%90%86/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -628,23 +566,7 @@ doDecrypt(passwd, onError);
     <div class="post-body" itemprop="articleBody">
 
       
-          一 简介
-​ 通过检验数据集的数据质量,绘制图表,计算某些特征量等手段,对样本数据集的结构和规律进行分析的过程就是数据探索,数据探索有助于数据预处理和建模方法的选取,本文主要从数据质量分析和数据特征分析两个角度对数据进行探索
-
-二 数据质量分析
-2.1简介
-​ 数据质量分析是数据挖掘中数据准备过程中的重要一环,是数据预处理的前提,也是数据挖掘分析结论有效性和准确性的基础,无可信的数据,数据挖掘构建的模型将是空中楼阁.
-
-​ 数据质量分析的主要任务是检查原始数据中是否存在脏数据
-
-1
-
-
-缺失值,异常值,不一致的值,重复数据以及含有特殊符号(如#,*等)的数据
-
-
-2.2 缺失值分析
-2.2.1
+          U2FsdGVkX19cIP1Aq9zkYyvbV9gQofZ4xY9CIiRxSacxOunwO5v3ryNo8RfIl6qmzkZGhRBvkdyXTdvaoUXogGK446xXg3NGc21ek4z1v+Wwa1aONhNHottnkzVJJCpTa3yzqw5aBpdhxxFW56dGEOFtrwiiBfjH2wKUMEjOFsbp64taF+EdWG4oDcoh7y/8LdJBCnArzNKZ2OR2lKuUgSeLugTTjGqzstEl3R7dvkq4UMMqC5aZJeOU6dpuRG2do4Q5tVGmsflT034tUY5PbujUgs48jMdRV1yq2VUJNNbO
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2020/11/23/%E6%95%B0%E6%8D%AE%E6%8E%A2%E7%B4%A2/#more" rel="contents">

@@ -1,7 +1,7 @@
 ---
 title: Anaconda
-tags: python
-categories: python
+tags: Python
+categories: Python
 abbrlink: 41489
 date: 2019-07-19 22:48:19
 summary_img:

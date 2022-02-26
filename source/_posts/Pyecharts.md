@@ -1,7 +1,7 @@
 ---
 title: Pyecharts
-tags: Python
-categories: Python
+tags: 数据可视化
+categories: 数据可视化
 abbrlink: 5055
 date: 2021-12-19 18:04:19
 summary_img:

@@ -1,7 +1,7 @@
 ---
 title: Matplotlib
-tags: 数据分析与可视化
-categories: 数据分析与可视化
+tags: 数据可视化
+categories: 数据可视化
 encrypt: 
 enc_pwd: 
 abbrlink: 40424

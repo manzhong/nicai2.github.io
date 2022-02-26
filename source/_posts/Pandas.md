@@ -1,9 +1,7 @@
 ---
 title: Pandas
-tags:
-  - Python
-  - 数据分析与可视化
-categories: 数据分析与可视化
+tags: 数据分析
+categories: 数据分析
 encrypt: 
 enc_pwd: 
 abbrlink: 55940

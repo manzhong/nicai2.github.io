@@ -1,9 +1,9 @@
 ---
-title: 数据库
+title: Mysql
 abbrlink: 33510
 date: 2019-08-09 20:45:25
-tags: 数据库
-categories: 数据库
+tags: Mysql
+categories: Mysql
 summary_img:
 encrypt:
 enc_pwd:

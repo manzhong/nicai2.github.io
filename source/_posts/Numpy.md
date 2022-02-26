@@ -1,10 +1,7 @@
 ---
 title: Numpy
-tags:
-  - Ai
-  - Python
-  - 数据分析与可视化
-categories: 数据分析与可视化
+tags: 数据分析
+categories: 数据分析
 abbrlink: 64775
 date: 2020-11-23 21:35:45
 summary_img:

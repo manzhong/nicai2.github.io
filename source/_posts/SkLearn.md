@@ -1,10 +1,7 @@
 ---
 title: SkLearn
-tags:
-  - Ai
-  - Python
-  - 机器学习与深度学习
-categories: 机器学习与深度学习
+tags: 机器学习
+categories: 机器学习
 encrypt: true
 enc_pwd: 123456
 abbrlink: 20112

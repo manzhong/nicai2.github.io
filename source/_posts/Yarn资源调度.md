@@ -2,8 +2,8 @@
 title: YARN
 abbrlink: 33510
 date: 2018-01-09 20:45:25
-tags: Yarn
-categories: Yarn
+tags: Hadoop
+categories: Hadoop
 summary_img:
 encrypt:
 enc_pwd:

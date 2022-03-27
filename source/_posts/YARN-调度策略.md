@@ -1,8 +1,8 @@
 ---
 title: YARN-调度策略
 tags:
-  - Yarn
-categories: Yarn
+  - Hadoop
+categories: Hadoop
 encrypt: 
 enc_pwd: 
 abbrlink: 30491

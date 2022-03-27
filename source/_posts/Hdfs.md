@@ -2,8 +2,8 @@
 title: Hdfs
 abbrlink: 14908
 date: 2017-07-05 14:05:02
-tags: Hdfs
-categories: Hdfs
+tags: Hadoop
+categories: Hadoop
 summary_img:
 encrypt:
 enc_pwd:

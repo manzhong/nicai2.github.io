@@ -2,8 +2,8 @@
 title: MapReduce
 abbrlink: 64376
 date: 2017-07-06 14:56:23
-tags: MapReduce
-categories: MapReduce
+tags: Hadoop
+categories: Hadoop
 summary_img:
 encrypt:
 enc_pwd:

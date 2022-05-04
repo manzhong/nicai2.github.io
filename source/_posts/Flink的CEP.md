@@ -133,7 +133,7 @@ start.where(event=>event.getName.startsWith(“foo”))
       允许中间出现不匹配的事件，由.followedBy()指定。例如对于模式“a followedBy b”，事件序列“a,c,b1,b2”匹配为{a,b1}。
 （3）非确定性宽松近邻
       进一步放宽条件，之前已经匹配过的事件也可以再次使用，由.followedByAny()指定。例如对于模式“a followedByAny b”，事件序列“a,c,b1,b2”匹配为{ab1}，{a,b2}。
-      
+
 （4）除了以上模式序列外，还可以定义“不希望出现某种近邻关系”
 
 ```
@@ -183,6 +183,21 @@ def selectFn(pattern : Map[String,Iterable[IN]]):OUT={
 ### 2.5 超时事件的提取
 
  当一个模式通过within关键字定义了检测窗口时间时，部分事件序列可能因为超过窗口长度而被丢弃；为了能够处理这些超时的部分匹配，select和flatSelect API调用允许指定超时处理程序。
+
+超时处理程序会接受到目前为止由模式匹配到的所有事件，由一个OutputTag定义接受到的超时事件序列
+
+```scala
+patternStream:PatternStream[Event]=CEP.pattern(input,pattern)
+val outputtag = OutputTagp[string]("side-output")
+patternStream.select(outputtag){
+  (pattern:Map[String,Iterable[event]],timestamp:long) => TimeoutEvent()
+}{
+  pattern:Map[String,Iterable[event]] => ComplexEvent()
+}
+val timeoutResout : DataStream<TimeoutEvent> = result.getSideOutput(outputTag)
+```
+
+
 
 ## 三 使用
 

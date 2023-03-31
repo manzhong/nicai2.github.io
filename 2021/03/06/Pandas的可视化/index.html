@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":false,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="一 简介 pandas自身依赖于matplotlib,自己构造了一套数据可视化的api,主要有以下几个包  1 2 3   1: pandas.DataFrame.plot.* (area,bar,barh,box,hist,line,pie....) 2: pandas.DataFrame.hist&#x2F;boxplot 3: pandas.plotting.* (table,scatter_matr">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Pandas的可视化">
+<meta property="og:url" content="http://example.com/2021/03/06/Pandas%E7%9A%84%E5%8F%AF%E8%A7%86%E5%8C%96/index.html">
+<meta property="og:site_name" content="春雨里洗过的太阳">
+<meta property="og:description" content="一 简介 pandas自身依赖于matplotlib,自己构造了一套数据可视化的api,主要有以下几个包  1 2 3   1: pandas.DataFrame.plot.* (area,bar,barh,box,hist,line,pie....) 2: pandas.DataFrame.hist&#x2F;boxplot 3: pandas.plotting.* (table,scatter_matr">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-03-06T11:52:51.000Z">
+<meta property="article:modified_time" content="2023-03-17T15:42:10.673Z">
+<meta property="article:author" content="HF">
+<meta property="article:tag" content="数据分析">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2021/03/06/Pandas%E7%9A%84%E5%8F%AF%E8%A7%86%E5%8C%96/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<link rel="stylesheet" type="text/css" href="/css/injector.css" />
+  <title>Pandas的可视化 | 春雨里洗过的太阳</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">春雨里洗过的太阳</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">世间所有的相遇，都是久别重逢</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/06/Pandas%E7%9A%84%E5%8F%AF%E8%A7%86%E5%8C%96/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/hexo.jpg">
+      <meta itemprop="name" content="HF">
+      <meta itemprop="description" content="第二名就是头号输家">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="春雨里洗过的太阳">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Pandas的可视化
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-03-06 19:52:51" itemprop="dateCreated datePublished" datetime="2021-03-06T19:52:51+08:00">2021-03-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-03-17 23:42:10" itemprop="dateModified" datetime="2023-03-17T23:42:10+08:00">2023-03-17</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/" itemprop="url" rel="index"><span itemprop="name">数据分析</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>6.9k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>6 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="一-简介"><a href="#一-简介" class="headerlink" title="一 简介"></a>一 简介</h2><p>pandas自身依赖于matplotlib,自己构造了一套数据可视化的api,主要有以下几个包</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1: pandas.DataFrame.plot.* (area,bar,barh,box,hist,line,pie....)</span><br><span class="line">2: pandas.DataFrame.hist&#x2F;boxplot</span><br><span class="line">3: pandas.plotting.* (table,scatter_matrix,boxplot....)</span><br></pre></td></tr></table></figure>
+
+<h2 id="二-使用"><a href="#二-使用" class="headerlink" title="二 使用"></a>二 使用</h2><h3 id="2-1-DataFrame自带的绘图"><a href="#2-1-DataFrame自带的绘图" class="headerlink" title="2.1 DataFrame自带的绘图"></a>2.1 DataFrame自带的绘图</h3><p>目前自带的绘图只有两个直方图和箱型图</p>
+<p><strong>1 hist图</strong></p>
+<p><strong>用于查看dataframe的每个数值属性的直方图</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line">%matplotlib inline</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="comment"># 绘制df的每一列的直方图分布</span></span><br><span class="line"><span class="comment"># bins 直方图的箱数</span></span><br><span class="line">df.hist(bins=<span class="number">20</span>,figsize=(<span class="number">20</span>,<span class="number">15</span>))</span><br><span class="line">plt.show()</span><br><span class="line"></span><br><span class="line"><span class="comment">#new_pbf同一幅图里 分sex指标的直方图</span></span><br><span class="line"><span class="comment">#newdf_sub.groupby(&quot;sex&quot;)[&quot;new_pbf&quot;].hist(bins=100,figsize=(10,6),alpha=0.5)</span></span><br><span class="line"><span class="comment"># 按性别分两个图</span></span><br><span class="line"><span class="comment">#newdf_sub[&quot;newb&quot;].hist(bins=100,figsize=(10,6),alpha=0.5,by=&quot;sex&quot;)</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>2 boxplot</strong></p>
+<p><strong>用于查看df的每一列的箱型图</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line">%matplotlib inline</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"></span><br><span class="line">np.random.seed(<span class="number">1234</span>)</span><br><span class="line">df = pd.DataFrame(np.random.randn(<span class="number">10</span>, <span class="number">4</span>),</span><br><span class="line">                  columns=[<span class="string">&#x27;Col1&#x27;</span>, <span class="string">&#x27;Col2&#x27;</span>, <span class="string">&#x27;Col3&#x27;</span>, <span class="string">&#x27;Col4&#x27;</span>])</span><br><span class="line">boxplot = df.boxplot(column=[<span class="string">&#x27;Col1&#x27;</span>, <span class="string">&#x27;Col2&#x27;</span>, <span class="string">&#x27;Col3&#x27;</span>]) </span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-dataframe-的plot下的绘图"><a href="#2-2-dataframe-的plot下的绘图" class="headerlink" title="2.2 dataframe 的plot下的绘图"></a>2.2 dataframe 的plot下的绘图</h3><h4 id="1-plot"><a href="#1-plot" class="headerlink" title="1 plot"></a>1 plot</h4><p>可以绘制多类型图</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line">np.random.seed(<span class="number">1234</span>)</span><br><span class="line">df = pd.DataFrame(np.random.randn(<span class="number">10</span>, <span class="number">4</span>),</span><br><span class="line">                  columns=[<span class="string">&#x27;Col1&#x27;</span>, <span class="string">&#x27;Col2&#x27;</span>, <span class="string">&#x27;Col3&#x27;</span>, <span class="string">&#x27;Col4&#x27;</span>]) </span><br><span class="line"><span class="comment"># kind</span></span><br><span class="line"><span class="comment">#‘line’ : line plot (default)</span></span><br><span class="line"><span class="comment">#‘bar’ : vertical bar plot</span></span><br><span class="line"><span class="comment">#‘barh’ : horizontal bar plot</span></span><br><span class="line"><span class="comment">#‘hist’ : histogram</span></span><br><span class="line"><span class="comment">#‘box’ : boxplot</span></span><br><span class="line"><span class="comment">#‘kde’ : Kernel Density Estimation plot</span></span><br><span class="line"><span class="comment">#‘density’ : same as ‘kde’</span></span><br><span class="line"><span class="comment">#‘area’ : area plot</span></span><br><span class="line"><span class="comment">#‘pie’ : pie plot</span></span><br><span class="line"><span class="comment">#‘scatter’ : scatter plot (DataFrame only)</span></span><br><span class="line"><span class="comment">#‘hexbin’ : hexbin plot (DataFrame only)</span></span><br><span class="line">df.plot(kind=<span class="string">&quot;line&quot;</span>,x=<span class="string">&quot;Col1&quot;</span>,y=<span class="string">&quot;Col2&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-bar-barh"><a href="#2-bar-barh" class="headerlink" title="2 bar/barh"></a>2 bar/barh</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line">df = pd.DataFrame(&#123;<span class="string">&#x27;lab&#x27;</span>:[<span class="string">&#x27;A&#x27;</span>, <span class="string">&#x27;B&#x27;</span>, <span class="string">&#x27;C&#x27;</span>], <span class="string">&#x27;val&#x27;</span>:[<span class="number">10</span>, <span class="number">30</span>, <span class="number">20</span>]&#125;)</span><br><span class="line">ax = df.plot.bar(x=<span class="string">&#x27;lab&#x27;</span>, y=<span class="string">&#x27;val&#x27;</span>, rot=<span class="number">0</span>)</span><br><span class="line"><span class="comment"># 竖直条形图</span></span><br><span class="line">axh = df.plot.barh(x=<span class="string">&#x27;lab&#x27;</span>, y=<span class="string">&#x27;val&#x27;</span>) </span><br></pre></td></tr></table></figure>
+
+<h4 id="3-box"><a href="#3-box" class="headerlink" title="3 box"></a>3 box</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">data = np.random.randn(<span class="number">25</span>, <span class="number">4</span>)</span><br><span class="line">df = pd.DataFrame(data, columns=list(<span class="string">&#x27;ABCD&#x27;</span>))</span><br><span class="line">ax = df.plot.box()</span><br></pre></td></tr></table></figure>
+
+<h4 id="4-density-核密度估计图"><a href="#4-density-核密度估计图" class="headerlink" title="4 density 核密度估计图"></a>4 density 核密度估计图</h4><p>核密度图可以看作是概率密度图,其纵轴可以粗略看做是数据出现的次数，与横轴围成的面积是一.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">df = pd.DataFrame(&#123;</span><br><span class="line">    <span class="string">&#x27;x&#x27;</span>: [<span class="number">1</span>, <span class="number">2</span>, <span class="number">2.5</span>, <span class="number">3</span>, <span class="number">3.5</span>, <span class="number">4</span>, <span class="number">5</span>],</span><br><span class="line">    <span class="string">&#x27;y&#x27;</span>: [<span class="number">4</span>, <span class="number">4</span>, <span class="number">4.5</span>, <span class="number">5</span>, <span class="number">5.5</span>, <span class="number">6</span>, <span class="number">6</span>],</span><br><span class="line">&#125;)</span><br><span class="line">ax = df.plot.kde()</span><br><span class="line">ax2 = df.plot.kde(bw_method=<span class="number">0.3</span>)</span><br></pre></td></tr></table></figure>
+
+<h4 id="5-hist"><a href="#5-hist" class="headerlink" title="5 hist"></a>5 hist</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">df = pd.DataFrame(</span><br><span class="line">    np.random.randint(<span class="number">1</span>, <span class="number">7</span>, <span class="number">6000</span>),</span><br><span class="line">    columns = [<span class="string">&#x27;one&#x27;</span>])</span><br><span class="line">df[<span class="string">&#x27;two&#x27;</span>] = df[<span class="string">&#x27;one&#x27;</span>] + np.random.randint(<span class="number">1</span>, <span class="number">7</span>, <span class="number">6000</span>)</span><br><span class="line">ax = df.plot.hist(bins=<span class="number">12</span>, alpha=<span class="number">0.5</span>)</span><br></pre></td></tr></table></figure>
+
+<p>by参数分组直方图</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">age_list = [<span class="number">8</span>, <span class="number">10</span>, <span class="number">12</span>, <span class="number">14</span>, <span class="number">72</span>, <span class="number">74</span>, <span class="number">76</span>, <span class="number">78</span>, <span class="number">20</span>, <span class="number">25</span>, <span class="number">30</span>, <span class="number">35</span>, <span class="number">60</span>, <span class="number">85</span>]</span><br><span class="line">df = pd.DataFrame(&#123;<span class="string">&quot;gender&quot;</span>: list(<span class="string">&quot;MMMMMMMMFFFFFF&quot;</span>), <span class="string">&quot;age&quot;</span>: age_list&#125;)</span><br><span class="line">ax = df.plot.hist(column=[<span class="string">&quot;age&quot;</span>], by=<span class="string">&quot;gender&quot;</span>, figsize=(<span class="number">10</span>, <span class="number">8</span>))</span><br></pre></td></tr></table></figure>
+
+<h4 id="5-line"><a href="#5-line" class="headerlink" title="5 line"></a>5 line</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">df = pd.DataFrame(&#123;</span><br><span class="line">   <span class="string">&#x27;pig&#x27;</span>: [<span class="number">20</span>, <span class="number">18</span>, <span class="number">489</span>, <span class="number">675</span>, <span class="number">1776</span>],</span><br><span class="line">   <span class="string">&#x27;horse&#x27;</span>: [<span class="number">4</span>, <span class="number">25</span>, <span class="number">281</span>, <span class="number">600</span>, <span class="number">1900</span>]</span><br><span class="line">   &#125;, index=[<span class="number">1990</span>, <span class="number">1997</span>, <span class="number">2003</span>, <span class="number">2009</span>, <span class="number">2014</span>])</span><br><span class="line">lines = df.plot.line()</span><br></pre></td></tr></table></figure>
+
+<p>分组子图</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">axes = df.plot.line(subplots=<span class="literal">True</span>)</span><br></pre></td></tr></table></figure>
+
+<p>指定xy</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lines = df.plot.line(x=<span class="string">&#x27;pig&#x27;</span>, y=<span class="string">&#x27;horse&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<h4 id="6-pie"><a href="#6-pie" class="headerlink" title="6 pie"></a>6 pie</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">df = pd.DataFrame(&#123;<span class="string">&#x27;mass&#x27;</span>: [<span class="number">0.330</span>, <span class="number">4.87</span> , <span class="number">5.97</span>],</span><br><span class="line">                   <span class="string">&#x27;radius&#x27;</span>: [<span class="number">2439.7</span>, <span class="number">6051.8</span>, <span class="number">6378.1</span>]&#125;,</span><br><span class="line">                  index=[<span class="string">&#x27;Mercury&#x27;</span>, <span class="string">&#x27;Venus&#x27;</span>, <span class="string">&#x27;Earth&#x27;</span>])</span><br><span class="line">plot = df.plot.pie(y=<span class="string">&#x27;mass&#x27;</span>, figsize=(<span class="number">5</span>, <span class="number">5</span>))</span><br></pre></td></tr></table></figure>
+
+<p>分组子图</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">plot = df.plot.pie(subplots=<span class="literal">True</span>, figsize=(<span class="number">11</span>, <span class="number">6</span>))</span><br></pre></td></tr></table></figure>
+
+<h4 id="7-scatter"><a href="#7-scatter" class="headerlink" title="7 scatter"></a>7 scatter</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">df = pd.DataFrame([[<span class="number">5.1</span>, <span class="number">3.5</span>, <span class="number">0</span>], [<span class="number">4.9</span>, <span class="number">3.0</span>, <span class="number">0</span>], [<span class="number">7.0</span>, <span class="number">3.2</span>, <span class="number">1</span>],</span><br><span class="line">                   [<span class="number">6.4</span>, <span class="number">3.2</span>, <span class="number">1</span>], [<span class="number">5.9</span>, <span class="number">3.0</span>, <span class="number">2</span>]],</span><br><span class="line">                  columns=[<span class="string">&#x27;length&#x27;</span>, <span class="string">&#x27;width&#x27;</span>, <span class="string">&#x27;species&#x27;</span>])</span><br><span class="line">ax1 = df.plot.scatter(x=<span class="string">&#x27;length&#x27;</span>,</span><br><span class="line">                      y=<span class="string">&#x27;width&#x27;</span>,</span><br><span class="line">                      c=<span class="string">&#x27;DarkBlue&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>控制颜色</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ax2 = df.plot.scatter(x=<span class="string">&#x27;length&#x27;</span>,</span><br><span class="line">                      y=<span class="string">&#x27;width&#x27;</span>,</span><br><span class="line">                      c=<span class="string">&#x27;species&#x27;</span>,</span><br><span class="line">                      colormap=<span class="string">&#x27;viridis&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="2-3-pandas下的plotting"><a href="#2-3-pandas下的plotting" class="headerlink" title="2.3 pandas下的plotting"></a>2.3 pandas下的plotting</h3><h4 id="1-pandas-plotting-scatter-matrix"><a href="#1-pandas-plotting-scatter-matrix" class="headerlink" title="1 pandas.plotting.scatter_matrix"></a>1 pandas.plotting.scatter_matrix</h4><p><strong>监测属性间相关性的散点直方图</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pandas.plotting <span class="keyword">import</span> scatter_matrix</span><br><span class="line">df = pd.DataFrame(np.random.randn(<span class="number">1000</span>, <span class="number">4</span>), columns=[<span class="string">&#x27;A&#x27;</span>,<span class="string">&#x27;B&#x27;</span>,<span class="string">&#x27;C&#x27;</span>,<span class="string">&#x27;D&#x27;</span>])</span><br><span class="line"><span class="comment">#pd.plotting.scatter_matrix(df, alpha=0.2)</span></span><br><span class="line">scatter_matrix(df, alpha=<span class="number">0.2</span>,figsize=(<span class="number">20</span>,<span class="number">15</span>))</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-pandas-plotting-radviz"><a href="#2-pandas-plotting-radviz" class="headerlink" title="2 pandas.plotting.radviz"></a>2 pandas.plotting.radviz</h4><p><strong>绘制聚类图,将 N 维数据集投影到 2D 空间中，其中每个维度的影响可以解释为所有维度影响之间的平衡</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">df = pd.DataFrame(</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="string">&#x27;SepalLength&#x27;</span>: [<span class="number">6.5</span>, <span class="number">7.7</span>, <span class="number">5.1</span>, <span class="number">5.8</span>, <span class="number">7.6</span>, <span class="number">5.0</span>, <span class="number">5.4</span>, <span class="number">4.6</span>, <span class="number">6.7</span>, <span class="number">4.6</span>],</span><br><span class="line">        <span class="string">&#x27;SepalWidth&#x27;</span>: [<span class="number">3.0</span>, <span class="number">3.8</span>, <span class="number">3.8</span>, <span class="number">2.7</span>, <span class="number">3.0</span>, <span class="number">2.3</span>, <span class="number">3.0</span>, <span class="number">3.2</span>, <span class="number">3.3</span>, <span class="number">3.6</span>],</span><br><span class="line">        <span class="string">&#x27;PetalLength&#x27;</span>: [<span class="number">5.5</span>, <span class="number">6.7</span>, <span class="number">1.9</span>, <span class="number">5.1</span>, <span class="number">6.6</span>, <span class="number">3.3</span>, <span class="number">4.5</span>, <span class="number">1.4</span>, <span class="number">5.7</span>, <span class="number">1.0</span>],</span><br><span class="line">        <span class="string">&#x27;PetalWidth&#x27;</span>: [<span class="number">1.8</span>, <span class="number">2.2</span>, <span class="number">0.4</span>, <span class="number">1.9</span>, <span class="number">2.1</span>, <span class="number">1.0</span>, <span class="number">1.5</span>, <span class="number">0.2</span>, <span class="number">2.1</span>, <span class="number">0.2</span>],</span><br><span class="line">        <span class="string">&#x27;Category&#x27;</span>: [</span><br><span class="line">            <span class="string">&#x27;virginica&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;virginica&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;setosa&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;virginica&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;virginica&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;versicolor&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;versicolor&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;setosa&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;virginica&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;setosa&#x27;</span></span><br><span class="line">        ]</span><br><span class="line">    &#125;</span><br><span class="line">)</span><br><span class="line">pd.plotting.radviz(df, <span class="string">&#x27;Category&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-pandas-plotting-parallel-coordinates"><a href="#3-pandas-plotting-parallel-coordinates" class="headerlink" title="3 pandas.plotting.parallel_coordinates"></a>3 pandas.plotting.parallel_coordinates</h4><p>平行坐标绘图</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">dfiris = pd.read_csv(</span><br><span class="line">    <span class="string">&#x27;https://raw.github.com/pandas-dev/&#x27;</span></span><br><span class="line">    <span class="string">&#x27;pandas/main/pandas/tests/io/data/csv/iris.csv&#x27;</span></span><br><span class="line">)</span><br><span class="line">pd.plotting.parallel_coordinates(</span><br><span class="line">    df, <span class="string">&#x27;Name&#x27;</span>, color=(<span class="string">&#x27;#556270&#x27;</span>, <span class="string">&#x27;#4ECDC4&#x27;</span>, <span class="string">&#x27;#C7F464&#x27;</span>)</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h4 id="4-pandas-plotting-lag-plot"><a href="#4-pandas-plotting-lag-plot" class="headerlink" title="4 pandas.plotting.lag_plot"></a>4 pandas.plotting.lag_plot</h4><p>时间序列的滞后图,滞后图是用时间序列和相应的滞后阶数序列做出的散点图。可以用于观测自相关性。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 给定序列</span></span><br><span class="line">np.random.seed(<span class="number">5</span>)</span><br><span class="line">x = np.cumsum(np.random.normal(loc=<span class="number">1</span>, scale=<span class="number">5</span>, size=<span class="number">50</span>))</span><br><span class="line">s = pd.Series(x)</span><br><span class="line">s.plot()</span><br><span class="line"></span><br><span class="line"><span class="comment">#lag=1 的回报滞后图</span></span><br><span class="line">pd.plotting.lag_plot(s, lag=<span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+
+<h4 id="5-pandas-plotting-boxplot"><a href="#5-pandas-plotting-boxplot" class="headerlink" title="5 pandas.plotting.boxplot"></a>5 pandas.plotting.boxplot</h4><p><strong>从 DataFrame 列制作箱形图</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">np.random.seed(<span class="number">1234</span>)</span><br><span class="line">df = pd.DataFrame(np.random.randn(<span class="number">10</span>, <span class="number">4</span>),</span><br><span class="line">                  columns=[<span class="string">&#x27;Col1&#x27;</span>, <span class="string">&#x27;Col2&#x27;</span>, <span class="string">&#x27;Col3&#x27;</span>, <span class="string">&#x27;Col4&#x27;</span>])</span><br><span class="line">boxplot = df.boxplot(column=[<span class="string">&#x27;Col1&#x27;</span>, <span class="string">&#x27;Col2&#x27;</span>, <span class="string">&#x27;Col3&#x27;</span>]) </span><br></pre></td></tr></table></figure>
+
+<p><strong>分组</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">df = pd.DataFrame(np.random.randn(<span class="number">10</span>, <span class="number">2</span>),</span><br><span class="line">                  columns=[<span class="string">&#x27;Col1&#x27;</span>, <span class="string">&#x27;Col2&#x27;</span>])</span><br><span class="line">df[<span class="string">&#x27;X&#x27;</span>] = pd.Series([<span class="string">&#x27;A&#x27;</span>, <span class="string">&#x27;A&#x27;</span>, <span class="string">&#x27;A&#x27;</span>, <span class="string">&#x27;A&#x27;</span>, <span class="string">&#x27;A&#x27;</span>,</span><br><span class="line">                     <span class="string">&#x27;B&#x27;</span>, <span class="string">&#x27;B&#x27;</span>, <span class="string">&#x27;B&#x27;</span>, <span class="string">&#x27;B&#x27;</span>, <span class="string">&#x27;B&#x27;</span>])</span><br><span class="line">boxplot = df.boxplot(by=<span class="string">&#x27;X&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>可以将字符串列表（即）传递给箱线图，以便通过 x 轴中的变量组合对数据进行分组：<code>[&#39;X&#39;, &#39;Y&#39;]</code></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">df = pd.DataFrame(np.random.randn(<span class="number">10</span>, <span class="number">3</span>),</span><br><span class="line">                  columns=[<span class="string">&#x27;Col1&#x27;</span>, <span class="string">&#x27;Col2&#x27;</span>, <span class="string">&#x27;Col3&#x27;</span>])</span><br><span class="line">df[<span class="string">&#x27;X&#x27;</span>] = pd.Series([<span class="string">&#x27;A&#x27;</span>, <span class="string">&#x27;A&#x27;</span>, <span class="string">&#x27;A&#x27;</span>, <span class="string">&#x27;A&#x27;</span>, <span class="string">&#x27;A&#x27;</span>,</span><br><span class="line">                     <span class="string">&#x27;B&#x27;</span>, <span class="string">&#x27;B&#x27;</span>, <span class="string">&#x27;B&#x27;</span>, <span class="string">&#x27;B&#x27;</span>, <span class="string">&#x27;B&#x27;</span>])</span><br><span class="line">df[<span class="string">&#x27;Y&#x27;</span>] = pd.Series([<span class="string">&#x27;A&#x27;</span>, <span class="string">&#x27;B&#x27;</span>, <span class="string">&#x27;A&#x27;</span>, <span class="string">&#x27;B&#x27;</span>, <span class="string">&#x27;A&#x27;</span>,</span><br><span class="line">                     <span class="string">&#x27;B&#x27;</span>, <span class="string">&#x27;A&#x27;</span>, <span class="string">&#x27;B&#x27;</span>, <span class="string">&#x27;A&#x27;</span>, <span class="string">&#x27;B&#x27;</span>])</span><br><span class="line">boxplot = df.boxplot(column=[<span class="string">&#x27;Col1&#x27;</span>, <span class="string">&#x27;Col2&#x27;</span>], by=[<span class="string">&#x27;X&#x27;</span>, <span class="string">&#x27;Y&#x27;</span>])</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#可以对箱线图进行其他格式化，例如抑制网格 ( grid=False)、在 x 轴上旋转标签 (ie rot=45) 或更改字体大小 (ie fontsize=15)</span></span><br><span class="line">boxplot = df.boxplot(grid=<span class="literal">False</span>, rot=<span class="number">45</span>, fontsize=<span class="number">15</span>)  </span><br></pre></td></tr></table></figure>
+
+<h4 id="6-pandas-plotting-bootstrap-plot"><a href="#6-pandas-plotting-bootstrap-plot" class="headerlink" title="6 pandas.plotting.bootstrap_plot"></a>6 pandas.plotting.bootstrap_plot</h4><p>均值、中值和中间范围统计数据的引导图。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">s = pd.Series(np.random.uniform(size=<span class="number">100</span>))</span><br><span class="line">pd.plotting.bootstrap_plot(s)</span><br></pre></td></tr></table></figure>
+
+<h4 id="7-pandas-plotting-autocorrelation-plot"><a href="#7-pandas-plotting-autocorrelation-plot" class="headerlink" title="7 pandas.plotting.autocorrelation_plot"></a>7 pandas.plotting.autocorrelation_plot</h4><p>时间序列的自相关图。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">spacing = np.linspace(<span class="number">-9</span> * np.pi, <span class="number">9</span> * np.pi, num=<span class="number">1000</span>)</span><br><span class="line">s = pd.Series(<span class="number">0.7</span> * np.random.rand(<span class="number">1000</span>) + <span class="number">0.3</span> * np.sin(spacing))</span><br><span class="line"><span class="comment"># 图中的水平线对应于 95% 和 99% 的置信带。虚线是 99% 置信带。</span></span><br><span class="line">pd.plotting.autocorrelation_plot(s)</span><br></pre></td></tr></table></figure>
+
+<h4 id="8-pandas-plotting-andrews-curves-调和曲线"><a href="#8-pandas-plotting-andrews-curves-调和曲线" class="headerlink" title="8 pandas.plotting.andrews_curves(调和曲线)"></a>8 pandas.plotting.andrews_curves(调和曲线)</h4><p>生成 Andrews 曲线的 matplotlib 图，用于可视化多变量数据的集群。一般用户聚类分析</p>
+<p>两个样品点之间的欧式距离越近，其Andrews曲线也会越近，往往彼此纠缠在一起。因此Andrews曲线常用于反映多元样品数据的结构，以预估各样品的聚类情况。</p>
+<p>调和曲线图由Andrews于1972年提出，因此又叫Andrews plots或Andrews curve，是将多元数据以二维曲线展现的一种统计图，常用于表示多元数据的结构</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">df = pd.read_csv(</span><br><span class="line">    <span class="string">&#x27;https://raw.github.com/pandas-dev/&#x27;</span></span><br><span class="line">    <span class="string">&#x27;pandas/main/pandas/tests/io/data/csv/iris.csv&#x27;</span></span><br><span class="line">)</span><br><span class="line">pd.plotting.andrews_curves(df, <span class="string">&#x27;Name&#x27;</span>)</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>HF
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://example.com/2021/03/06/Pandas%E7%9A%84%E5%8F%AF%E8%A7%86%E5%8C%96/" title="Pandas的可视化">http://example.com/2021/03/06/Pandas的可视化/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/" rel="tag"># 数据分析</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/02/10/mysql%E7%9A%84%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/" rel="prev" title="mysql的常用函数">
+      <i class="fa fa-chevron-left"></i> mysql的常用函数
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/03/22/%E6%A0%91%E5%92%8C%E4%BA%8C%E5%8F%89%E6%A0%91/" rel="next" title="树和二叉树">
+      树和二叉树 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80-%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">一 简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C-%E4%BD%BF%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">二 使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-DataFrame%E8%87%AA%E5%B8%A6%E7%9A%84%E7%BB%98%E5%9B%BE"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 DataFrame自带的绘图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-dataframe-%E7%9A%84plot%E4%B8%8B%E7%9A%84%E7%BB%98%E5%9B%BE"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 dataframe 的plot下的绘图</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-plot"><span class="nav-number">2.2.1.</span> <span class="nav-text">1 plot</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-bar-barh"><span class="nav-number">2.2.2.</span> <span class="nav-text">2 bar&#x2F;barh</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-box"><span class="nav-number">2.2.3.</span> <span class="nav-text">3 box</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-density-%E6%A0%B8%E5%AF%86%E5%BA%A6%E4%BC%B0%E8%AE%A1%E5%9B%BE"><span class="nav-number">2.2.4.</span> <span class="nav-text">4 density 核密度估计图</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-hist"><span class="nav-number">2.2.5.</span> <span class="nav-text">5 hist</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-line"><span class="nav-number">2.2.6.</span> <span class="nav-text">5 line</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-pie"><span class="nav-number">2.2.7.</span> <span class="nav-text">6 pie</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#7-scatter"><span class="nav-number">2.2.8.</span> <span class="nav-text">7 scatter</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-pandas%E4%B8%8B%E7%9A%84plotting"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 pandas下的plotting</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-pandas-plotting-scatter-matrix"><span class="nav-number">2.3.1.</span> <span class="nav-text">1 pandas.plotting.scatter_matrix</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-pandas-plotting-radviz"><span class="nav-number">2.3.2.</span> <span class="nav-text">2 pandas.plotting.radviz</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-pandas-plotting-parallel-coordinates"><span class="nav-number">2.3.3.</span> <span class="nav-text">3 pandas.plotting.parallel_coordinates</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-pandas-plotting-lag-plot"><span class="nav-number">2.3.4.</span> <span class="nav-text">4 pandas.plotting.lag_plot</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-pandas-plotting-boxplot"><span class="nav-number">2.3.5.</span> <span class="nav-text">5 pandas.plotting.boxplot</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-pandas-plotting-bootstrap-plot"><span class="nav-number">2.3.6.</span> <span class="nav-text">6 pandas.plotting.bootstrap_plot</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#7-pandas-plotting-autocorrelation-plot"><span class="nav-number">2.3.7.</span> <span class="nav-text">7 pandas.plotting.autocorrelation_plot</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#8-pandas-plotting-andrews-curves-%E8%B0%83%E5%92%8C%E6%9B%B2%E7%BA%BF"><span class="nav-number">2.3.8.</span> <span class="nav-text">8 pandas.plotting.andrews_curves(调和曲线)</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="HF"
+      src="/images/hexo.jpg">
+  <p class="site-author-name" itemprop="name">HF</p>
+  <div class="site-description" itemprop="description">第二名就是头号输家</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">105</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      推荐阅读
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="http://www.54tianzhisheng.cn/tags/Flink/" title="http:&#x2F;&#x2F;www.54tianzhisheng.cn&#x2F;tags&#x2F;Flink&#x2F;" rel="noopener" target="_blank">Flink</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://nginxconfig.io/" title="https:&#x2F;&#x2F;nginxconfig.io&#x2F;" rel="noopener" target="_blank">Nginxconfig</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://linux.51yip.com/" title="http:&#x2F;&#x2F;linux.51yip.com&#x2F;" rel="noopener" target="_blank">Linux命令手册</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://echarts.baidu.com/index.html" title="https:&#x2F;&#x2F;echarts.baidu.com&#x2F;index.html" rel="noopener" target="_blank">echarts可视化库</a>
+        </li>
+    </ul>
+  </div>
+<div style="">
+  <canvas id="canvas" style="width:60%;">当前浏览器不支持canvas，请更换浏览器后再试</canvas>
+</div>
+<script>
+(function(){
+
+   var digit=
+    [
+        [
+            [0,0,1,1,1,0,0],
+            [0,1,1,0,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,0,1,1,0],
+            [0,0,1,1,1,0,0]
+        ],//0
+        [
+            [0,0,0,1,1,0,0],
+            [0,1,1,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [1,1,1,1,1,1,1]
+        ],//1
+        [
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,0,1,1,0,0,0],
+            [0,1,1,0,0,0,0],
+            [1,1,0,0,0,0,0],
+            [1,1,0,0,0,1,1],
+            [1,1,1,1,1,1,1]
+        ],//2
+        [
+            [1,1,1,1,1,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//3
+        [
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,1,0],
+            [0,0,1,1,1,1,0],
+            [0,1,1,0,1,1,0],
+            [1,1,0,0,1,1,0],
+            [1,1,1,1,1,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,1,1]
+        ],//4
+        [
+            [1,1,1,1,1,1,1],
+            [1,1,0,0,0,0,0],
+            [1,1,0,0,0,0,0],
+            [1,1,1,1,1,1,0],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//5
+        [
+            [0,0,0,0,1,1,0],
+            [0,0,1,1,0,0,0],
+            [0,1,1,0,0,0,0],
+            [1,1,0,0,0,0,0],
+            [1,1,0,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//6
+        [
+            [1,1,1,1,1,1,1],
+            [1,1,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,1,1,0,0,0],
+            [0,0,1,1,0,0,0],
+            [0,0,1,1,0,0,0],
+            [0,0,1,1,0,0,0]
+        ],//7
+        [
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//8
+        [
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,1,1,0,0,0,0]
+        ],//9
+        [
+            [0,0,0,0,0,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,0,0,0,0,0]
+        ]//:
+    ];
+
+var canvas = document.getElementById('canvas');
+
+if(canvas.getContext){
+    var cxt = canvas.getContext('2d');
+    //声明canvas的宽高
+    var H = 100,W = 700;
+    canvas.height = H;
+    canvas.width = W;
+    cxt.fillStyle = '#f00';
+    cxt.fillRect(10,10,50,50);
+
+    //存储时间数据
+    var data = [];
+    //存储运动的小球
+    var balls = [];
+    //设置粒子半径
+    var R = canvas.height/20-1;
+    (function(){
+        var temp = /(\d)(\d):(\d)(\d):(\d)(\d)/.exec(new Date());
+        //存储时间数字，由十位小时、个位小时、冒号、十位分钟、个位分钟、冒号、十位秒钟、个位秒钟这7个数字组成
+        data.push(temp[1],temp[2],10,temp[3],temp[4],10,temp[5],temp[6]);
+    })();
+
+    /*生成点阵数字*/
+    function renderDigit(index,num){
+        for(var i = 0; i < digit[num].length; i++){
+            for(var j = 0; j < digit[num][i].length; j++){
+                if(digit[num][i][j] == 1){
+                    cxt.beginPath();
+                    cxt.arc(14*(R+2)*index + j*2*(R+1)+(R+1),i*2*(R+1)+(R+1),R,0,2*Math.PI);
+                    cxt.closePath();
+                    cxt.fill();
+                }
+            }
+        }
+    }
+
+    /*更新时钟*/
+    function updateDigitTime(){
+        var changeNumArray = [];
+        var temp = /(\d)(\d):(\d)(\d):(\d)(\d)/.exec(new Date());
+        var NewData = [];
+        NewData.push(temp[1],temp[2],10,temp[3],temp[4],10,temp[5],temp[6]);
+        for(var i = data.length-1; i >=0 ; i--){
+            //时间发生变化
+            if(NewData[i] !== data[i]){
+                //将变化的数字值和在data数组中的索引存储在changeNumArray数组中
+                changeNumArray.push(i+'_'+(Number(data[i])+1)%10);
+            }
+        }
+        //增加小球
+        for(var i = 0; i< changeNumArray.length; i++){
+            addBalls.apply(this,changeNumArray[i].split('_'));
+        }
+        data = NewData.concat();
+    }
+
+    /*更新小球状态*/
+    function updateBalls(){
+        for(var i = 0; i < balls.length; i++){
+            balls[i].stepY += balls[i].disY;
+            balls[i].x += balls[i].stepX;
+            balls[i].y += balls[i].stepY;
+            if(balls[i].x > W + R || balls[i].y > H + R){
+                balls.splice(i,1);
+                i--;
+            }
+        }
+    }
+
+    /*增加要运动的小球*/
+    function addBalls(index,num){
+        var numArray = [1,2,3];
+        var colorArray =  ["#3BE","#09C","#A6C","#93C","#9C0","#690","#FB3","#F80","#F44","#C00"];
+        for(var i = 0; i < digit[num].length; i++){
+            for(var j = 0; j < digit[num][i].length; j++){
+                if(digit[num][i][j] == 1){
+                    var ball = {
+                        x:14*(R+2)*index + j*2*(R+1)+(R+1),
+                        y:i*2*(R+1)+(R+1),
+                        stepX:Math.floor(Math.random() * 4 -2),
+                        stepY:-2*numArray[Math.floor(Math.random()*numArray.length)],
+                        color:colorArray[Math.floor(Math.random()*colorArray.length)],
+                        disY:1
+                    };
+                    balls.push(ball);
+                }
+            }
+        }
+    }
+
+    /*渲染*/
+    function render(){
+        //重置画布宽度，达到清空画布的效果
+        canvas.height = 100;
+        //渲染时钟
+        for(var i = 0; i < data.length; i++){
+            renderDigit(i,data[i]);
+        }
+        //渲染小球
+        for(var i = 0; i < balls.length; i++){
+            cxt.beginPath();
+            cxt.arc(balls[i].x,balls[i].y,R,0,2*Math.PI);
+            cxt.fillStyle = balls[i].color;
+            cxt.closePath();
+            cxt.fill();
+        }
+    }
+
+    clearInterval(oTimer);
+    var oTimer = setInterval(function(){
+        //更新时钟
+        updateDigitTime();
+        //更新小球状态
+        updateBalls();
+        //渲染
+        render();
+    },50);
+}
+
+})();
+</script>
+      </div>
+
+    
+          <script type="text/javascript" charset="utf-8" src="/js/tagcloud.js"></script>
+         <script type="text/javascript" charset="utf-8" src="/js/tagcanvas.js"></script>
+           <div class="widget-wrap">
+        <h3 class="widget-title">Tag Cloud</h3>
+        <div id="myCanvasContainer" class="widget tagcloud">
+            <canvas width="250" height="250" id="resCanvas" style="width=100%">
+                <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Azkaban/" rel="tag">Azkaban</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Blog/" rel="tag">Blog</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ClickHouse/" rel="tag">ClickHouse</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ClouderaManager/" rel="tag">ClouderaManager</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ElSearch/" rel="tag">ElSearch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flink/" rel="tag">Flink</a><span class="tag-list-count">17</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flume/" rel="tag">Flume</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Git/" rel="tag">Git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/" rel="tag">Hadoop</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hbase/" rel="tag">Hbase</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hexo/" rel="tag">Hexo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hive/" rel="tag">Hive</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hue/" rel="tag">Hue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Impala/" rel="tag">Impala</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/" rel="tag">Java</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jvm/" rel="tag">Jvm</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kafka/" rel="tag">Kafka</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kettle/" rel="tag">Kettle</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kudu/" rel="tag">Kudu</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/" rel="tag">Linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Livy/" rel="tag">Livy</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mysql/" rel="tag">Mysql</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Oozie/" rel="tag">Oozie</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redis/" rel="tag">Redis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scala/" rel="tag">Scala</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Shell/" rel="tag">Shell</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spark/" rel="tag">Spark</a><span class="tag-list-count">14</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Sqoop/" rel="tag">Sqoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web/" rel="tag">Web</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ZK/" rel="tag">ZK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E4%BB%93/" rel="tag">数仓</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/" rel="tag">数据分析</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%8F%AF%E8%A7%86%E5%8C%96/" rel="tag">数据可视化</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E6%B9%96/" rel="tag">数据湖</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" rel="tag">数据结构与算法</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag">机器学习</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BB%9F%E8%AE%A1/" rel="tag">统计</a><span class="tag-list-count">1</span></li></ul>
+            </canvas>
+        </div>
+    </div>
+    
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright" style=" text-align:center;">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HF</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">1.6m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">24:05</span>
+</div>
+
+  <!-- 网站运行时间的设置 -->
+<div class="run_time" style=" text-align:center;">
+  <span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+  <script>
+    var now = new Date(); 
+    function createtime() { 
+        var grt= new Date("07/23/2017 10:00:00");//此处修改你的建站时间或者网站上线时间 
+        now.setTime(now.getTime()+250); 
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days); 
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours); 
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum); 
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;} 
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum); 
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;} 
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 "; 
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒"; 
+    } 
+    setInterval("createtime()",250);
+  </script>
+</div>
+        
+<div class="busuanzi-count" style=" text-align:center;">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      我的第 <span class="busuanzi-value" id="busuanzi_value_site_uv"></span> 位朋友，
+    </span>
+  
+
+
+
+  
+    <span class="site-pv">
+      历经 <span class="busuanzi-value" id="busuanzi_value_site_pv"></span> 次回眸才与你相遇
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div class="moon-menu-item" onclick="back2bottom()">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div class="moon-menu-item" onclick="back2top()">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/clicklove.js"></script>
+<!-- 雪花特效 -->
+<script type="text/javascript" src="/js/jquery.js"></script>
+<script type="text/javascript" src="/js/jquery.min.js"></script>
+<script type="text/javascript" src="/js/snow.js"></script>

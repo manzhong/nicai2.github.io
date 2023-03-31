@@ -1,0 +1,1480 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":false,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="#一 样例类  样例类是一种特殊类，它可以用来快速定义一个用于保存数据的类（类似于Java POJO类），而且它会自动生成apply方法，允许我们快速地创建样例类实例对象。后面，在并发编程和spark、flink这些框架也都会经常使用它。   1. 样例类可以使用**类名(参数1, 参数2…)**快速创建实例对象  2. 定义样例类成员变量时，可以指定var类型，表示可变。默认是不可变的 val">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Scala进阶2">
+<meta property="og:url" content="http://example.com/2017/08/12/Scala%E8%BF%9B%E9%98%B62/index.html">
+<meta property="og:site_name" content="春雨里洗过的太阳">
+<meta property="og:description" content="#一 样例类  样例类是一种特殊类，它可以用来快速定义一个用于保存数据的类（类似于Java POJO类），而且它会自动生成apply方法，允许我们快速地创建样例类实例对象。后面，在并发编程和spark、flink这些框架也都会经常使用它。   1. 样例类可以使用**类名(参数1, 参数2…)**快速创建实例对象  2. 定义样例类成员变量时，可以指定var类型，表示可变。默认是不可变的 val">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/images/scala/fxn.png">
+<meta property="og:image" content="http://example.com/images/scala/xcss.png">
+<meta property="og:image" content="http://example.com/images/scala/bf.png">
+<meta property="og:image" content="http://example.com/images/scala/wc.png">
+<meta property="article:published_time" content="2017-08-12T02:11:17.000Z">
+<meta property="article:modified_time" content="2023-03-17T15:42:10.674Z">
+<meta property="article:author" content="HF">
+<meta property="article:tag" content="Scala">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/scala/fxn.png">
+
+<link rel="canonical" href="http://example.com/2017/08/12/Scala%E8%BF%9B%E9%98%B62/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<link rel="stylesheet" type="text/css" href="/css/injector.css" />
+  <title>Scala进阶2 | 春雨里洗过的太阳</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">春雨里洗过的太阳</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">世间所有的相遇，都是久别重逢</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2017/08/12/Scala%E8%BF%9B%E9%98%B62/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/hexo.jpg">
+      <meta itemprop="name" content="HF">
+      <meta itemprop="description" content="第二名就是头号输家">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="春雨里洗过的太阳">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Scala进阶2
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-08-12 10:11:17" itemprop="dateCreated datePublished" datetime="2017-08-12T10:11:17+08:00">2017-08-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-03-17 23:42:10" itemprop="dateModified" datetime="2023-03-17T23:42:10+08:00">2023-03-17</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Scala/" itemprop="url" rel="index"><span itemprop="name">Scala</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>25k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>23 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>#一   样例类</p>
+<p>样例类是一种特殊类，它可以用来快速定义一个用于<strong>保存数据</strong>的类（类似于Java POJO类），而且它会自动生成apply方法，允许我们快速地创建样例类实例对象。后面，在并发编程和spark、flink这些框架也都会经常使用它。</p>
+<ol>
+<li>样例类可以使用**类名(参数1, 参数2…)**快速创建实例对象</li>
+<li>定义样例类成员变量时，可以指定var类型，表示可变。默认是不可变的 val  可省略</li>
+<li>样例类自动生成了toString、equals、hashCode、copy方法</li>
+<li>样例对象没有主构造器，可以使用样例对象来创建枚举、或者标识一类没有任何数据的消息</li>
+</ol>
+<p>语法:</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">样例类名</span>(<span class="params">成员变量名1:类型1, 成员变量名2:类型2, 成员变量名3:类型3</span>)</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>定义样例类</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo1</span> </span>&#123;</span><br><span class="line">  <span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">Per</span>(<span class="params">name:<span class="type">String</span>, var age:<span class="type">Int</span></span>)</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class">  <span class="title">def</span> <span class="title">main</span>(<span class="params">args: <span class="type">Array</span>[<span class="type">String</span>]</span>)</span>: <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> per = <span class="type">Per</span>(<span class="string">&quot;你猜&quot;</span>,<span class="number">25</span>)</span><br><span class="line">    <span class="comment">//per.name=&quot;njj&quot;   会报错</span></span><br><span class="line">    per.age=<span class="number">25</span>  <span class="comment">//正常可以修改</span></span><br><span class="line">    println(per)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="样例类的方法"><a href="#样例类的方法" class="headerlink" title="样例类的方法"></a>样例类的方法</h3><p>定义样例类编译器自动帮我们实现了一下几个方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">apply   快速的用类名创建对象</span><br><span class="line">toString   与java同</span><br><span class="line">equals      比较两个样例类的成员变量是否相等  与&#x3D;&#x3D;类似</span><br><span class="line">hashCode    如两个样例类的所有的成员变量的值相等 则hash值相等 否则 只要一个不同 则hash值就不等</span><br><span class="line">copy     样例类的克隆</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo2</span> </span>&#123;</span><br><span class="line">  <span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">Per</span>(<span class="params">name:<span class="type">String</span>,age:<span class="type">Int</span></span>)</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class">  <span class="title">def</span> <span class="title">main</span>(<span class="params">args: <span class="type">Array</span>[<span class="type">String</span>]</span>)</span>: <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> nicai = <span class="type">Per</span>(<span class="string">&quot;nicai&quot;</span>,<span class="number">55</span>)</span><br><span class="line">    <span class="keyword">val</span> nn = nicai.copy(<span class="string">&quot;nn&quot;</span>)</span><br><span class="line">      <span class="comment">//可以修改成员变量的值</span></span><br><span class="line">    println(nn)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="样例对象"><a href="#样例对象" class="headerlink" title="样例对象"></a>样例对象</h3><p>使用case object可以创建样例对象。样例对象是单例的，而且它<strong>没有主构造器</strong>。样例对象是可序列化的。格式：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">object</span> <span class="title">样例对象名</span></span></span><br></pre></td></tr></table></figure>
+
+<p>它主要用在两个地方：</p>
+<ol>
+<li>定义枚举</li>
+<li>作为没有任何参数的消息传递（后面Akka编程会讲到）</li>
+</ol>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo3</span> </span>&#123;</span><br><span class="line">  <span class="comment">//定义一个枚举</span></span><br><span class="line">  <span class="class"><span class="keyword">trait</span> <span class="title">Sex</span></span></span><br><span class="line"><span class="class">  <span class="title">case</span> <span class="title">object</span> <span class="title">Man</span> <span class="keyword">extends</span> <span class="title">Sex</span></span></span><br><span class="line"><span class="class">  <span class="title">case</span> <span class="title">object</span> <span class="title">Wonmn</span> <span class="keyword">extends</span> <span class="title">Sex</span></span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"> <span class="title">case</span> <span class="title">class</span> <span class="title">Per</span>(<span class="params">name:<span class="type">String</span>,sex: <span class="type">Sex</span></span>)</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class">  <span class="title">def</span> <span class="title">main</span>(<span class="params">args: <span class="type">Array</span>[<span class="type">String</span>]</span>)</span>: <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> per = <span class="type">Per</span>(<span class="string">&quot;小明&quot;</span>,<span class="type">Man</span>)</span><br><span class="line">    <span class="keyword">val</span> p = <span class="type">Per</span>(<span class="string">&quot;小红&quot;</span>,<span class="type">Wonmn</span>)</span><br><span class="line">    println(per)</span><br><span class="line">    println(p)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>定义消息</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">StartSpeakingMessage</span>(<span class="params">textToSpeak: <span class="type">String</span></span>)</span></span><br><span class="line"><span class="class"><span class="title">//</span> <span class="title">消息如果没有任何参数，就可以定义为样例对象</span></span></span><br><span class="line"><span class="class"><span class="title">case</span> <span class="title">object</span> <span class="title">StopSpeakingMessage</span></span></span><br><span class="line"><span class="class"><span class="title">case</span> <span class="title">object</span> <span class="title">PauseSpeakingMessage</span></span></span><br><span class="line"><span class="class"><span class="title">case</span> <span class="title">object</span> <span class="title">ResumeSpeakingMessage</span></span></span><br></pre></td></tr></table></figure>
+
+<h1 id="二模板匹配"><a href="#二模板匹配" class="headerlink" title="二模板匹配"></a>二模板匹配</h1><p>scala中有一个非常强大的模式匹配机制，可以应用在很多场景：</p>
+<ul>
+<li>switch语句</li>
+<li>类型查询</li>
+<li>以及快速获取数据</li>
+</ul>
+<h3 id="简单模式匹配"><a href="#简单模式匹配" class="headerlink" title="简单模式匹配"></a>简单模式匹配</h3><p>相当于java中的switch语句</p>
+<p>语法</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">变量 <span class="keyword">match</span> &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">&quot;常量1&quot;</span> =&gt; 表达式<span class="number">1</span></span><br><span class="line">    <span class="keyword">case</span> <span class="string">&quot;常量2&quot;</span> =&gt; 表达式<span class="number">2</span></span><br><span class="line">    <span class="keyword">case</span> <span class="string">&quot;常量3&quot;</span> =&gt; 表达式<span class="number">3</span></span><br><span class="line">    <span class="keyword">case</span> _ =&gt; 表达式<span class="number">4</span>		<span class="comment">// 默认匹配</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo1</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> str = <span class="type">StdIn</span>.readLine()   <span class="comment">//从键盘录入</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> unit = str <span class="keyword">match</span> &#123;</span><br><span class="line">      <span class="keyword">case</span> <span class="string">&quot;hadoop&quot;</span> =&gt; <span class="string">&quot;nicai&quot;</span></span><br><span class="line">      <span class="keyword">case</span> <span class="string">&quot;spaker&quot;</span> =&gt; <span class="string">&quot;分布式计算框架&quot;</span></span><br><span class="line">      <span class="keyword">case</span> _ =&gt; <span class="string">&quot;未匹配&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">    println(unit)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="匹配类型"><a href="#匹配类型" class="headerlink" title="匹配类型"></a>匹配类型</h3><p>根据不同的数据类型进行匹配</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">变量 <span class="keyword">match</span> &#123;</span><br><span class="line">    <span class="keyword">case</span> 类型<span class="number">1</span>变量名: 类型<span class="number">1</span> =&gt; 表达式<span class="number">1</span></span><br><span class="line">    <span class="keyword">case</span> 类型<span class="number">2</span>变量名: 类型<span class="number">2</span> =&gt; 表达式<span class="number">2</span></span><br><span class="line">    <span class="keyword">case</span> 类型<span class="number">3</span>变量名: 类型<span class="number">3</span> =&gt; 表达式<span class="number">3</span></span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">case</span> _ =&gt; 表达式<span class="number">4</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo2</span> </span>&#123;</span><br><span class="line">  <span class="keyword">var</span>  a:<span class="type">Any</span>=<span class="string">&quot;hadoop&quot;</span></span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> unit = a <span class="keyword">match</span> &#123;</span><br><span class="line">      <span class="keyword">case</span> x: <span class="type">String</span> =&gt; <span class="string">s&quot;<span class="subst">$&#123;x&#125;</span>字符串&quot;</span>   <span class="comment">//若后面没有用到这个变量 可以写为 _:String</span></span><br><span class="line">      <span class="keyword">case</span> x: <span class="type">Int</span> =&gt; <span class="string">&quot;整形&quot;</span></span><br><span class="line">      <span class="keyword">case</span> x: <span class="type">Double</span> =&gt; <span class="string">&quot;浮点型&quot;</span></span><br><span class="line">      <span class="keyword">case</span> _ =&gt; <span class="string">&quot;没匹配&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">    println(unit)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="守卫"><a href="#守卫" class="headerlink" title="守卫"></a>守卫</h3><p>在Java中，只能简单地添加多个case标签，例如：要匹配0-7，就需要写出来8个case语句。例如：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">int a = <span class="number">0</span>;</span><br><span class="line">switch(a) &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="number">0</span>: a += <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">case</span> <span class="number">1</span>: a += <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">case</span> <span class="number">2</span>: a += <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">case</span> <span class="number">3</span>: a += <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">case</span> <span class="number">4</span>: a += <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">case</span> <span class="number">5</span>: a += <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">case</span> <span class="number">6</span>: a += <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">case</span> <span class="number">7</span>: a += <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">default</span>: a = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在scala中，可以使用守卫来简化上述代码——也就是在<strong>case语句中添加if条件判断</strong>。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo3</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> i: <span class="type">Int</span> = <span class="type">StdIn</span>.readInt()</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> unit = i <span class="keyword">match</span> &#123;</span><br><span class="line">      <span class="keyword">case</span> x <span class="keyword">if</span> x &gt; <span class="number">0</span> &amp;&amp; x &lt; <span class="number">3</span> =&gt; <span class="string">&quot;0-3&quot;</span>   </span><br><span class="line">      <span class="keyword">case</span> x <span class="keyword">if</span> x &gt; <span class="number">3</span> &amp;&amp; x &lt; <span class="number">10</span> =&gt; println(<span class="string">&quot;3-10&quot;</span>)  <span class="comment">//若这样鞋  则0-3 之后会打印()</span></span><br><span class="line">      <span class="keyword">case</span> x <span class="keyword">if</span> x &gt; <span class="number">10</span> &amp;&amp; x &lt; <span class="number">13</span> =&gt; println(<span class="string">&quot;10-13&quot;</span>)</span><br><span class="line">      <span class="keyword">case</span> _ =&gt; println(<span class="string">&quot;weipi&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    println(unit)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="匹配样例类"><a href="#匹配样例类" class="headerlink" title="匹配样例类"></a>匹配样例类</h3><p>scala可以使用模式匹配来匹配样例类，从而可以快速获取样例类中的成员数据。后续，我们在开发Akka案例时，还会用到。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo4</span> </span>&#123;</span><br><span class="line">  <span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">Per</span>(<span class="params">name:<span class="type">String</span>,age:<span class="type">Int</span></span>)</span></span><br><span class="line"><span class="class">  <span class="title">case</span> <span class="title">class</span> <span class="title">Stu</span>(<span class="params">name:<span class="type">String</span>,age:<span class="type">Int</span></span>)</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class">  <span class="title">def</span> <span class="title">main</span>(<span class="params">args: <span class="type">Array</span>[<span class="type">String</span>]</span>)</span>: <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> ni:<span class="type">Any</span> = <span class="type">Per</span>(<span class="string">&quot;ni&quot;</span>,<span class="number">55</span>)              <span class="comment">//若不为any则会报错</span></span><br><span class="line">    <span class="keyword">val</span> unit = ni <span class="keyword">match</span> &#123;</span><br><span class="line">      <span class="keyword">case</span> <span class="type">Per</span>(name, age) =&gt; <span class="string">s&quot;<span class="subst">$&#123;name&#125;</span>:<span class="subst">$&#123;age&#125;</span>per&quot;</span></span><br><span class="line">      <span class="keyword">case</span> <span class="type">Stu</span>(name, age) =&gt; <span class="string">s&quot;<span class="subst">$&#123;name&#125;</span>:<span class="subst">$&#123;age&#125;</span>stu&quot;</span></span><br><span class="line">      <span class="keyword">case</span> _ =&gt; <span class="string">&quot;未匹配&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">    println(unit)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="匹配集合"><a href="#匹配集合" class="headerlink" title="匹配集合"></a>匹配集合</h3><p>1 匹配数组</p>
+<ul>
+<li><p>依次修改代码定义以下三个数组</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Array</span>(<span class="number">1</span>,x,y)   <span class="comment">// 以1开头，后续的两个元素不固定</span></span><br><span class="line"><span class="type">Array</span>(<span class="number">0</span>)       <span class="comment">// 只匹配一个0元素的元素</span></span><br><span class="line"><span class="type">Array</span>(<span class="number">0</span>, ...)  <span class="comment">// 可以任意数量，但是以0开头</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>使用模式匹配上述数组</p>
+</li>
+</ul>
+<p><strong>参考代码</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> arr = <span class="type">Array</span>(<span class="number">1</span>, <span class="number">3</span>, <span class="number">5</span>)</span><br><span class="line">arr <span class="keyword">match</span> &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="type">Array</span>(<span class="number">1</span>, x, y) =&gt; println(x + <span class="string">&quot; &quot;</span> + y)</span><br><span class="line">    <span class="keyword">case</span> <span class="type">Array</span>(<span class="number">0</span>) =&gt; println(<span class="string">&quot;only 0&quot;</span>)</span><br><span class="line">    <span class="keyword">case</span> <span class="type">Array</span>(<span class="number">0</span>, _*) =&gt; println(<span class="string">&quot;0 ...&quot;</span>)</span><br><span class="line">    <span class="keyword">case</span> _ =&gt; println(<span class="string">&quot;something else&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>2匹配列表</p>
+<ul>
+<li><p>依次修改代码定义以下三个列表</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">List</span>(<span class="number">0</span>)                <span class="comment">// 只保存0一个元素的列表</span></span><br><span class="line"><span class="type">List</span>(<span class="number">0</span>,...)           <span class="comment">// 以0开头的列表，数量不固定</span></span><br><span class="line"><span class="type">List</span>(x,y)               <span class="comment">// 只包含两个元素的列表</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>使用模式匹配上述列表</p>
+</li>
+</ul>
+<p><strong>参考代码</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> list = <span class="type">List</span>(<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">list <span class="keyword">match</span> &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="number">0</span> :: <span class="type">Nil</span> =&gt; println(<span class="string">&quot;只有0的列表&quot;</span>)</span><br><span class="line">    <span class="keyword">case</span> <span class="number">0</span> :: tail =&gt; println(<span class="string">&quot;0开头的列表&quot;</span>)</span><br><span class="line">    <span class="keyword">case</span> x :: y :: <span class="type">Nil</span> =&gt; println(<span class="string">s&quot;只有另两个元素<span class="subst">$&#123;x&#125;</span>, <span class="subst">$&#123;y&#125;</span>的列表&quot;</span>)</span><br><span class="line">    <span class="keyword">case</span> _ =&gt; println(<span class="string">&quot;未匹配&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>3 匹配元组</p>
+<ul>
+<li><p>依次修改代码定义以下两个元组</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(<span class="number">1</span>, x, y)        <span class="comment">// 以1开头的、一共三个元素的元组</span></span><br><span class="line">(x, y, <span class="number">5</span>)   <span class="comment">// 一共有三个元素，最后一个元素为5的元组</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>使用模式匹配上述元素</p>
+</li>
+</ul>
+<p><strong>参考代码</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> tuple = (<span class="number">2</span>, <span class="number">2</span>, <span class="number">5</span>)</span><br><span class="line"></span><br><span class="line">tuple <span class="keyword">match</span> &#123;</span><br><span class="line">    <span class="keyword">case</span> (<span class="number">1</span>, x, y) =&gt; println(<span class="string">s&quot;三个元素，1开头的元组：1, <span class="subst">$&#123;x&#125;</span>, <span class="subst">$&#123;y&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="keyword">case</span> (x, y, <span class="number">5</span>) =&gt; println(<span class="string">s&quot;三个元素，5结尾的元组：<span class="subst">$&#123;x&#125;</span>, <span class="subst">$&#123;y&#125;</span>, 5&quot;</span>)</span><br><span class="line">    <span class="keyword">case</span> _ =&gt; println(<span class="string">&quot;未匹配&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="变量声明中的模式匹配"><a href="#变量声明中的模式匹配" class="headerlink" title="变量声明中的模式匹配"></a>变量声明中的模式匹配</h3><p>在定义变量的时候，可以使用模式匹配快速获取数据。</p>
+<p>1 获取数组中的元素</p>
+<ul>
+<li>生成包含0-10数字的数组，使用模式匹配分别获取第二个、第三个、第四个元素</li>
+</ul>
+<p><strong>参考代码</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.nicai.demo.matchdemo</span><br><span class="line"><span class="comment">//变量声明中的模式匹配</span></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo8</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">var</span> array=(<span class="number">0</span> to <span class="number">10</span>).toArray</span><br><span class="line">    <span class="keyword">var</span> <span class="type">Array</span>(_,x,y,z,_*)=array</span><br><span class="line">    println(x)  <span class="comment">//1</span></span><br><span class="line">    println(y)  <span class="comment">//2</span></span><br><span class="line">    println(z)   <span class="comment">//3</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>2 获取列表中的数据</p>
+<ul>
+<li>生成包含0-10数字的列表，使用模式匹配分别获取第一个、第二个元素</li>
+</ul>
+<p><strong>参考代码</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.nicai.demo.matchdemo</span><br><span class="line"><span class="comment">//变量声明中的模式匹配</span></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo9</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">var</span> a= (<span class="number">0</span> to <span class="number">10</span>).toList</span><br><span class="line">    <span class="keyword">var</span> x :: y :: tail =a</span><br><span class="line"></span><br><span class="line">    println(x) <span class="comment">//0</span></span><br><span class="line">    println(y)  <span class="comment">//1</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="option类型"><a href="#option类型" class="headerlink" title="option类型"></a>option类型</h3><p>scala中，Option类型来表示可选值。这种类型的数据有两种形式：</p>
+<p>Some(x)：表示实际的值</p>
+<p>None：表示没有值</p>
+<p>使用Option类型，可以用来有效避免空引用(null)异常。也就是说，将来我们返回某些数据时，可以返回一个Option类型来替代。</p>
+<p>getOrElse方法</p>
+<p>使用getOrElse方法，当Option对应的实例是None时，可以指定一个默认值，从而避免空指针异常</p>
+<ol>
+<li>scala鼓励使用Option类型来封装数据，可以有效减少，在代码中判断某个值是否为null</li>
+<li>可以使用getOrElse方法来针对None返回一个默认值</li>
+</ol>
+<p>例子一</p>
+<ul>
+<li>定义一个两个数相除的方法，使用Option类型来封装结果</li>
+<li>然后使用模式匹配来打印结果<ul>
+<li>不是除零，打印结果</li>
+<li>除零打印异常错误</li>
+</ul>
+</li>
+</ul>
+<p><strong>参考代码</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">package</span> com.nicai.demo.matchdemo</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo10</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">div</span></span>(a:<span class="type">Double</span>,b:<span class="type">Int</span>): <span class="type">Option</span>[<span class="type">Double</span>] =&#123;</span><br><span class="line">    <span class="keyword">if</span> (b != <span class="number">0</span>)&#123;</span><br><span class="line">      <span class="type">Some</span>(a/b)</span><br><span class="line">    &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="type">None</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> option = div(<span class="number">15.2</span>,<span class="number">2</span>)</span><br><span class="line">    <span class="keyword">val</span> unit = option <span class="keyword">match</span> &#123;</span><br><span class="line">      <span class="keyword">case</span> <span class="type">Some</span>(x) =&gt; x</span><br><span class="line">      <span class="keyword">case</span> <span class="type">None</span> =&gt; <span class="string">&quot;除数不可为0&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">    println(unit)  <span class="comment">//7.6</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>例子二</p>
+<ul>
+<li>重写上述案例，使用getOrElse方法，当除零时，或者默认值为0</li>
+</ul>
+<p><strong>参考代码</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.nicai.demo.matchdemo</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo11</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">div</span></span>(a: <span class="type">Double</span>, b: <span class="type">Int</span>):<span class="type">Option</span>[<span class="type">Double</span>]= &#123;</span><br><span class="line">    <span class="keyword">if</span>( b != <span class="number">0</span>)&#123;</span><br><span class="line">      <span class="type">Some</span>(a/b)</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">      <span class="type">None</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> d = div(<span class="number">15.6</span>,<span class="number">0</span>).getOrElse(<span class="number">0</span>)</span><br><span class="line">    println(d)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="偏函数"><a href="#偏函数" class="headerlink" title="偏函数"></a>偏函数</h3><p>偏函数可以提供了简洁的语法，可以简化函数的定义。配合集合的函数式编程，可以让代码更加优雅。</p>
+<h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><ul>
+<li>偏函数被包在花括号内没有match的一组case语句是一个偏函数</li>
+<li>偏函数是PartialFunction[A, B]的一个实例<ul>
+<li>A代表输入参数类型</li>
+<li>B代表返回结果类型</li>
+</ul>
+</li>
+</ul>
+<p>可以理解为：偏函数是一个参数和一个返回值的函数。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.nicai.demo.<span class="type">PartialFunctionDemo</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo12</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">val</span> value: <span class="type">PartialFunction</span>[<span class="type">Int</span>, <span class="type">String</span>] = &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="number">1</span> =&gt; <span class="string">&quot;一&quot;</span></span><br><span class="line">    <span class="keyword">case</span> <span class="number">2</span> =&gt; <span class="string">&quot;二&quot;</span></span><br><span class="line">    <span class="keyword">case</span> _ =&gt; <span class="string">&quot;其他&quot;</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    println(value(<span class="number">1</span>))</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>定义一个列表，包含1-10的数字</li>
+<li>请将1-3的数字都转换为[1-3]</li>
+<li>请将4-8的数字都转换为[4-8]</li>
+<li>将其他的数字转换为(8-星]</li>
+</ul>
+<p><strong>参考代码</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> list = (<span class="number">1</span> to <span class="number">10</span>).toList</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> list2 = list.map&#123;</span><br><span class="line">    <span class="keyword">case</span> x <span class="keyword">if</span> x &gt;= <span class="number">1</span> &amp;&amp; x &lt;= <span class="number">3</span> =&gt; <span class="string">&quot;[1-3]&quot;</span></span><br><span class="line">    <span class="keyword">case</span> x <span class="keyword">if</span> x &gt;= <span class="number">4</span> &amp;&amp; x &lt;= <span class="number">8</span> =&gt; <span class="string">&quot;[4-8]&quot;</span></span><br><span class="line">    <span class="keyword">case</span> x <span class="keyword">if</span> x &gt; <span class="number">8</span> =&gt; <span class="string">&quot;(8-*]&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">println(list2)</span><br></pre></td></tr></table></figure>
+
+<h3 id="正则表达式"><a href="#正则表达式" class="headerlink" title="正则表达式"></a>正则表达式</h3><p>在scala中，可以很方便地使用正则表达式来匹配数据。</p>
+<p>scala中提供了Regex类来定义正则表达式，要构造一个RegEx对象，直接使用String类的r方法即可。</p>
+<p>建议使用三个双引号来表示正则表达式，不然就得对正则中的反斜杠来进行转义。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> regEx = <span class="string">&quot;&quot;</span><span class="string">&quot;正则表达式&quot;</span><span class="string">&quot;&quot;</span>.r</span><br></pre></td></tr></table></figure>
+
+<p>findAllMatchIn方法</p>
+<p>使用findAllMatchIn方法可以获取所有正则匹配到的字符串</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">示例说明</span><br><span class="line"></span><br><span class="line">定义一个正则表达式，来匹配邮箱是否合法</span><br><span class="line">合法邮箱测试：qq12344@<span class="number">163.</span>com</span><br><span class="line">不合法邮箱测试：qq12344@.com</span><br><span class="line"><span class="keyword">val</span> r = <span class="string">&quot;&quot;</span><span class="string">&quot;.+@.+\..+&quot;</span><span class="string">&quot;&quot;</span>.r</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> eml1 = <span class="string">&quot;qq12344@163.com&quot;</span></span><br><span class="line"><span class="keyword">val</span> eml2 = <span class="string">&quot;qq12344@.com&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>(r.findAllMatchIn(eml1).size &gt; <span class="number">0</span>) &#123;  <span class="comment">//z\size  为0 没有匹配上  大于0 为匹配上</span></span><br><span class="line">    println(eml1 + <span class="string">&quot;邮箱合法&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">else</span> &#123;</span><br><span class="line">    println(eml1 + <span class="string">&quot;邮箱不合法&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>(r.findAllMatchIn(eml2).size &gt; <span class="number">0</span>) &#123;</span><br><span class="line">    println(eml2 + <span class="string">&quot;邮箱合法&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">else</span> &#123;</span><br><span class="line">    println(eml2 + <span class="string">&quot;邮箱不合法&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>找出以下列表中的所有不合法的邮箱</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&quot;38123845@qq.com&quot;, &quot;a1da88123f@gmail.com&quot;, &quot;zhansan@163.com&quot;, &quot;123afadff.com&quot;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.nicai.demo.zhengzebiaodashi</span><br><span class="line"><span class="comment">//匹配多个邮箱</span></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo15</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">var</span> a= <span class="type">List</span>(<span class="string">&quot;38123845@qq.com&quot;</span>, <span class="string">&quot;a1da88123f@gmail.com&quot;</span>, <span class="string">&quot;zhansan@163.com&quot;</span>, <span class="string">&quot;123afadff.com&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> r=<span class="string">&quot;&quot;</span><span class="string">&quot;.+@.+\.com&quot;</span><span class="string">&quot;&quot;</span>.r</span><br><span class="line">    <span class="keyword">val</span> strings = a.filter &#123;</span><br><span class="line">      <span class="comment">//过滤出不合法的</span></span><br><span class="line">      <span class="keyword">case</span> x <span class="keyword">if</span> r.findAllMatchIn(x).size == <span class="number">0</span> =&gt; <span class="literal">true</span></span><br><span class="line">      <span class="keyword">case</span> _ =&gt; <span class="literal">false</span></span><br><span class="line">    &#125;</span><br><span class="line">    println(strings)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>有以下邮箱列表</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;38123845@qq.com&quot;</span>, <span class="string">&quot;a1da88123f@gmail.com&quot;</span>, <span class="string">&quot;zhansan@163.com&quot;</span>, <span class="string">&quot;123afadff.com&quot;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>使用正则表达式进行模式匹配，匹配出来邮箱运营商的名字。例如：邮箱<a href="mailto:&#x7a;&#x68;&#x61;&#110;&#x73;&#x61;&#110;&#64;&#49;&#54;&#51;&#46;&#99;&#x6f;&#x6d;">&#x7a;&#x68;&#x61;&#110;&#x73;&#x61;&#110;&#64;&#49;&#54;&#51;&#46;&#99;&#x6f;&#x6d;</a>，需要将163匹配出来</p>
+<ul>
+<li>使用括号来匹配分组</li>
+</ul>
+</li>
+<li><p>打印匹配到的邮箱以及运营商</p>
+</li>
+</ul>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.nicai.demo.zhengzebiaodashi</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo16</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="comment">//括号为分组</span></span><br><span class="line">    <span class="keyword">val</span> re =<span class="string">&quot;&quot;</span><span class="string">&quot;.+@(.+)\.com&quot;</span><span class="string">&quot;&quot;</span>.r   <span class="comment">//此处必为 val</span></span><br><span class="line">    <span class="keyword">var</span> li=<span class="type">List</span>(<span class="string">&quot;38123845@qq.com&quot;</span>, <span class="string">&quot;a1da88123f@gmail.com&quot;</span>, <span class="string">&quot;zhansan@163.com&quot;</span>, <span class="string">&quot;123afadff.com&quot;</span>)</span><br><span class="line">    <span class="keyword">val</span> strings = li.map &#123;</span><br><span class="line">      <span class="comment">//company为分组的名字  就是分组的字段</span></span><br><span class="line">      <span class="keyword">case</span> x<span class="meta">@re</span>(company) =&gt; <span class="string">s&quot;<span class="subst">$&#123;x&#125;</span> -&gt; <span class="subst">$&#123;company&#125;</span>&quot;</span></span><br><span class="line">      <span class="keyword">case</span> x =&gt; <span class="string">s&quot;<span class="subst">$&#123;x&#125;</span> + 未知&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">    println(strings)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="异常处理"><a href="#异常处理" class="headerlink" title="异常处理"></a>异常处理</h2><p>来看看下面一段代码。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">   <span class="keyword">val</span> i = <span class="number">10</span> / <span class="number">0</span></span><br><span class="line"></span><br><span class="line">    println(<span class="string">&quot;你好！&quot;</span>)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="type">Exception</span> in thread <span class="string">&quot;main&quot;</span> java.lang.<span class="type">ArithmeticException</span>: / by zero</span><br><span class="line">    at <span class="type">ForDemo</span>$.main(<span class="type">ForDemo</span>.scala:<span class="number">3</span>)</span><br><span class="line">    at <span class="type">ForDemo</span>.main(<span class="type">ForDemo</span>.scala)</span><br></pre></td></tr></table></figure>
+
+<p>执行程序，可以看到scala抛出了异常，而且没有打印出来”你好”。说明程序出现错误后就终止了。</p>
+<p>那怎么解决该问题呢？</p>
+<p>在scala中，可以使用异常处理来解决这个问题</p>
+<h3 id="捕获异常"><a href="#捕获异常" class="headerlink" title="捕获异常"></a>捕获异常</h3><p><strong>语法格式</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="comment">// 代码</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">catch</span> &#123;</span><br><span class="line">    <span class="keyword">case</span> ex:异常类型<span class="number">1</span> =&gt; <span class="comment">// 代码</span></span><br><span class="line">    <span class="keyword">case</span> ex:异常类型<span class="number">2</span> =&gt; <span class="comment">// 代码</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">finally</span> &#123;</span><br><span class="line">    <span class="comment">// 代码</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>try中的代码是我们编写的业务处理代码</li>
+<li>在catch中表示当出现某个异常时，需要执行的代码</li>
+<li>在finally中，是不管是否出现异常都会执行的代码</li>
+</ul>
+<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><p><strong>示例说明</strong></p>
+<ul>
+<li>使用try..catch来捕获除零异常</li>
+</ul>
+<p><strong>参考代码</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.nicai.demo.exceptionDemo</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo17</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">try</span>&#123;</span><br><span class="line">      <span class="keyword">var</span> a= <span class="number">4</span>/<span class="number">0</span></span><br><span class="line">    &#125;<span class="keyword">catch</span> &#123;</span><br><span class="line">      <span class="keyword">case</span> ex:<span class="type">Exception</span> =&gt; println(ex.getMessage)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>###抛出异常</p>
+<p>我们也可以在一个方法中，抛出异常。语法格式和Java类似，使用<code>throw new Exception...</code></p>
+<p>例子:</p>
+<ul>
+<li>在main方法中抛出一个异常</li>
+</ul>
+<p><strong>参考代码</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">package</span> com.nicai.demo.exceptionDemo</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo18</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="type">Exception</span>(<span class="string">&quot;这是一个异常&quot;</span>)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="type">Exception</span> in thread <span class="string">&quot;main&quot;</span> java.lang.<span class="type">Exception</span>: 这是一个异常</span><br><span class="line">    at <span class="type">ForDemo</span>$.main(<span class="type">ForDemo</span>.scala:<span class="number">3</span>)</span><br><span class="line">    at <span class="type">ForDemo</span>.main(<span class="type">ForDemo</span>.scala)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>scala不需要在方法上声明要抛出的异常，它已经解决了再Java中被认为是设计失败的检查型异常。</li>
+</ul>
+<p>下面是Java代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> Exception(<span class="string">&quot;这是一个异常&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="提取器"><a href="#提取器" class="headerlink" title="提取器"></a>提取器</h2><p>我们之前已经使用过scala中非常强大的模式匹配功能了，通过模式匹配，我们可以快速匹配样例类中的成员变量.  </p>
+<p>那是不是所有的类都可以进行这样的模式匹配呢？答案是：</p>
+<p><code>不可以</code>的。要支持模式匹配，必须要实现一个<strong>提取器</strong>。</p>
+<p><strong>样例类自动实现了apply、unapply方法</strong></p>
+<h2 id="定义提取器"><a href="#定义提取器" class="headerlink" title="定义提取器"></a>定义提取器</h2><p>之前我们学习过了，实现一个类的伴生对象中的apply方法，可以用类名来快速构建一个对象。伴生对象中，还有一个unapply方法。与apply相反，unapply是将该类的对象，拆解为一个个的元素。</p>
+<p>要实现一个类的提取器，只需要在该类的伴生对象中实现一个unapply方法即可</p>
+<p><strong>语法格式</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">unapply</span></span>(stu:<span class="type">Student</span>):<span class="type">Option</span>[(类型<span class="number">1</span>, 类型<span class="number">2</span>, 类型<span class="number">3.</span>..)] = &#123;</span><br><span class="line">    <span class="keyword">if</span>(stu != <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="type">Some</span>((变量<span class="number">1</span>, 变量<span class="number">2</span>, 变量<span class="number">3.</span>..))</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="type">None</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例说明</strong></p>
+<ul>
+<li>创建一个Student类，包含姓名年龄两个字段</li>
+<li>实现一个类的解构器，并使用match表达式进行模式匹配，提取类中的字段。</li>
+</ul>
+<p><strong>参考代码</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.nicai.demo.tiquqi</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo19</span> </span>&#123;</span><br><span class="line">  <span class="class"><span class="keyword">class</span> <span class="title">Stu</span>(<span class="params">var name:<span class="type">String</span>,var age:<span class="type">Int</span></span>)</span></span><br><span class="line"><span class="class">  <span class="title">object</span> <span class="title">Stu</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">apply</span></span>(name: <span class="type">String</span>, age: <span class="type">Int</span>): <span class="type">Stu</span> = <span class="keyword">new</span> <span class="type">Stu</span>(name, age)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">unapply</span></span>(stu :<span class="type">Stu</span>) = &#123;</span><br><span class="line">      <span class="keyword">val</span> tuple =(stu.name,stu.age)</span><br><span class="line">      <span class="type">Some</span>(tuple)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> nicai = <span class="type">Stu</span>(<span class="string">&quot;nicai&quot;</span>,<span class="number">55</span>)</span><br><span class="line">    <span class="keyword">val</span> unit = nicai <span class="keyword">match</span> &#123;</span><br><span class="line">      <span class="keyword">case</span> <span class="type">Stu</span>(name, age) =&gt; <span class="string">s&quot;<span class="subst">$&#123;name&#125;</span>:<span class="subst">$&#123;age&#125;</span>&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">    println(unit)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="泛型"><a href="#泛型" class="headerlink" title="泛型"></a>泛型</h2><p>scala和Java一样，类和特质、方法都可以支持泛型。我们在学习集合的时候，一般都会涉及到泛型。</p>
+<h2 id="定义一个泛型方法"><a href="#定义一个泛型方法" class="headerlink" title="定义一个泛型方法"></a>定义一个泛型方法</h2><p>在scala中，使用方括号来定义类型参数。</p>
+<p><strong>语法格式</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">方法名</span></span>[泛型名称](..) = &#123;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例说明</strong></p>
+<ul>
+<li>用一个方法来获取任意类型数组的中间的元素<ul>
+<li>不考虑泛型直接实现（基于Array[Int]实现）</li>
+<li>加入泛型支持</li>
+</ul>
+</li>
+</ul>
+<p><strong>参考代码</strong></p>
+<p>不考虑泛型的实现</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">getMiddle</span></span>(arr:<span class="type">Array</span>[<span class="type">Int</span>]) = arr(arr.length / <span class="number">2</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">  <span class="keyword">val</span> arr1 = <span class="type">Array</span>(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>)</span><br><span class="line"></span><br><span class="line">  println(getMiddle(arr1))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>加入泛型支持</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.nicai.demo.fanxing</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo20</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">getMid</span></span>[<span class="type">T</span>](array: <span class="type">Array</span>[<span class="type">T</span>])= array(array.length/<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    println(getMid(<span class="type">Array</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)))</span><br><span class="line">    println(getMid(<span class="type">Array</span>(<span class="string">&quot;dd&quot;</span>, <span class="string">&quot;uu&quot;</span>, <span class="string">&quot;sss&quot;</span>)))</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>##泛型类</p>
+<p>scala的类也可以定义泛型。接下来，我们来学习如何定义scala的泛型类</p>
+<h2 id="定义-1"><a href="#定义-1" class="headerlink" title="定义"></a>定义</h2><p><strong>语法格式</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">类</span>[<span class="type">T</span>](<span class="params">val 变量名: <span class="type">T</span></span>)</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>定义一个泛型类，直接在类名后面加上方括号，指定要使用的泛型参数</li>
+<li>指定类对应的泛型参数后，就使用这些类型参数来定义变量了</li>
+</ul>
+<h2 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h2><p><strong>参考代码</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.nicai.demo.fanxing</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo21</span> </span>&#123;</span><br><span class="line">  <span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">Per</span>[y] (<span class="params">name:y,age:y</span>)</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class">  <span class="title">def</span> <span class="title">main</span>(<span class="params">args: <span class="type">Array</span>[<span class="type">String</span>]</span>)</span>: <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> list = <span class="type">List</span>(</span><br><span class="line">      <span class="type">Per</span>(<span class="string">&quot;NJJS&quot;</span>, <span class="number">45</span>),</span><br><span class="line">      <span class="type">Per</span>(<span class="string">&quot;jsjj&quot;</span>, <span class="number">789</span>),</span><br><span class="line">      <span class="type">Per</span>(<span class="number">56456</span>, <span class="string">&quot;SSS&quot;</span>)</span><br><span class="line">    )</span><br><span class="line">    println(list)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="上下界"><a href="#上下界" class="headerlink" title="上下界"></a>上下界</h2><p>需求：</p>
+<p>我们在定义方法/类的泛型时，限定必须从哪个类继承、或者必须是哪个类的父类。此时，就需要使用到上下界。    </p>
+<p><strong>上界定义:</strong></p>
+<p>使用<code>&lt;: 类型名</code>表示给类型添加一个<strong>上界</strong>，表示泛型参数必须要从该类（或本身）继承</p>
+<p><strong>语法格式</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[<span class="type">T</span> &lt;: 类型]</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例说明</strong></p>
+<p><strong>参考代码</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.nicai.demo.fanxing</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo22</span> </span>&#123;</span><br><span class="line">   <span class="comment">//上界</span></span><br><span class="line">  <span class="class"><span class="keyword">class</span>  <span class="title">Per</span></span></span><br><span class="line"><span class="class">  <span class="title">class</span> <span class="title">Stu</span> <span class="keyword">extends</span> <span class="title">Per</span></span></span><br><span class="line"><span class="class">  <span class="title">class</span> <span class="title">Man</span> <span class="keyword">extends</span> <span class="title">Stu</span></span></span><br><span class="line"><span class="class">  <span class="title">def</span> <span class="title">m</span>[t &lt;: <span class="type">Stu</span>](<span class="params">a:<span class="type">Array</span>[t]</span>) </span>= println(a)   <span class="comment">//Per 本身及其子类</span></span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="comment">// 编译报错</span></span><br><span class="line">   <span class="comment">// m(Array(new Per))</span></span><br><span class="line">    m(<span class="type">Array</span>(<span class="keyword">new</span> <span class="type">Stu</span>))</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>下界</strong></p>
+<p>上界是要求必须是某个类的子类，或者必须从某个类继承，而下界是必须是<strong>某个类的父类</strong>（或本身）</p>
+<p><strong>语法格式</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[<span class="type">T</span> &gt;: 类型]</span><br></pre></td></tr></table></figure>
+
+<p>注意:</p>
+<p>如果类既有上界、又有下界。下界写在前面，上界写在后面    (同时又上下界,可能会守不住,即范围之外的也可以)</p>
+<p><strong>示例说明</strong></p>
+<p><strong>参考代码</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.nicai.demo.fanxing</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo23</span> </span>&#123;</span><br><span class="line"><span class="comment">//下界</span></span><br><span class="line"></span><br><span class="line">  <span class="class"><span class="keyword">class</span>  <span class="title">Per</span></span></span><br><span class="line"><span class="class">  <span class="title">class</span> <span class="title">Stu</span> <span class="keyword">extends</span> <span class="title">Per</span></span></span><br><span class="line"><span class="class">  <span class="title">class</span> <span class="title">Man</span> <span class="keyword">extends</span> <span class="title">Stu</span></span></span><br><span class="line"><span class="class">  <span class="title">def</span> <span class="title">m</span>[<span class="type">T</span> &gt;: <span class="type">Stu</span>](<span class="params">a:<span class="type">Array</span>[<span class="type">T</span>]</span>)</span>= println(a)  <span class="comment">//Stu  本身及其父类</span></span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    m(<span class="type">Array</span>(<span class="keyword">new</span> <span class="type">Stu</span>))</span><br><span class="line">    m(<span class="type">Array</span>(<span class="keyword">new</span> <span class="type">Per</span>))</span><br><span class="line">    <span class="comment">//会报错</span></span><br><span class="line">    <span class="comment">//m(Array(new Man))</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<h2 id="协变-逆变-非变"><a href="#协变-逆变-非变" class="headerlink" title="协变 逆变 非变"></a>协变 逆变 非变</h2><p>spark的源代码中大量使用到了协变、逆变、非变，学习该知识点对我们将来阅读spark源代码很有帮助。</p>
+<p>来看一个类型转换的问题：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Pair</span>[<span class="type">T</span>]</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">object</span> <span class="title">Pair</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> p1 = <span class="type">Pair</span>(<span class="string">&quot;hello&quot;</span>)</span><br><span class="line">    <span class="comment">// 编译报错，无法将p1转换为p2</span></span><br><span class="line">    <span class="keyword">val</span> p2:<span class="type">Pair</span>[<span class="type">AnyRef</span>] = p1</span><br><span class="line"></span><br><span class="line">    println(p2)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如何让带有泛型的类支持类型转换呢？</p>
+<p><strong>非变</strong></p>
+<p><strong>语法格式</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Pair</span>[<span class="type">T</span>]</span>&#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>默认泛型类是非变的</li>
+<li>类型B是A的子类型，Pair[A]和Pair[B]没有任何从属关系</li>
+<li>Java是一样的</li>
+</ul>
+<p><img src="/images/scala/fxn.png" alt="img"></p>
+<h3 id="协变"><a href="#协变" class="headerlink" title="协变"></a>协变</h3><p><strong>语法格式</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Pair</span>[+<span class="type">T</span>]</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>类型B是A的子类型，Pair[B]可以认为是Pair[A]的子类型</li>
+<li>参数化类型的方向和类型的方向是一致的。</li>
+</ul>
+<h3 id="逆变"><a href="#逆变" class="headerlink" title="逆变"></a>逆变</h3><p><strong>语法格式</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Pair</span>[-<span class="type">T</span>]</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>类型B是A的子类型，Pair[A]反过来可以认为是Pair[B]的子类型</li>
+<li>参数化类型的方向和类型的方向是相反的</li>
+</ul>
+<p><strong>参考代码</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Super</span></span></span><br><span class="line"><span class="class"><span class="title">class</span> <span class="title">Sub</span> <span class="keyword">extends</span> <span class="title">Super</span></span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">class</span> <span class="title">Temp1</span>[<span class="type">T</span>]</span></span><br><span class="line"><span class="class"><span class="title">class</span> <span class="title">Temp2</span>[+<span class="type">T</span>]</span></span><br><span class="line"><span class="class"><span class="title">class</span> <span class="title">Temp3</span>[-<span class="type">T</span>]</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">def</span> <span class="title">main</span>(<span class="params">args: <span class="type">Array</span>[<span class="type">String</span>]</span>)</span>: <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> a:<span class="type">Temp1</span>[<span class="type">Sub</span>] = <span class="keyword">new</span> <span class="type">Temp1</span>[<span class="type">Sub</span>]</span><br><span class="line">    <span class="comment">// 编译报错</span></span><br><span class="line">    <span class="comment">// 非变</span></span><br><span class="line">    <span class="comment">//val b:Temp1[Super] = a</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 协变</span></span><br><span class="line">    <span class="keyword">val</span> c: <span class="type">Temp2</span>[<span class="type">Sub</span>] = <span class="keyword">new</span> <span class="type">Temp2</span>[<span class="type">Sub</span>]</span><br><span class="line">    <span class="keyword">val</span> d: <span class="type">Temp2</span>[<span class="type">Super</span>] = c</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 逆变</span></span><br><span class="line">    <span class="keyword">val</span> e: <span class="type">Temp3</span>[<span class="type">Super</span>] = <span class="keyword">new</span> <span class="type">Temp3</span>[<span class="type">Super</span>]</span><br><span class="line">    <span class="keyword">val</span> f: <span class="type">Temp3</span>[<span class="type">Sub</span>] = e</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Actor并发编程"><a href="#Actor并发编程" class="headerlink" title="Actor并发编程"></a>Actor并发编程</h2><p>scala的Actor并发编程模型可以用来开发比Java线程效率更高的并发程序。我们学习scala Actor的目的主要是为后续学习Akka做准备。</p>
+<h2 id="Java并发编程的问题"><a href="#Java并发编程的问题" class="headerlink" title="Java并发编程的问题"></a>Java并发编程的问题</h2><p>在Java并发编程中，每个对象都有一个逻辑监视器（monitor），可以用来控制对象的多线程访问。我们添加sychronized关键字来标记，需要进行同步加锁访问。这样，通过加锁的机制来确保同一时间只有一个线程访问共享数据。但这种方式存在资源争夺、以及死锁问题，程序越大问题越麻烦。</p>
+<p>思索问题</p>
+<p><img src="/images/scala/xcss.png" alt="img"></p>
+<p>例子:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.nicai.Demo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyLock</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Object obja = <span class="keyword">new</span> Object();</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Object objb = <span class="keyword">new</span> Object();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DieLock</span> <span class="keyword">extends</span> <span class="title">Thread</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> flag;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">DieLock</span><span class="params">(<span class="keyword">boolean</span> flag)</span> </span>&#123;</span><br><span class="line">         <span class="keyword">this</span>.flag=flag;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(flag)&#123;</span><br><span class="line">            <span class="keyword">synchronized</span> (MyLock.obja)&#123;</span><br><span class="line">                System.out.println(<span class="string">&quot;a&quot;</span>);</span><br><span class="line">                <span class="keyword">synchronized</span> (MyLock.objb)&#123;</span><br><span class="line">                    System.out.println(<span class="string">&quot;b&quot;</span>);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">synchronized</span> (MyLock.objb)&#123;</span><br><span class="line">                System.out.println(<span class="string">&quot;bb&quot;</span>);</span><br><span class="line">                <span class="keyword">synchronized</span> (MyLock.obja)&#123;</span><br><span class="line">                    System.out.println(<span class="string">&quot;aa&quot;</span>);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span>&#123;</span><br><span class="line">        DieLock lock1 = <span class="keyword">new</span> DieLock(<span class="keyword">true</span>);</span><br><span class="line">        DieLock lock2 = <span class="keyword">new</span> DieLock(<span class="keyword">false</span>);</span><br><span class="line">        lock1.start();</span><br><span class="line">        lock2.start();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Artor并发编程模型"><a href="#Artor并发编程模型" class="headerlink" title="Artor并发编程模型"></a>Artor并发编程模型</h3><p>Actor并发编程模型，是scala提供给程序员的一种与Java并发编程完全不一样的并发编程模型，是一种基于事件模型的并发机制。Actor并发编程模型是一种不共享数据，依赖消息传递的一种并发编程模式，有效避免资源争夺、死锁等情况。</p>
+<p><img src="/images/scala/bf.png" alt="img"></p>
+<h3 id="java-并发编程-与Actor并发编程对比"><a href="#java-并发编程-与Actor并发编程对比" class="headerlink" title="java 并发编程 与Actor并发编程对比"></a>java 并发编程 与Actor并发编程对比</h3><table>
+<thead>
+<tr>
+<th align="left">Java内置线程模型</th>
+<th align="left">scala Actor模型</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">“共享数据-锁”模型 (share data and lock)</td>
+<td align="left">share nothing</td>
+</tr>
+<tr>
+<td align="left">每个object有一个monitor，监视线程对共享数据的访问</td>
+<td align="left">不共享数据，Actor之间通过Message通讯</td>
+</tr>
+<tr>
+<td align="left">加锁代码使用synchronized标识</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">死锁问题</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">每个线程内部是顺序执行的</td>
+<td align="left">每个Actor内部是顺序执行的</td>
+</tr>
+</tbody></table>
+<p> <strong>注意</strong></p>
+<p>scala在2.11.x版本中加入了Akka并发编程框架，老版本已经废弃。Actor的编程模型和Akka很像，我们这里学习Actor的目的是为学习Akka做准备。</p>
+<h3 id="创建Actor"><a href="#创建Actor" class="headerlink" title="创建Actor"></a>创建Actor</h3><p>创建Actor的方式和Java中创建线程很类似，也是通过继承来创建。</p>
+<p>  使用方式</p>
+<ol>
+<li>定义class或object继承Actor特质</li>
+<li>重写act方法</li>
+<li>调用Actor的start方法执行Actor</li>
+</ol>
+<p>类似于Java线程，这里的每个Actor是并行执行的</p>
+<p><strong>示例说明</strong></p>
+<p>创建两个Actor，一个Actor打印1-10，另一个Actor打印11-20</p>
+<ul>
+<li>使用class继承Actor创建（如果需要在程序中创建多个相同的Actor）</li>
+<li>使用object继承Actor创建（如果在程序中只创建一个Actor）</li>
+</ul>
+<p><strong>参考代码</strong></p>
+<p>使用class继承Actor创建</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">_05ActorDemo</span> </span>&#123;</span><br><span class="line">  <span class="class"><span class="keyword">class</span> <span class="title">Actor1</span> <span class="keyword">extends</span> <span class="title">Actor</span> </span>&#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">act</span></span>(): <span class="type">Unit</span> = (<span class="number">1</span> to <span class="number">10</span>).foreach(println(_))</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="class"><span class="keyword">class</span> <span class="title">Actor2</span> <span class="keyword">extends</span> <span class="title">Actor</span> </span>&#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">act</span></span>(): <span class="type">Unit</span> = (<span class="number">11</span> to <span class="number">20</span>).foreach(println(_))</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">new</span> <span class="type">Actor1</span>().start()</span><br><span class="line">    <span class="keyword">new</span> <span class="type">Actor2</span>().start()</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用object继承Actor创建</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.nicai.demo.actorDemo</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> scala.actors.<span class="type">Actor</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo26</span> </span>&#123;</span><br><span class="line">  <span class="class"><span class="keyword">object</span>  <span class="title">A1</span> <span class="keyword">extends</span> <span class="title">Actor</span></span>&#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">act</span></span>(): <span class="type">Unit</span> = (<span class="number">1</span> to <span class="number">10</span>).foreach(println(_)+<span class="string">&quot;,&quot;</span>)</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="class"><span class="keyword">object</span> <span class="title">A2</span> <span class="keyword">extends</span> <span class="title">Actor</span> </span>&#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">act</span></span>(): <span class="type">Unit</span> = (<span class="number">11</span> to <span class="number">20</span>).foreach(print(_)+<span class="string">&quot;,&quot;</span>)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="type">A1</span>.start()</span><br><span class="line">     <span class="type">A2</span>.start()</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Actor程序运行流程"><a href="#Actor程序运行流程" class="headerlink" title="Actor程序运行流程"></a>Actor程序运行流程</h2><ol>
+<li>调用start()方法启动Actor</li>
+<li>自动执行<strong>act</strong>()方法</li>
+<li>向Actor发送消息</li>
+<li>act方法执行完成后，程序会调用**exit()**方法</li>
+</ol>
+<h3 id="发送消息-与接收消息"><a href="#发送消息-与接收消息" class="headerlink" title="发送消息 与接收消息"></a>发送消息 与接收消息</h3><p>我们之前介绍Actor的时候，说过Actor是基于事件（消息）的并发编程模型，那么Actor是如何发送消息和接收消息的呢？</p>
+<h4 id="使用方式"><a href="#使用方式" class="headerlink" title="使用方式"></a>使用方式</h4><p><strong>发送消息</strong></p>
+<p>我们可以使用三种方式来发送消息：</p>
+<table>
+<thead>
+<tr>
+<th align="left"><strong>！</strong></th>
+<th align="left"><strong>发送异步消息，没有返回值</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>!?</strong></td>
+<td align="left"><strong>发送同步消息，等待返回值</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>!!</strong></td>
+<td align="left"><strong>发送异步消息，返回值是Future[Any]</strong></td>
+</tr>
+</tbody></table>
+<p>例如：</p>
+<p>要给actor1发送一个异步字符串消息，使用以下代码：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">actor1 ! <span class="string">&quot;你好!&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>接收消息</strong></p>
+<p>Actor中使用receive方法来接收消息，需要给receive方法传入一个偏函数</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="keyword">case</span> 变量名<span class="number">1</span>:消息类型<span class="number">1</span> =&gt; 业务处理<span class="number">1</span>,</span><br><span class="line">    <span class="keyword">case</span> 变量名<span class="number">2</span>:消息类型<span class="number">2</span> =&gt; 业务处理<span class="number">2</span>,</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> 注意:</p>
+<p>receive方法只接收一次消息，接收完后继续执行act方法  </p>
+<p><strong>示例说明</strong></p>
+<ul>
+<li>创建两个Actor（ActorSender、ActorReceiver）</li>
+<li>ActorSender发送一个异步字符串消息给ActorReceiver</li>
+<li>ActorReceive接收到该消息后，打印出来</li>
+</ul>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.nicai.demo.actorDemo</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.<span class="type">TimeUnit</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> scala.actors.<span class="type">Actor</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo27</span> </span>&#123;</span><br><span class="line"><span class="comment">//发送消息 与 接收消息</span></span><br><span class="line"><span class="comment">//发送</span></span><br><span class="line">  <span class="class"><span class="keyword">object</span>  <span class="title">MsgSender</span> <span class="keyword">extends</span> <span class="title">Actor</span></span>&#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">act</span></span>(): <span class="type">Unit</span> = &#123;</span><br><span class="line">      <span class="type">MsgReceiver</span> ! <span class="string">&quot;nicai&quot;</span>    <span class="comment">//给谁发消息</span></span><br><span class="line">      <span class="type">TimeUnit</span>.<span class="type">SECONDS</span>.sleep(<span class="number">3</span>)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">//接收</span></span><br><span class="line">  <span class="class"><span class="keyword">object</span> <span class="title">MsgReceiver</span> <span class="keyword">extends</span> <span class="title">Actor</span></span>&#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">act</span></span>(): <span class="type">Unit</span> = &#123;</span><br><span class="line">      receive&#123;</span><br><span class="line">        <span class="keyword">case</span> msg: <span class="type">String</span> =&gt; println(msg)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="type">MsgSender</span>.start()</span><br><span class="line">    <span class="type">MsgReceiver</span>.start()</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="持续接收消息"><a href="#持续接收消息" class="headerlink" title="持续接收消息"></a>持续接收消息</h3><p>通过上一个案例，ActorReceiver调用receive来接收消息，但接收一次后，Actor就退出了。</p>
+<p>我们希望ActorReceiver能够一直接收消息，怎么实现呢？</p>
+<p>——我们只需要使用一个while(true)循环，不停地调用receive来接收消息就可以啦</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.nicai.demo.actorDemo</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.<span class="type">TimeUnit</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> scala.actors.<span class="type">Actor</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo27</span> </span>&#123;</span><br><span class="line"><span class="comment">//发送消息 与 接收消息</span></span><br><span class="line"><span class="comment">//发送</span></span><br><span class="line">  <span class="class"><span class="keyword">object</span>  <span class="title">MsgSender</span> <span class="keyword">extends</span> <span class="title">Actor</span></span>&#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">act</span></span>(): <span class="type">Unit</span> = &#123;</span><br><span class="line">      <span class="type">MsgReceiver</span> ! <span class="string">&quot;nicai&quot;</span></span><br><span class="line">      <span class="type">TimeUnit</span>.<span class="type">SECONDS</span>.sleep(<span class="number">3</span>)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">//接收</span></span><br><span class="line">  <span class="class"><span class="keyword">object</span> <span class="title">MsgReceiver</span> <span class="keyword">extends</span> <span class="title">Actor</span></span>&#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">act</span></span>(): <span class="type">Unit</span> = &#123;</span><br><span class="line">      receive&#123;</span><br><span class="line">        <span class="keyword">case</span> msg: <span class="type">String</span> =&gt; println(msg)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="type">MsgSender</span>.start()</span><br><span class="line">    <span class="type">MsgReceiver</span>.start()</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="使用loop和react-优化接收消息"><a href="#使用loop和react-优化接收消息" class="headerlink" title="使用loop和react 优化接收消息"></a>使用loop和react 优化接收消息</h3><p>上述代码，使用while循环来不断接收消息。</p>
+<ul>
+<li>如果当前Actor没有接收到消息，线程就会处于阻塞状态</li>
+<li>如果有很多的Actor，就有可能会导致很多线程都是处于阻塞状态</li>
+<li>每次有新的消息来时，重新创建线程来处理</li>
+<li>频繁的线程创建、销毁和切换，会影响运行效率</li>
+</ul>
+<p>在scala中，可以使用loop + react来复用线程。比while + receive更高效</p>
+<p>使用loop + react重写上述案例</p>
+<p><strong>参考代码</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 持续接收消息</span></span><br><span class="line">loop &#123;</span><br><span class="line">    react &#123;</span><br><span class="line">        <span class="keyword">case</span> msg:<span class="type">String</span> =&gt; println(<span class="string">&quot;接收到消息：&quot;</span> + msg)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">改写:</span><br><span class="line"><span class="keyword">package</span> com.nicai.demo.actorDemo</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.<span class="type">TimeUnit</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> scala.actors.<span class="type">Actor</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo29</span> </span>&#123;</span><br><span class="line">  <span class="class"><span class="keyword">object</span> <span class="title">MsgSender</span> <span class="keyword">extends</span> <span class="title">Actor</span></span>&#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">act</span></span>(): <span class="type">Unit</span> = &#123;</span><br><span class="line">      <span class="keyword">while</span>(<span class="literal">true</span>)&#123;</span><br><span class="line">        <span class="type">MsgReceice</span> ! <span class="string">&quot;NICAII&quot;</span></span><br><span class="line">        <span class="type">TimeUnit</span>.<span class="type">SECONDS</span>.sleep(<span class="number">3</span>)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="class"><span class="keyword">object</span> <span class="title">MsgReceice</span> <span class="keyword">extends</span> <span class="title">Actor</span></span>&#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">act</span></span>(): <span class="type">Unit</span> = &#123;</span><br><span class="line">      loop&#123;</span><br><span class="line">        react&#123;</span><br><span class="line">          <span class="keyword">case</span> msg :<span class="type">String</span> =&gt; println(msg)</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="type">MsgReceice</span>.start()</span><br><span class="line">    <span class="type">MsgSender</span>.start()</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="发送和接收自定义消息"><a href="#发送和接收自定义消息" class="headerlink" title="发送和接收自定义消息"></a>发送和接收自定义消息</h3><p>我们前面发送的消息是字符串类型，Actor中也支持发送自定义消息，常见的如：使用样例类封装消息，然后进行发送处理。</p>
+<p><strong>例子1</strong></p>
+<p><strong>示例说明</strong></p>
+<ul>
+<li>创建一个MsgActor，并向它发送一个同步消息，该消息包含两个字段（id、message）</li>
+<li>MsgActor回复一个消息，该消息包含两个字段（message、name）</li>
+<li>打印回复消息</li>
+</ul>
+<p>注意:</p>
+<ul>
+<li>使用<code>!?</code>来发送同步消息</li>
+<li>在Actor的act方法中，可以使用sender获取发送者的Actor引用</li>
+</ul>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//同步的方式</span></span><br><span class="line"><span class="keyword">import</span> scala.actors.<span class="type">Actor</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//发送和接收自定义消息</span></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo30</span> </span>&#123;</span><br><span class="line"> <span class="comment">//封装发送消息</span></span><br><span class="line"> <span class="keyword">case</span>  <span class="class"><span class="keyword">class</span> <span class="title">Msg</span>(<span class="params">name:<span class="type">String</span>,<span class="type">Age</span>:<span class="type">Int</span></span>)</span></span><br><span class="line"><span class="class">  <span class="title">//封装回复消息</span></span></span><br><span class="line"><span class="class"> <span class="title">case</span> <span class="title">class</span> <span class="title">ReplyMsg</span>(<span class="params">name:<span class="type">String</span>,addres:<span class="type">String</span></span>)</span></span><br><span class="line"><span class="class">  <span class="title">//接收消息</span></span></span><br><span class="line"><span class="class">  <span class="title">object</span> <span class="title">MsgActor</span> <span class="keyword">extends</span> <span class="title">Actor</span></span>&#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">act</span></span>(): <span class="type">Unit</span> = &#123;</span><br><span class="line">      loop&#123;</span><br><span class="line">        react&#123;</span><br><span class="line">          <span class="keyword">case</span> <span class="type">Msg</span>(name,age) =&gt;&#123;</span><br><span class="line">            println(<span class="string">&quot;收到消息&quot;</span>+<span class="string">s&quot;<span class="subst">$&#123;name&#125;</span>:<span class="subst">$&#123;age&#125;</span>&quot;</span>)</span><br><span class="line">            <span class="comment">//获取发送者队象 并回复消息</span></span><br><span class="line">            sender ! <span class="type">ReplyMsg</span>(<span class="string">&quot;wobucai&quot;</span>,<span class="string">&quot;bbb&quot;</span>)</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="type">MsgActor</span>.start()</span><br><span class="line"><span class="comment">//发送消息 并获取返回的消息</span></span><br><span class="line">    <span class="keyword">val</span> unit:<span class="type">Any</span> = <span class="type">MsgActor</span> !? <span class="type">Msg</span>(<span class="string">&quot;nicai&quot;</span>,<span class="number">22</span>)</span><br><span class="line">    <span class="comment">//转换 消息类型</span></span><br><span class="line">    <span class="keyword">if</span>(unit.isInstanceOf[<span class="type">ReplyMsg</span>])&#123;</span><br><span class="line">      println(<span class="string">&quot;回复消息&quot;</span>+unit.asInstanceOf[<span class="type">ReplyMsg</span>])</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>实例2</strong></p>
+<ul>
+<li>创建一个MsgActor，并向它发送一个异步无返回消息，该消息包含两个字段（message, company）</li>
+<li>使用<code>!</code>发送异步无返回消息</li>
+</ul>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//异步无返回值</span></span><br><span class="line"><span class="keyword">import</span> com.nicai.demo.actorDemo.<span class="type">Demo30</span>.<span class="type">Msg</span></span><br><span class="line"><span class="keyword">import</span> scala.actors.<span class="type">Actor</span></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo31</span> </span>&#123;</span><br><span class="line">  <span class="comment">//封装 消息</span></span><br><span class="line">  <span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">Mag</span>(<span class="params">name:<span class="type">String</span>,age:<span class="type">Int</span></span>)</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class">  <span class="title">object</span>  <span class="title">MsgActor</span> <span class="keyword">extends</span> <span class="title">Actor</span></span>&#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">act</span></span>(): <span class="type">Unit</span> = &#123;</span><br><span class="line">      loop&#123;</span><br><span class="line">        react&#123;</span><br><span class="line">          <span class="keyword">case</span> <span class="type">Msg</span>(name,age) =&gt; &#123;</span><br><span class="line">            println(<span class="string">s&quot;<span class="subst">$&#123;name&#125;</span>:<span class="subst">$&#123;age&#125;</span>&quot;</span>)</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="type">MsgActor</span>.start()</span><br><span class="line">    <span class="comment">//发送消息</span></span><br><span class="line">    <span class="type">MsgActor</span> ! <span class="type">Msg</span>(<span class="string">&quot;你猜&quot;</span>,<span class="number">55</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>例子3</strong></p>
+<ul>
+<li><p>创建一个MsgActor，并向它发送一个异步有返回消息，该消息包含两个字段（id、message）</p>
+</li>
+<li><p>MsgActor回复一个消息，该消息包含两个字段（message、name）</p>
+</li>
+<li><p>打印回复消息</p>
+<p>注意:</p>
+</li>
+<li><p>使用<code>!!</code>发送异步有返回消息</p>
+</li>
+<li><p>发送后，返回类型为Future[Any]的对象</p>
+</li>
+<li><p>Future表示异步返回数据的封装，虽获取到Future的返回值，但不一定有值，可能在将来某一时刻才会返回消息</p>
+</li>
+<li><p>Future的isSet()可检查是否已经收到返回消息，apply()方法可获取返回数据</p>
+</li>
+</ul>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//异步有返回值</span></span><br><span class="line"><span class="keyword">package</span> com.nicai.demo.actorDemo</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> scala.actors.<span class="type">Actor</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo32</span> </span>&#123;</span><br><span class="line">    <span class="comment">//封装发送消息</span></span><br><span class="line">  <span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">Msg</span>(<span class="params">name:<span class="type">String</span> ,age: <span class="type">Int</span></span>)</span></span><br><span class="line"><span class="class">  <span class="title">//封装返回消息</span></span></span><br><span class="line"><span class="class">  <span class="title">case</span> <span class="title">class</span> <span class="title">ReMsg</span>(<span class="params">name:<span class="type">String</span> ,age: <span class="type">Int</span></span>)</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class">  <span class="title">//设置接收消息</span></span></span><br><span class="line"><span class="class">  <span class="title">object</span>  <span class="title">MsgActor</span> <span class="keyword">extends</span> <span class="title">Actor</span></span>&#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">act</span></span>(): <span class="type">Unit</span> = &#123;</span><br><span class="line"></span><br><span class="line">        loop&#123;</span><br><span class="line">          react&#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="type">Msg</span>(name,age) =&gt;&#123;</span><br><span class="line">              println(<span class="string">s&quot;<span class="subst">$&#123;name&#125;</span>:<span class="subst">$&#123;age&#125;</span>&quot;</span>)</span><br><span class="line">              <span class="comment">//返回消息</span></span><br><span class="line">              sender ! <span class="type">ReMsg</span>(<span class="string">&quot;NICAI&quot;</span>,<span class="number">4564</span>)</span><br><span class="line">            &#125;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="type">MsgActor</span>.start()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> unit = <span class="type">MsgActor</span> !! <span class="type">Msg</span>(<span class="string">&quot;温暖你的空间&quot;</span>,<span class="number">777</span>)</span><br><span class="line">    <span class="comment">//if(unit.isInstanceOf[ReMsg])&#123;</span></span><br><span class="line">      <span class="comment">//检查是否已经收到返回消息  apply()方法可获取返回数据</span></span><br><span class="line">      <span class="comment">// 等待所有结果都已返回</span></span><br><span class="line">    <span class="keyword">while</span>(!unit.isSet)&#123; &#125;</span><br><span class="line">println(unit.apply().asInstanceOf[<span class="type">ReMsg</span>])</span><br><span class="line">    <span class="comment">//&#125;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>##WordCount案例</p>
+<p>我们要使用Actor并发编程模型实现多文件的单词统计</p>
+<p>需求:</p>
+<p>给定几个文本文件（文本文件都是以空格分隔的），使用Actor并发编程来统计单词的数量</p>
+<p><img src="/images/scala/wc.png" alt="img"></p>
+<p><strong>实现思路</strong></p>
+<ol>
+<li>MainActor获取要进行单词统计的文件</li>
+<li>根据文件数量创建对应的WordCountActor</li>
+<li>将文件名封装为消息发送给WordCountActor</li>
+<li>WordCountActor接收消息，并统计单个文件的单词计数</li>
+<li>将单词计数结果发送给MainActor</li>
+<li>MainActor等待所有的WordCountActor都已经成功返回消息，然后进行结果合并</li>
+</ol>
+<h2 id="步骤1-获取文件列表"><a href="#步骤1-获取文件列表" class="headerlink" title="步骤1 | 获取文件列表"></a>步骤1 | 获取文件列表</h2><p><strong>实现思路</strong></p>
+<p>在main方法中读取指定目录(${project_root_dir}/data/)下的所有文件，并打印所有的文件名</p>
+<p><strong>实现步骤</strong></p>
+<ol>
+<li>创建用于测试的数据文件</li>
+<li>加载工程根目录，获取到所有文件</li>
+<li>将每一个文件名，添加目录路径</li>
+<li>打印所有文件名</li>
+</ol>
+<p><strong>参考代码</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//获取文件目录</span></span><br><span class="line">   <span class="comment">// val DIR=&quot;G:\\develop\\bigdatas\\BigData\\day22Scala3\\data/&quot;</span></span><br><span class="line">    <span class="keyword">val</span> <span class="type">DIR</span>=<span class="string">&quot;day22Scala3/data/&quot;</span>   <span class="comment">//当为maven的子工程时 不可使用 &quot;./data/&quot;</span></span><br><span class="line">    <span class="comment">//获取文件流</span></span><br><span class="line">    <span class="keyword">val</span> list = <span class="keyword">new</span> <span class="type">File</span>(<span class="type">DIR</span>).list().toList</span><br><span class="line">    <span class="comment">//把每个文件加上前缀 形成完整路径</span></span><br><span class="line">    <span class="keyword">val</span> pathAll = list.map(<span class="type">DIR</span> + _)</span><br><span class="line">    println(pathAll)</span><br></pre></td></tr></table></figure>
+
+<h2 id="步骤2-创建WordCountActor"><a href="#步骤2-创建WordCountActor" class="headerlink" title="步骤2 | 创建WordCountActor"></a>步骤2 | 创建WordCountActor</h2><p><strong>实现思路</strong></p>
+<p>根据文件数量创建WordCountActor，为了方便后续发送消息给Actor，将每个Actor与文件名关联在一起</p>
+<p><strong>实现步骤</strong></p>
+<ol>
+<li>创建WordCountActor</li>
+<li>将文件列表转换为WordCountActor</li>
+<li>为了后续方便发送消息给Actor，将Actor列表和文件列表拉链到一起</li>
+<li>打印测试</li>
+</ol>
+<p><strong>参考代码</strong></p>
+<p>MainActor.scala</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//获取wordcountList</span></span><br><span class="line"> <span class="keyword">val</span> wordCountList = list.map &#123;</span><br><span class="line">   fileNmae =&gt; <span class="keyword">new</span> <span class="type">WordCountActor</span>()</span><br><span class="line"> &#125;</span><br><span class="line"> <span class="comment">//每个 文件路径与 wordcount建立连接</span></span><br><span class="line"> <span class="keyword">val</span> tuplesList = wordCountList.zip(pathAll)</span><br><span class="line"> println(tuplesList)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>WordCountActor.scala</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WordCountActor</span> <span class="keyword">extends</span> <span class="title">Actor</span></span>&#123;</span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">act</span></span>(): <span class="type">Unit</span> = &#123;</span><br><span class="line">      </span><br><span class="line">  &#125;    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="步骤3-启动Actor-发送-接收任务消息"><a href="#步骤3-启动Actor-发送-接收任务消息" class="headerlink" title="步骤3 | 启动Actor/发送/接收任务消息"></a>步骤3 | 启动Actor/发送/接收任务消息</h2><p><strong>实现思路</strong></p>
+<p>启动所有WordCountActor，并发送单词统计任务消息给每个WordCountActor</p>
+<p> <strong>注意</strong></p>
+<p>此处应发送异步有返回消息</p>
+<p><strong>实现步骤</strong></p>
+<ol>
+<li>创建一个WordCountTask样例类消息，封装要进行单词计数的文件名</li>
+<li>启动所有WordCountTask，并发送异步有返回消息</li>
+<li>获取到所有的WordCount中获取到的消息（封装到一个Future列表中）</li>
+<li>在WordCountActor中接收并打印消息</li>
+</ol>
+<p><strong>参考代码</strong></p>
+<p>MainActor.scala</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//启动 actor /发送和接收消息</span></span><br><span class="line">   tuplesList.map&#123;</span><br><span class="line">     actorFileName =&gt;&#123;</span><br><span class="line">       <span class="keyword">val</span> actor = actorFileName._1</span><br><span class="line">       actor.start()</span><br><span class="line">       <span class="keyword">val</span> future = actor !! <span class="type">Msg</span>(actorFileName._2)</span><br><span class="line">       future</span><br><span class="line">     &#125;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>MessagePackage.scala</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">  * 单词统计任务消息</span></span><br><span class="line"><span class="comment">  * @param fileName 文件名</span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">Msg</span>(<span class="params">name:<span class="type">String</span></span>)</span></span><br><span class="line"><span class="class"></span></span><br></pre></td></tr></table></figure>
+
+<p>WordCountActor.scala</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WordCountActor</span> <span class="keyword">extends</span> <span class="title">Actor</span></span>&#123;</span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">act</span></span>(): <span class="type">Unit</span> = &#123;</span><br><span class="line">    loop&#123;</span><br><span class="line">      react&#123;</span><br><span class="line">        <span class="comment">//获取消息</span></span><br><span class="line">        <span class="keyword">case</span> <span class="type">Msg</span>(fileName) =&gt; println(<span class="string">&quot;对&quot;</span>+fileName+<span class="string">&quot;进行单词统计&quot;</span>)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="步骤4-消息统计文件单词计数"><a href="#步骤4-消息统计文件单词计数" class="headerlink" title="步骤4 | 消息统计文件单词计数"></a>步骤4 | 消息统计文件单词计数</h2><p><strong>实现思路</strong></p>
+<p>读取文件文本，并统计出来单词的数量。例如：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(hadoop, 3), (spark, 1)...</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>实现步骤</strong></p>
+<ol>
+<li>读取文件内容，并转换为列表</li>
+<li>按照空格切割文本，并转换为一个一个的单词</li>
+<li>为了方便进行计数，将单词转换为元组</li>
+<li>按照单词进行分组，然后再进行聚合统计</li>
+<li>打印聚合统计结果</li>
+</ol>
+<p><strong>参考代码</strong></p>
+<p>WordCountActor.scala</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WordCountActor</span> <span class="keyword">extends</span> <span class="title">Actor</span></span>&#123;</span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">act</span></span>(): <span class="type">Unit</span> = &#123;</span><br><span class="line">    loop&#123;</span><br><span class="line">      react&#123;</span><br><span class="line">        <span class="comment">//获取消息</span></span><br><span class="line">        <span class="keyword">case</span> <span class="type">Msg</span>(fileName) =&gt; println(<span class="string">&quot;对&quot;</span>+fileName+<span class="string">&quot;进行单词统计&quot;</span>)</span><br><span class="line">          <span class="comment">//一 读取文件 获取列表  hadoop sqoop hadoop</span></span><br><span class="line">        <span class="keyword">val</span> wordLineList = <span class="type">Source</span>.fromFile(fileName).getLines().toList</span><br><span class="line">          <span class="comment">//二 切割字符串,转换为一个一个的单词[hadoop, sqoop, hadoop]</span></span><br><span class="line">        <span class="keyword">val</span> wordList = wordLineList.flatMap(_.split(<span class="string">&quot; &quot;</span>))</span><br><span class="line">          <span class="comment">//三将单词转换为元组  [&lt;hadoop,1&gt;, &lt;sqoop,1&gt;, &lt;hadoop,1&gt;]</span></span><br><span class="line">        <span class="keyword">val</span> wordAndCountList = wordList.map(_ -&gt; <span class="number">1</span>)</span><br><span class="line">          <span class="comment">// 四 对其进行分组 聚合计算</span></span><br><span class="line">        <span class="comment">//4.1 分组 &#123;hadoop-&gt;List(&lt;hadoop,1&gt;,&lt;hadoop,1&gt;), sqoop-&gt;List(&lt;sqoop,1&gt;)&#125;</span></span><br><span class="line">        <span class="keyword">val</span> wordGroubList = wordAndCountList.groupBy(_._1)</span><br><span class="line">          <span class="comment">//4.2 聚合  &#123;hadoop-&gt;2, sqoop-&gt;1&#125;</span></span><br><span class="line">        <span class="keyword">var</span> wordSum=wordGroubList.map&#123;</span><br><span class="line">          keyValue =&gt;</span><br><span class="line">            keyValue._1 -&gt; keyValue._2.map(_._2).sum</span><br><span class="line">        &#125;</span><br><span class="line">          println(wordSum)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="步骤5-封装单词计数结果回复给MainActor"><a href="#步骤5-封装单词计数结果回复给MainActor" class="headerlink" title="步骤5 | 封装单词计数结果回复给MainActor"></a>步骤5 | 封装单词计数结果回复给MainActor</h2><p><strong>实现思路</strong></p>
+<ul>
+<li>将单词计数的结果封装为一个样例类消息，并发送给MainActor</li>
+<li>MainActor等待所有WordCount均已返回后获取到每个WordCountActor单词计算后的结果</li>
+</ul>
+<p><strong>实现步骤</strong></p>
+<ol>
+<li>定义一个样例类封装单词计数结果</li>
+<li>将单词计数结果发送给MainActor</li>
+<li>MainActor中检测所有WordActor是否均已返回，如果均已返回，则获取并转换结果</li>
+<li>打印结果</li>
+</ol>
+<p><strong>参考代码</strong></p>
+<p>MessagePackage.scala</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">  * 单词统计结果</span></span><br><span class="line"><span class="comment">  * @param wordCount 单词计数</span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line"><span class="comment">//封装单词统计结果</span></span><br><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">WordCountResult</span>(<span class="params">wordSum:<span class="type">Map</span>[<span class="type">String</span>,<span class="type">Int</span>]</span>)</span></span><br><span class="line"><span class="class"></span></span><br></pre></td></tr></table></figure>
+
+<p>WordCountActor.scala</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//6将结果封装到样例类中,发送给WcMain</span></span><br><span class="line">sender ! <span class="type">WordCountResult</span>(wordSum)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>MainActor.scala</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 编写一个while循环来等待所有的Actor都已经返回数据</span></span><br><span class="line">     <span class="keyword">while</span> (futureList.filter(!_.isSet).size!=<span class="number">0</span>)&#123;&#125;</span><br><span class="line">   <span class="comment">// 获取Future中封装的数据</span></span><br><span class="line">     <span class="keyword">val</span> wordCountResultList = futureList.map(_.apply().asInstanceOf[<span class="type">WordCountResult</span>])</span><br><span class="line">   <span class="comment">// 获取样例类中封装的单词统计结果</span></span><br><span class="line">   <span class="keyword">val</span> stringToInts = wordCountResultList.map(_.wordSum)</span><br><span class="line">   println(stringToInts)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="步骤6-结果合并"><a href="#步骤6-结果合并" class="headerlink" title="步骤6 | 结果合并"></a>步骤6 | 结果合并</h2><p><strong>实现思路</strong></p>
+<p>对接收到的所有单词计数进行合并。因为该部分已经在WordCountActor已经编写过，所以抽取这部分一样的代码到一个工具类中，再调用合并得到最终结果</p>
+<p><strong>实现步骤</strong></p>
+<ol>
+<li>创建一个用于单词合并的工具类</li>
+<li>抽取重复代码为一个方法</li>
+<li>在MainActor调用该合并方法，计算得到最终结果，并打印</li>
+</ol>
+<p><strong>参考代码</strong></p>
+<p>WordCountUtil.scala</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">  * 单词分组统计</span></span><br><span class="line"><span class="comment">  * @param wordCountList 单词计数列表</span></span><br><span class="line"><span class="comment">  * @return 分组聚合结果</span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">reduce</span></span>(wordCountList:<span class="type">List</span>[(<span class="type">String</span>, <span class="type">Int</span>)]) = &#123;</span><br><span class="line">  <span class="comment">// 按照单词进行分组</span></span><br><span class="line">  <span class="comment">// [单词分组] = &#123;hadoop-&gt;List(hadoop-&gt;1, hadoop-&gt;1, hadoop-&gt;1), spark-&gt;List(spark -&gt;1)&#125;</span></span><br><span class="line">  <span class="keyword">val</span> grouped: <span class="type">Map</span>[<span class="type">String</span>, <span class="type">List</span>[(<span class="type">String</span>, <span class="type">Int</span>)]] = wordCountList.groupBy(_._1)</span><br><span class="line">  <span class="comment">// 将分组内的数据进行聚合</span></span><br><span class="line">  <span class="comment">// [单词计数] = (hadoop, 3), (spark, 1)</span></span><br><span class="line">  <span class="keyword">val</span> wordCount: <span class="type">Map</span>[<span class="type">String</span>, <span class="type">Int</span>] = grouped.map &#123;</span><br><span class="line">    tuple =&gt;</span><br><span class="line">      <span class="comment">// 单词</span></span><br><span class="line">      <span class="keyword">val</span> word = tuple._1</span><br><span class="line">      <span class="comment">// 进行计数</span></span><br><span class="line">      <span class="comment">// 获取到所有的单词数量，然后进行累加</span></span><br><span class="line">      <span class="keyword">val</span> total = tuple._2.map(_._2).sum</span><br><span class="line">      word -&gt; total</span><br><span class="line">  &#125;</span><br><span class="line">  wordCount</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>MainActor.scala</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 扁平化后再聚合计算</span></span><br><span class="line"><span class="keyword">val</span> result: <span class="type">Map</span>[<span class="type">String</span>, <span class="type">Int</span>] = <span class="type">WordCountUtil</span>.reduce(resultList.flatten)</span><br><span class="line"></span><br><span class="line">println(<span class="string">&quot;最终结果:&quot;</span> + result)</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>HF
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://example.com/2017/08/12/Scala%E8%BF%9B%E9%98%B62/" title="Scala进阶2">http://example.com/2017/08/12/Scala进阶2/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Scala/" rel="tag"># Scala</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/08/11/Scala%E8%BF%9B%E9%98%B6/" rel="prev" title="Scala进阶">
+      <i class="fa fa-chevron-left"></i> Scala进阶
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/08/13/Scala%E9%AB%98%E7%BA%A7/" rel="next" title="Scala高级">
+      Scala高级 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B7%E4%BE%8B%E7%B1%BB%E7%9A%84%E6%96%B9%E6%B3%95"><span class="nav-number">1.</span> <span class="nav-text">样例类的方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B7%E4%BE%8B%E5%AF%B9%E8%B1%A1"><span class="nav-number">2.</span> <span class="nav-text">样例对象</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%8C%E6%A8%A1%E6%9D%BF%E5%8C%B9%E9%85%8D"><span class="nav-number"></span> <span class="nav-text">二模板匹配</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%80%E5%8D%95%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D"><span class="nav-number">1.</span> <span class="nav-text">简单模式匹配</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8C%B9%E9%85%8D%E7%B1%BB%E5%9E%8B"><span class="nav-number">2.</span> <span class="nav-text">匹配类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%88%E5%8D%AB"><span class="nav-number">3.</span> <span class="nav-text">守卫</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8C%B9%E9%85%8D%E6%A0%B7%E4%BE%8B%E7%B1%BB"><span class="nav-number">4.</span> <span class="nav-text">匹配样例类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8C%B9%E9%85%8D%E9%9B%86%E5%90%88"><span class="nav-number">5.</span> <span class="nav-text">匹配集合</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%98%E9%87%8F%E5%A3%B0%E6%98%8E%E4%B8%AD%E7%9A%84%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D"><span class="nav-number">6.</span> <span class="nav-text">变量声明中的模式匹配</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#option%E7%B1%BB%E5%9E%8B"><span class="nav-number">7.</span> <span class="nav-text">option类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%81%8F%E5%87%BD%E6%95%B0"><span class="nav-number">8.</span> <span class="nav-text">偏函数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9A%E4%B9%89"><span class="nav-number"></span> <span class="nav-text">定义</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="nav-number">1.</span> <span class="nav-text">正则表达式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86"><span class="nav-number"></span> <span class="nav-text">异常处理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8D%95%E8%8E%B7%E5%BC%82%E5%B8%B8"><span class="nav-number">1.</span> <span class="nav-text">捕获异常</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B"><span class="nav-number"></span> <span class="nav-text">示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%90%E5%8F%96%E5%99%A8"><span class="nav-number"></span> <span class="nav-text">提取器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9A%E4%B9%89%E6%8F%90%E5%8F%96%E5%99%A8"><span class="nav-number"></span> <span class="nav-text">定义提取器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B3%9B%E5%9E%8B"><span class="nav-number"></span> <span class="nav-text">泛型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9A%E4%B9%89%E4%B8%80%E4%B8%AA%E6%B3%9B%E5%9E%8B%E6%96%B9%E6%B3%95"><span class="nav-number"></span> <span class="nav-text">定义一个泛型方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9A%E4%B9%89-1"><span class="nav-number"></span> <span class="nav-text">定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B-1"><span class="nav-number"></span> <span class="nav-text">示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8A%E4%B8%8B%E7%95%8C"><span class="nav-number"></span> <span class="nav-text">上下界</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%8F%E5%8F%98-%E9%80%86%E5%8F%98-%E9%9D%9E%E5%8F%98"><span class="nav-number"></span> <span class="nav-text">协变 逆变 非变</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%8F%E5%8F%98"><span class="nav-number">1.</span> <span class="nav-text">协变</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%86%E5%8F%98"><span class="nav-number">2.</span> <span class="nav-text">逆变</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Actor%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B"><span class="nav-number"></span> <span class="nav-text">Actor并发编程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number"></span> <span class="nav-text">Java并发编程的问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Artor%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E6%A8%A1%E5%9E%8B"><span class="nav-number">1.</span> <span class="nav-text">Artor并发编程模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#java-%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B-%E4%B8%8EActor%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E5%AF%B9%E6%AF%94"><span class="nav-number">2.</span> <span class="nav-text">java 并发编程 与Actor并发编程对比</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BAActor"><span class="nav-number">3.</span> <span class="nav-text">创建Actor</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Actor%E7%A8%8B%E5%BA%8F%E8%BF%90%E8%A1%8C%E6%B5%81%E7%A8%8B"><span class="nav-number"></span> <span class="nav-text">Actor程序运行流程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%91%E9%80%81%E6%B6%88%E6%81%AF-%E4%B8%8E%E6%8E%A5%E6%94%B6%E6%B6%88%E6%81%AF"><span class="nav-number">1.</span> <span class="nav-text">发送消息 与接收消息</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F"><span class="nav-number">1.1.</span> <span class="nav-text">使用方式</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%81%E7%BB%AD%E6%8E%A5%E6%94%B6%E6%B6%88%E6%81%AF"><span class="nav-number">2.</span> <span class="nav-text">持续接收消息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8loop%E5%92%8Creact-%E4%BC%98%E5%8C%96%E6%8E%A5%E6%94%B6%E6%B6%88%E6%81%AF"><span class="nav-number">3.</span> <span class="nav-text">使用loop和react 优化接收消息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%91%E9%80%81%E5%92%8C%E6%8E%A5%E6%94%B6%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B6%88%E6%81%AF"><span class="nav-number">4.</span> <span class="nav-text">发送和接收自定义消息</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A41-%E8%8E%B7%E5%8F%96%E6%96%87%E4%BB%B6%E5%88%97%E8%A1%A8"><span class="nav-number"></span> <span class="nav-text">步骤1 | 获取文件列表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A42-%E5%88%9B%E5%BB%BAWordCountActor"><span class="nav-number"></span> <span class="nav-text">步骤2 | 创建WordCountActor</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A43-%E5%90%AF%E5%8A%A8Actor-%E5%8F%91%E9%80%81-%E6%8E%A5%E6%94%B6%E4%BB%BB%E5%8A%A1%E6%B6%88%E6%81%AF"><span class="nav-number"></span> <span class="nav-text">步骤3 | 启动Actor&#x2F;发送&#x2F;接收任务消息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A44-%E6%B6%88%E6%81%AF%E7%BB%9F%E8%AE%A1%E6%96%87%E4%BB%B6%E5%8D%95%E8%AF%8D%E8%AE%A1%E6%95%B0"><span class="nav-number"></span> <span class="nav-text">步骤4 | 消息统计文件单词计数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A45-%E5%B0%81%E8%A3%85%E5%8D%95%E8%AF%8D%E8%AE%A1%E6%95%B0%E7%BB%93%E6%9E%9C%E5%9B%9E%E5%A4%8D%E7%BB%99MainActor"><span class="nav-number"></span> <span class="nav-text">步骤5 | 封装单词计数结果回复给MainActor</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A46-%E7%BB%93%E6%9E%9C%E5%90%88%E5%B9%B6"><span class="nav-number"></span> <span class="nav-text">步骤6 | 结果合并</span></a></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="HF"
+      src="/images/hexo.jpg">
+  <p class="site-author-name" itemprop="name">HF</p>
+  <div class="site-description" itemprop="description">第二名就是头号输家</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">105</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      推荐阅读
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="http://www.54tianzhisheng.cn/tags/Flink/" title="http:&#x2F;&#x2F;www.54tianzhisheng.cn&#x2F;tags&#x2F;Flink&#x2F;" rel="noopener" target="_blank">Flink</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://nginxconfig.io/" title="https:&#x2F;&#x2F;nginxconfig.io&#x2F;" rel="noopener" target="_blank">Nginxconfig</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://linux.51yip.com/" title="http:&#x2F;&#x2F;linux.51yip.com&#x2F;" rel="noopener" target="_blank">Linux命令手册</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://echarts.baidu.com/index.html" title="https:&#x2F;&#x2F;echarts.baidu.com&#x2F;index.html" rel="noopener" target="_blank">echarts可视化库</a>
+        </li>
+    </ul>
+  </div>
+<div style="">
+  <canvas id="canvas" style="width:60%;">当前浏览器不支持canvas，请更换浏览器后再试</canvas>
+</div>
+<script>
+(function(){
+
+   var digit=
+    [
+        [
+            [0,0,1,1,1,0,0],
+            [0,1,1,0,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,0,1,1,0],
+            [0,0,1,1,1,0,0]
+        ],//0
+        [
+            [0,0,0,1,1,0,0],
+            [0,1,1,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [1,1,1,1,1,1,1]
+        ],//1
+        [
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,0,1,1,0,0,0],
+            [0,1,1,0,0,0,0],
+            [1,1,0,0,0,0,0],
+            [1,1,0,0,0,1,1],
+            [1,1,1,1,1,1,1]
+        ],//2
+        [
+            [1,1,1,1,1,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//3
+        [
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,1,0],
+            [0,0,1,1,1,1,0],
+            [0,1,1,0,1,1,0],
+            [1,1,0,0,1,1,0],
+            [1,1,1,1,1,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,1,1]
+        ],//4
+        [
+            [1,1,1,1,1,1,1],
+            [1,1,0,0,0,0,0],
+            [1,1,0,0,0,0,0],
+            [1,1,1,1,1,1,0],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//5
+        [
+            [0,0,0,0,1,1,0],
+            [0,0,1,1,0,0,0],
+            [0,1,1,0,0,0,0],
+            [1,1,0,0,0,0,0],
+            [1,1,0,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//6
+        [
+            [1,1,1,1,1,1,1],
+            [1,1,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,1,1,0,0,0],
+            [0,0,1,1,0,0,0],
+            [0,0,1,1,0,0,0],
+            [0,0,1,1,0,0,0]
+        ],//7
+        [
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//8
+        [
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,1,1,0,0,0,0]
+        ],//9
+        [
+            [0,0,0,0,0,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,0,0,0,0,0]
+        ]//:
+    ];
+
+var canvas = document.getElementById('canvas');
+
+if(canvas.getContext){
+    var cxt = canvas.getContext('2d');
+    //声明canvas的宽高
+    var H = 100,W = 700;
+    canvas.height = H;
+    canvas.width = W;
+    cxt.fillStyle = '#f00';
+    cxt.fillRect(10,10,50,50);
+
+    //存储时间数据
+    var data = [];
+    //存储运动的小球
+    var balls = [];
+    //设置粒子半径
+    var R = canvas.height/20-1;
+    (function(){
+        var temp = /(\d)(\d):(\d)(\d):(\d)(\d)/.exec(new Date());
+        //存储时间数字，由十位小时、个位小时、冒号、十位分钟、个位分钟、冒号、十位秒钟、个位秒钟这7个数字组成
+        data.push(temp[1],temp[2],10,temp[3],temp[4],10,temp[5],temp[6]);
+    })();
+
+    /*生成点阵数字*/
+    function renderDigit(index,num){
+        for(var i = 0; i < digit[num].length; i++){
+            for(var j = 0; j < digit[num][i].length; j++){
+                if(digit[num][i][j] == 1){
+                    cxt.beginPath();
+                    cxt.arc(14*(R+2)*index + j*2*(R+1)+(R+1),i*2*(R+1)+(R+1),R,0,2*Math.PI);
+                    cxt.closePath();
+                    cxt.fill();
+                }
+            }
+        }
+    }
+
+    /*更新时钟*/
+    function updateDigitTime(){
+        var changeNumArray = [];
+        var temp = /(\d)(\d):(\d)(\d):(\d)(\d)/.exec(new Date());
+        var NewData = [];
+        NewData.push(temp[1],temp[2],10,temp[3],temp[4],10,temp[5],temp[6]);
+        for(var i = data.length-1; i >=0 ; i--){
+            //时间发生变化
+            if(NewData[i] !== data[i]){
+                //将变化的数字值和在data数组中的索引存储在changeNumArray数组中
+                changeNumArray.push(i+'_'+(Number(data[i])+1)%10);
+            }
+        }
+        //增加小球
+        for(var i = 0; i< changeNumArray.length; i++){
+            addBalls.apply(this,changeNumArray[i].split('_'));
+        }
+        data = NewData.concat();
+    }
+
+    /*更新小球状态*/
+    function updateBalls(){
+        for(var i = 0; i < balls.length; i++){
+            balls[i].stepY += balls[i].disY;
+            balls[i].x += balls[i].stepX;
+            balls[i].y += balls[i].stepY;
+            if(balls[i].x > W + R || balls[i].y > H + R){
+                balls.splice(i,1);
+                i--;
+            }
+        }
+    }
+
+    /*增加要运动的小球*/
+    function addBalls(index,num){
+        var numArray = [1,2,3];
+        var colorArray =  ["#3BE","#09C","#A6C","#93C","#9C0","#690","#FB3","#F80","#F44","#C00"];
+        for(var i = 0; i < digit[num].length; i++){
+            for(var j = 0; j < digit[num][i].length; j++){
+                if(digit[num][i][j] == 1){
+                    var ball = {
+                        x:14*(R+2)*index + j*2*(R+1)+(R+1),
+                        y:i*2*(R+1)+(R+1),
+                        stepX:Math.floor(Math.random() * 4 -2),
+                        stepY:-2*numArray[Math.floor(Math.random()*numArray.length)],
+                        color:colorArray[Math.floor(Math.random()*colorArray.length)],
+                        disY:1
+                    };
+                    balls.push(ball);
+                }
+            }
+        }
+    }
+
+    /*渲染*/
+    function render(){
+        //重置画布宽度，达到清空画布的效果
+        canvas.height = 100;
+        //渲染时钟
+        for(var i = 0; i < data.length; i++){
+            renderDigit(i,data[i]);
+        }
+        //渲染小球
+        for(var i = 0; i < balls.length; i++){
+            cxt.beginPath();
+            cxt.arc(balls[i].x,balls[i].y,R,0,2*Math.PI);
+            cxt.fillStyle = balls[i].color;
+            cxt.closePath();
+            cxt.fill();
+        }
+    }
+
+    clearInterval(oTimer);
+    var oTimer = setInterval(function(){
+        //更新时钟
+        updateDigitTime();
+        //更新小球状态
+        updateBalls();
+        //渲染
+        render();
+    },50);
+}
+
+})();
+</script>
+      </div>
+
+    
+          <script type="text/javascript" charset="utf-8" src="/js/tagcloud.js"></script>
+         <script type="text/javascript" charset="utf-8" src="/js/tagcanvas.js"></script>
+           <div class="widget-wrap">
+        <h3 class="widget-title">Tag Cloud</h3>
+        <div id="myCanvasContainer" class="widget tagcloud">
+            <canvas width="250" height="250" id="resCanvas" style="width=100%">
+                <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Azkaban/" rel="tag">Azkaban</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Blog/" rel="tag">Blog</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ClickHouse/" rel="tag">ClickHouse</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ClouderaManager/" rel="tag">ClouderaManager</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ElSearch/" rel="tag">ElSearch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flink/" rel="tag">Flink</a><span class="tag-list-count">17</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flume/" rel="tag">Flume</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Git/" rel="tag">Git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/" rel="tag">Hadoop</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hbase/" rel="tag">Hbase</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hexo/" rel="tag">Hexo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hive/" rel="tag">Hive</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hue/" rel="tag">Hue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Impala/" rel="tag">Impala</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/" rel="tag">Java</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jvm/" rel="tag">Jvm</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kafka/" rel="tag">Kafka</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kettle/" rel="tag">Kettle</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kudu/" rel="tag">Kudu</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/" rel="tag">Linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Livy/" rel="tag">Livy</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mysql/" rel="tag">Mysql</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Oozie/" rel="tag">Oozie</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redis/" rel="tag">Redis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scala/" rel="tag">Scala</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Shell/" rel="tag">Shell</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spark/" rel="tag">Spark</a><span class="tag-list-count">14</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Sqoop/" rel="tag">Sqoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web/" rel="tag">Web</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ZK/" rel="tag">ZK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E4%BB%93/" rel="tag">数仓</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/" rel="tag">数据分析</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%8F%AF%E8%A7%86%E5%8C%96/" rel="tag">数据可视化</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E6%B9%96/" rel="tag">数据湖</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" rel="tag">数据结构与算法</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag">机器学习</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BB%9F%E8%AE%A1/" rel="tag">统计</a><span class="tag-list-count">1</span></li></ul>
+            </canvas>
+        </div>
+    </div>
+    
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright" style=" text-align:center;">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HF</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">1.6m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">24:05</span>
+</div>
+
+  <!-- 网站运行时间的设置 -->
+<div class="run_time" style=" text-align:center;">
+  <span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+  <script>
+    var now = new Date(); 
+    function createtime() { 
+        var grt= new Date("07/23/2017 10:00:00");//此处修改你的建站时间或者网站上线时间 
+        now.setTime(now.getTime()+250); 
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days); 
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours); 
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum); 
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;} 
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum); 
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;} 
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 "; 
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒"; 
+    } 
+    setInterval("createtime()",250);
+  </script>
+</div>
+        
+<div class="busuanzi-count" style=" text-align:center;">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      我的第 <span class="busuanzi-value" id="busuanzi_value_site_uv"></span> 位朋友，
+    </span>
+  
+
+
+
+  
+    <span class="site-pv">
+      历经 <span class="busuanzi-value" id="busuanzi_value_site_pv"></span> 次回眸才与你相遇
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div class="moon-menu-item" onclick="back2bottom()">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div class="moon-menu-item" onclick="back2top()">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/clicklove.js"></script>
+<!-- 雪花特效 -->
+<script type="text/javascript" src="/js/jquery.js"></script>
+<script type="text/javascript" src="/js/jquery.min.js"></script>
+<script type="text/javascript" src="/js/snow.js"></script>

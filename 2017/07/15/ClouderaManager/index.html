@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":false,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="ClouderaManager cm 管理工具,用来安装cdh  cdh (cloudera distribute hadoop)  版本:5.14.0  Cloudera Manager是cloudera公司提供的一种大数据的解决方案，可以通过ClouderaManager管理界面来对我们的集群进行安装和操作，提供了良好的UI界面交互，使得我们管理集群不用熟悉任何的linux技术，只需要通过网页">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ClouderaManager">
+<meta property="og:url" content="http://example.com/2017/07/15/ClouderaManager/index.html">
+<meta property="og:site_name" content="春雨里洗过的太阳">
+<meta property="og:description" content="ClouderaManager cm 管理工具,用来安装cdh  cdh (cloudera distribute hadoop)  版本:5.14.0  Cloudera Manager是cloudera公司提供的一种大数据的解决方案，可以通过ClouderaManager管理界面来对我们的集群进行安装和操作，提供了良好的UI界面交互，使得我们管理集群不用熟悉任何的linux技术，只需要通过网页">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/images/ClouderaManager/clip_image001.png">
+<meta property="og:image" content="http://example.com/images/ClouderaManager/clip_image003.jpg">
+<meta property="og:image" content="http://example.com/images/ClouderaManager/clip_image005.jpg">
+<meta property="og:image" content="http://example.com/images/ClouderaManager/clip_image007.jpg">
+<meta property="og:image" content="http://example.com/images/ClouderaManager/clip_image009.jpg">
+<meta property="og:image" content="http://example.com/images/ClouderaManager/clip_image011.jpg">
+<meta property="og:image" content="http://example.com/images/ClouderaManager/clip_image013.jpg">
+<meta property="og:image" content="http://example.com/images/ClouderaManager/clip_image015.jpg">
+<meta property="og:image" content="http://example.com/images/ClouderaManager/clip_image017.jpg">
+<meta property="og:image" content="http://example.com/images/ClouderaManager/clip_image019.jpg">
+<meta property="og:image" content="http://example.com/images/ClouderaManager/clip_image021.jpg">
+<meta property="og:image" content="http://example.com/images/ClouderaManager/clip_image023.jpg">
+<meta property="article:published_time" content="2017-07-15T00:54:53.000Z">
+<meta property="article:modified_time" content="2023-03-17T15:42:10.667Z">
+<meta property="article:author" content="HF">
+<meta property="article:tag" content="ClouderaManager">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/ClouderaManager/clip_image001.png">
+
+<link rel="canonical" href="http://example.com/2017/07/15/ClouderaManager/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<link rel="stylesheet" type="text/css" href="/css/injector.css" />
+  <title>ClouderaManager | 春雨里洗过的太阳</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">春雨里洗过的太阳</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">世间所有的相遇，都是久别重逢</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2017/07/15/ClouderaManager/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/hexo.jpg">
+      <meta itemprop="name" content="HF">
+      <meta itemprop="description" content="第二名就是头号输家">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="春雨里洗过的太阳">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ClouderaManager
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-07-15 08:54:53" itemprop="dateCreated datePublished" datetime="2017-07-15T08:54:53+08:00">2017-07-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-03-17 23:42:10" itemprop="dateModified" datetime="2023-03-17T23:42:10+08:00">2023-03-17</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ClouderaManager/" itemprop="url" rel="index"><span itemprop="name">ClouderaManager</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>8.1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>7 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="ClouderaManager"><a href="#ClouderaManager" class="headerlink" title="ClouderaManager"></a>ClouderaManager</h1><p>cm 管理工具,用来安装cdh&lt;hadoop,zookeeper,habse…….&gt;</p>
+<p>cdh (cloudera distribute hadoop&lt;hadoop,zookeeper,hbase……&gt;)</p>
+<p>版本:5.14.0</p>
+<p>Cloudera Manager是cloudera公司提供的一种大数据的解决方案，可以通过ClouderaManager管理界面来对我们的集群进行安装和操作，提供了良好的UI界面交互，使得我们管理集群不用熟悉任何的linux技术，只需要通过网页浏览器就可以实现我们的集群的操作和管理，让我们使用和管理集群更加的方便。</p>
+<h1 id="1、ClouderaManager整体架构"><a href="#1、ClouderaManager整体架构" class="headerlink" title="1、ClouderaManager整体架构"></a>1、ClouderaManager整体架构</h1><p><img src="/images/ClouderaManager/clip_image001.png" alt="img"></p>
+<p>Cloudera Manager的核心是Cloudera Manager Server。Server托管Admin Console Web Server和应用程序逻辑。它负责安装软件、配置、启动和停止服务以及管理运行服务的群集。</p>
+<p>解释：</p>
+<p>·        Agent：安装在每台主机上。它负责启动和停止进程，解压缩配置，触发安装和监控主机</p>
+<p>·        Management Service：执行各种监控、报警和报告功能的一组角色的服务。</p>
+<p>·        Database：存储配置和监控信息</p>
+<p>·        Cloudera Repository：可供Cloudera Manager分配的软件的存储库（repo库）</p>
+<p>·        Client：用于与服务器进行交互的接口： </p>
+<p>·        Admin Console：管理员控制台</p>
+<p>·        API：开发人员使用 API可以创建自定义的Cloudera Manager应用程序</p>
+<h2 id="Cloudera-Management-Service"><a href="#Cloudera-Management-Service" class="headerlink" title="Cloudera Management Service"></a><strong>Cloudera Management Service</strong></h2><p>Cloudera Management Service 可作为一组角色实施各种管理功能</p>
+<p>·        Activity Monitor：收集有关服务运行的活动的信息</p>
+<p>·        Host Monitor：收集有关主机的运行状况和指标信息</p>
+<p>·        Service Monitor：收集有关服务的运行状况和指标信息</p>
+<p>·        Event Server：聚合组件的事件并将其用于警报和搜索</p>
+<p>·        Alert Publisher ：为特定类型的事件生成和提供警报</p>
+<p>·        Reports Manager：生成图表报告，它提供用户、用户组的目录的磁盘使用率、磁盘、io等历史视图</p>
+<h2 id="信号检测"><a href="#信号检测" class="headerlink" title="信号检测"></a><strong>信号检测</strong></h2><p>默认情况下，Agent 每隔 15 秒向 Cloudera Manager Server 发送一次检测信号。但是，为了减少用户延迟，在状态变化时会提高频率。</p>
+<h2 id="状态管理"><a href="#状态管理" class="headerlink" title="状态管理"></a><strong>状态管理</strong></h2><p>·        模型状态捕获什么进程应在何处运行以及具有什么配置</p>
+<p>·        运行时状态是哪些进程正在何处运行以及正在执行哪些命令（例如，重新平衡 HDFS 或执行备份/灾难恢复计划或滚动升级或停止）</p>
+<p>·        当您更新配置（例如Hue Server Web 端口）时，您即更新了模型状态。但是，如果 Hue 在更新时正在运行，则它仍将使用旧端口。当出现这种不匹配情况时，角色会标记为具有”过时的配置”。要重新同步，您需重启角色（这会触发重新生成配置和重启进程）</p>
+<p>·        特殊情况如果要加入一些clouder manager控制台没有的属性时候都在高级里面嵌入</p>
+<h2 id="服务器和客户端配置"><a href="#服务器和客户端配置" class="headerlink" title="服务器和客户端配置"></a><strong>服务器和客户端配置</strong></h2><p>·        如使用HDFS，文件 /etc/hadoop/conf/hdfs-site.xml 仅包含与 HDFS 客户端相关的配置</p>
+<p>·        而 HDFS 角色实例（例如，NameNode 和 DataNode）会从/var/run/cloudera-scm-agent/process/unique-process-name下的每个进程专用目录获取它们的配置</p>
+<h2 id="进程管理"><a href="#进程管理" class="headerlink" title="进程管理"></a><strong>进程管理</strong></h2><p>·        在 Cloudera Manager 管理的群集中，只能通过 Cloudera Manager 启动或停止服务。ClouderaManager 使用一种名为 supervisord的开源进程管理工具，它会重定向日志文件，通知进程失败，为合适用户设置调用进程的有效用户 ID 等等</p>
+<p>·        Cloudera Manager 支持自动重启崩溃进程。如果一个角色实例在启动后反复失败，Cloudera Manager还会用不良状态标记该实例</p>
+<p>·        特别需要注意的是，停止 Cloudera Manager 和 Cloudera Manager Agent 不会停止群集；所有正在运行的实例都将保持运行</p>
+<p>·        Agent 的一项主要职责是启动和停止进程。当 Agent 从检测信号检测到新进程时，Agent 会在/var/run/cloudera-scm-agent 中为它创建一个目录，并解压缩配置</p>
+<p>·        Agent 受到监控，属于 Cloudera Manager 的主机监控的一部分：如果 Agent 停止检测信号，主机将被标记为运行状况不良</p>
+<h2 id="主机管理"><a href="#主机管理" class="headerlink" title="主机管理"></a><strong>主机管理</strong></h2><p>·        Cloudera Manager 自动将作为群集中的托管主机身份：JDK、Cloudera Manager Agent、CDH、Impala、Solr 等参与所需的所有软件部署到主机</p>
+<p>·        Cloudera Manager 提供用于管理参与主机生命周期的操作以及添加和删除主机的操作</p>
+<p>·        Cloudera Management Service Host Monitor 角色执行运行状况检查并收集主机度量，以使您可以监控主机的运行状况和性能</p>
+<h2 id="安全"><a href="#安全" class="headerlink" title="安全"></a><strong>安全</strong></h2><p>·        <strong>身份验证</strong> </p>
+<p>·        Hadoop中身份验证的目的仅仅是证明用户或服务确实是他或她所声称的用户或服务，通常，企业中的身份验证通过单个分布式系统（例如，轻型目录访问协议 (LDAP) 目录）进行管理。LDAP身份验证包含由各种存储系统提供支持的简单用户名/密码服务</p>
+<p>·        Hadoop 生态系统的许多组件会汇总到一起来使用 Kerberos 身份验证并提供用于在 LDAP 或 AD 中管理和存储凭据的选项</p>
+<p>·        <strong>授权</strong><br> CDH 当前提供以下形式的访问控制： </p>
+<p>·        适用于目录和文件的传统 POSIX 样式的权限</p>
+<p>·        适用于 HDFS 的扩展的访问控制列表 (ACL)</p>
+<p>·        Apache HBase 使用 ACL 来按列、列族和列族限定符授权各种操作 (READ, WRITE, CREATE, ADMIN)</p>
+<p>·        使用 Apache Sentry 基于角色进行访问控制</p>
+<p>·        <strong>加密</strong> </p>
+<p>·        需要获得企业版的Cloudera（Cloudera Navigator 许可）</p>
+<h1 id="2、clouderaManager环境安装前准备"><a href="#2、clouderaManager环境安装前准备" class="headerlink" title="2、clouderaManager环境安装前准备"></a>2、clouderaManager环境安装前准备</h1><p>准备两台虚拟机，其中一台作为我们的主节点，安装我们的ClouderaManager Server与ClouderaManager  agent，另外一台作为我们的从节点只安装我们的clouderaManager  agent</p>
+<p>机器规划如下</p>
+<table>
+<thead>
+<tr>
+<th>服务器IP</th>
+<th>192.168.52.100</th>
+<th>192.168.52.110</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>主机名</td>
+<td>node01.hadoop.com</td>
+<td>node02.hadoop.com</td>
+</tr>
+<tr>
+<td>主机名与IP地址映射</td>
+<td>是</td>
+<td>是</td>
+</tr>
+<tr>
+<td>防火墙</td>
+<td>关闭</td>
+<td>关闭</td>
+</tr>
+<tr>
+<td>selinux</td>
+<td>关闭</td>
+<td>关闭</td>
+</tr>
+<tr>
+<td>jdk</td>
+<td>安装</td>
+<td>安装</td>
+</tr>
+<tr>
+<td>ssh免密码登录</td>
+<td>是</td>
+<td>是</td>
+</tr>
+<tr>
+<td>mysql数据库</td>
+<td>否</td>
+<td>是</td>
+</tr>
+<tr>
+<td>服务器内存</td>
+<td>16G</td>
+<td>8G</td>
+</tr>
+</tbody></table>
+<p>所有机器统一两个路径</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p &#x2F;export&#x2F;softwares&#x2F;</span><br><span class="line">mkdir -p &#x2F;export&#x2F;servers&#x2F;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-1、两台机器更改主机名"><a href="#2-1、两台机器更改主机名" class="headerlink" title="2.1、两台机器更改主机名"></a>2.1、两台机器更改主机名</h2><p>第一台机器更改主机名</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">vim &#x2F;etc&#x2F;sysconfig&#x2F;network</span><br><span class="line">NETWORKING&#x3D;yes</span><br><span class="line">HOSTNAME&#x3D;node01.hadoop.com</span><br></pre></td></tr></table></figure>
+
+<p>第二台机器更改主机名</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">vim &#x2F;etc&#x2F;sysconfig&#x2F;network</span><br><span class="line">NETWORKING&#x3D;yes</span><br><span class="line">HOSTNAME&#x3D;node02.hadoop.com</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-2、更改主机名与IP地址的映射"><a href="#2-2、更改主机名与IP地址的映射" class="headerlink" title="2.2、更改主机名与IP地址的映射"></a>2.2、更改主机名与IP地址的映射</h2><p>两台机器更改hosts文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">vim &#x2F;etc&#x2F;hosts</span><br><span class="line">192.168.52.100 node01.hadoop.com  node01</span><br><span class="line">192.168.52.110 node02.hadoop.com  node02</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-3、两台机器关闭防火墙"><a href="#2-3、两台机器关闭防火墙" class="headerlink" title="2.3、两台机器关闭防火墙"></a>2.3、两台机器关闭防火墙</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">service iptables stop</span><br><span class="line">chkconfig iptables off</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-4、两台机器关闭selinux"><a href="#2-4、两台机器关闭selinux" class="headerlink" title="2.4、两台机器关闭selinux"></a>2.4、两台机器关闭selinux</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">vim &#x2F;etc&#x2F;selinux&#x2F;config</span><br><span class="line">SELINUX&#x3D;disabled</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/ClouderaManager/clip_image003.jpg" alt="img"></p>
+<h2 id="2-5、两台机器安装jdk"><a href="#2-5、两台机器安装jdk" class="headerlink" title="2.5、两台机器安装jdk"></a>2.5、两台机器安装jdk</h2><p>将我们的jdk的压缩包上传到node01.hadoop.com的/export/softwares路径下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd &#x2F;export&#x2F;softwares&#x2F;</span><br><span class="line">tar -zxvf jdk-8u141-linux-x64.tar.gz  -C &#x2F;export&#x2F;servers&#x2F;</span><br></pre></td></tr></table></figure>
+
+<p>配置环境变量</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">vim &#x2F;etc&#x2F;profile</span><br><span class="line"></span><br><span class="line">export JAVA_HOME&#x3D;&#x2F;export&#x2F;servers&#x2F;jdk1.8.0_141</span><br><span class="line">export PATH&#x3D;:$JAVA_HOME&#x2F;bin:PATH</span><br><span class="line"></span><br><span class="line">source &#x2F;etc&#x2F;profile</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<p>第二台机器同样安装jdk即可</p>
+<h2 id="2-6、两台机器实现SSH免密码登录"><a href="#2-6、两台机器实现SSH免密码登录" class="headerlink" title="2.6、两台机器实现SSH免密码登录"></a>2.6、两台机器实现SSH免密码登录</h2><h3 id="第一步：两台器生成公钥与私钥"><a href="#第一步：两台器生成公钥与私钥" class="headerlink" title="第一步：两台器生成公钥与私钥"></a>第一步：两台器生成公钥与私钥</h3><p>两台机器上面执行以下命令，然后按下三个回车键即可生成公钥与私钥</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/ClouderaManager/clip_image005.jpg" alt="img"></p>
+<h3 id="第二步：两台机器将公钥拷贝到同一个文件当中去"><a href="#第二步：两台机器将公钥拷贝到同一个文件当中去" class="headerlink" title="第二步：两台机器将公钥拷贝到同一个文件当中去"></a>第二步：两台机器将公钥拷贝到同一个文件当中去</h3><p>两台机器执行以下命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-copy-id node01.hadoop.com</span><br></pre></td></tr></table></figure>
+
+<h3 id="第三步：拷贝authorized-keys到其他机器"><a href="#第三步：拷贝authorized-keys到其他机器" class="headerlink" title="第三步：拷贝authorized_keys到其他机器"></a>第三步：拷贝authorized_keys到其他机器</h3><p>第一台机器上将authorized_keys拷贝到第二台机器</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scp &#x2F;root&#x2F;.ssh&#x2F;authorized_keys node02.hadoop.com:&#x2F;root&#x2F;.ssh&#x2F;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-7、第二台机器安装mysql数据库"><a href="#2-7、第二台机器安装mysql数据库" class="headerlink" title="2.7、第二台机器安装mysql数据库"></a>2.7、第二台机器安装mysql数据库</h2><p>通过yum源，在线安装mysql</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">yum  install  mysql  mysql-server  mysql-devel</span><br><span class="line">&#x2F;etc&#x2F;init.d&#x2F;mysqld start</span><br><span class="line">&#x2F;usr&#x2F;bin&#x2F;mysql_secure_installation</span><br><span class="line"> grant all privileges on . to &#39;root&#39;@&#39;%&#39; identified by &#39;123456&#39; with grant option;</span><br><span class="line"> flush privileges;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/ClouderaManager/clip_image007.jpg" alt="img"></p>
+<h2 id="2-8、解除linux系统打开文件最大数量的限制"><a href="#2-8、解除linux系统打开文件最大数量的限制" class="headerlink" title="2.8、解除linux系统打开文件最大数量的限制"></a>2.8、解除linux系统打开文件最大数量的限制</h2><p>两台机器都需要执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi &#x2F;etc&#x2F;security&#x2F;limits.conf</span><br></pre></td></tr></table></figure>
+
+<p>添加以下内容</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">*   soft noproc 11000</span><br><span class="line"></span><br><span class="line">*   hard noproc 11000</span><br><span class="line"></span><br><span class="line">*   soft nofile 65535</span><br><span class="line"></span><br><span class="line">*   hard nofile 65535</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="2-9、设置linux交换区内存"><a href="#2-9、设置linux交换区内存" class="headerlink" title="2.9、设置linux交换区内存"></a>2.9、设置linux交换区内存</h2><p>两台机器都要执行</p>
+<p>执行命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo 10 &gt; &#x2F;proc&#x2F;sys&#x2F;vm&#x2F;swappiness</span><br></pre></td></tr></table></figure>
+
+<p>并编辑文件sysctl.conf：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">vim &#x2F;etc&#x2F;sysctl.conf</span><br><span class="line"></span><br><span class="line">添加或修改</span><br><span class="line"></span><br><span class="line">vm.swappiness &#x3D; 0</span><br></pre></td></tr></table></figure>
+
+<p>两台机器都要执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">echo never &gt; &#x2F;sys&#x2F;kernel&#x2F;mm&#x2F;transparent_hugepage&#x2F;defrag</span><br><span class="line">echo never &gt; &#x2F;sys&#x2F;kernel&#x2F;mm&#x2F;transparent_hugepage&#x2F;enabled</span><br></pre></td></tr></table></figure>
+
+<p>并编辑文件rc.local ：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">vim &#x2F;etc&#x2F;rc.local</span><br><span class="line"></span><br><span class="line">echo never &gt; &#x2F;sys&#x2F;kernel&#x2F;mm&#x2F;transparent_hugepage&#x2F;defrag</span><br><span class="line">echo never &gt; &#x2F;sys&#x2F;kernel&#x2F;mm&#x2F;transparent_hugepage&#x2F;enabled</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/ClouderaManager/clip_image009.jpg" alt="img"></p>
+<h2 id="2-10、两台机器时钟同步"><a href="#2-10、两台机器时钟同步" class="headerlink" title="2.10、两台机器时钟同步"></a>2.10、两台机器时钟同步</h2><p>两台机器需要进行时钟同步操作，保证两台机器时间相同</p>
+<h1 id="3、clouderaManager安装资源下载"><a href="#3、clouderaManager安装资源下载" class="headerlink" title="3、clouderaManager安装资源下载"></a>3、clouderaManager安装资源下载</h1><h2 id="第一步：下载安装资源并上传到服务器"><a href="#第一步：下载安装资源并上传到服务器" class="headerlink" title="第一步：下载安装资源并上传到服务器"></a>第一步：下载安装资源并上传到服务器</h2><p>我们这里安装CM5.14.0这个版本，需要下载以下这些资源，一共是四个文件即可</p>
+<p>下载cm5的压缩包</p>
+<p>下载地址：<a target="_blank" rel="noopener" href="http://archive.cloudera.com/cm5/cm/5/">http://archive.cloudera.com/cm5/cm/5/</a></p>
+<p>具体文件地址：</p>
+<p><a target="_blank" rel="noopener" href="http://archive.cloudera.com/cm5/cm/5/cloudera-manager-el6-cm5.14.0_x86_64.tar.gz">http://archive.cloudera.com/cm5/cm/5/cloudera-manager-el6-cm5.14.0_x86_64.tar.gz</a></p>
+<p>下载cm5的parcel包</p>
+<p>下载地址：</p>
+<p><a target="_blank" rel="noopener" href="http://archive.cloudera.com/cdh5/parcels/">http://archive.cloudera.com/cdh5/parcels/</a></p>
+<p>第一个文件具体下载地址：</p>
+<p><a target="_blank" rel="noopener" href="http://archive.cloudera.com/cdh5/parcels/5.14.0/CDH-5.14.0-1.cdh5.14.0.p0.24-el6.parcel">http://archive.cloudera.com/cdh5/parcels/5.14.0/CDH-5.14.0-1.cdh5.14.0.p0.24-el6.parcel</a></p>
+<p>第二个文件具体下载地址：</p>
+<p><a target="_blank" rel="noopener" href="http://archive.cloudera.com/cdh5/parcels/5.14.0/CDH-5.14.0-1.cdh5.14.0.p0.24-el6.parcel.sha1">http://archive.cloudera.com/cdh5/parcels/5.14.0/CDH-5.14.0-1.cdh5.14.0.p0.24-el6.parcel.sha1</a></p>
+<p>第三个文件具体下载地址：</p>
+<p><a target="_blank" rel="noopener" href="http://archive.cloudera.com/cdh5/parcels/5.14.0/manifest.json">http://archive.cloudera.com/cdh5/parcels/5.14.0/manifest.json</a></p>
+<p>将这四个安装包都上传到第一台机器的/opt/softwares路径下</p>
+<p><img src="/images/ClouderaManager/clip_image011.jpg" alt="img"></p>
+<h2 id="第二步：解压压缩包到指定路径"><a href="#第二步：解压压缩包到指定路径" class="headerlink" title="第二步：解压压缩包到指定路径"></a>第二步：解压压缩包到指定路径</h2><p>解压CM安装包到/opt路径下去</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cd &#x2F;export&#x2F;softwares</span><br><span class="line"></span><br><span class="line">tar -zxvf cloudera-manager-el6-cm5.14.0_x86_64.tar.gz -C &#x2F;opt&#x2F;</span><br></pre></td></tr></table></figure>
+
+<h2 id="第三步：将我们的parcel包的三个文件拷贝到对应路径"><a href="#第三步：将我们的parcel包的三个文件拷贝到对应路径" class="headerlink" title="第三步：将我们的parcel包的三个文件拷贝到对应路径"></a>第三步：将我们的parcel包的三个文件拷贝到对应路径</h2><p>将我们的parcel包含三个文件，拷贝到/opt/cloudera/parcel-repo路径下面去，并记得有个文件需要重命名</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cd &#x2F;export&#x2F;softwares&#x2F;</span><br><span class="line"></span><br><span class="line">cp CDH-5.14.0-1.cdh5.14.0.p0.24-el6.parcel CDH-5.14.0-1.cdh5.14.0.p0.24-el6.parcel.sha1 manifest.json  &#x2F;opt&#x2F;cloudera&#x2F;parcel-repo&#x2F;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/ClouderaManager/clip_image013.jpg" alt="img"></p>
+<p>重命名标黄的这个文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cd &#x2F;opt&#x2F;cloudera&#x2F;parcel-repo&#x2F;</span><br><span class="line"></span><br><span class="line">mv CDH-5.14.0-1.cdh5.14.0.p0.24-el6.parcel.sha1 CDH-5.14.0-1.cdh5.14.0.p0.24-el6.parcel.sha</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/ClouderaManager/clip_image015.jpg" alt="img"></p>
+<h2 id="第四步：所有节点添加普通用户并给与sudo权限"><a href="#第四步：所有节点添加普通用户并给与sudo权限" class="headerlink" title="第四步：所有节点添加普通用户并给与sudo权限"></a>第四步：所有节点添加普通用户并给与sudo权限</h2><p>在node01机器上面添加普通用户并赋予sudo权限</p>
+<p>执行以下命令创建普通用户cloudera-scm</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">useradd --system --home&#x3D;&#x2F;opt&#x2F;cm-5.14.0&#x2F;run&#x2F;cloudera-scm-server --no-create-home --shell&#x3D;&#x2F;bin&#x2F;false --comment &quot;Cloudera SCM User&quot; cloudera-scm</span><br></pre></td></tr></table></figure>
+
+<p>赋予cloudera-scm普通用户的sudo权限</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">vim &#x2F;etc&#x2F;sudoers</span><br><span class="line"></span><br><span class="line">cloudera-scm ALL&#x3D;(ALL) NOPASSWD: ALL</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/ClouderaManager/clip_image017.jpg" alt="img"></p>
+<h2 id="第五步：更改主节点的配置文件"><a href="#第五步：更改主节点的配置文件" class="headerlink" title="第五步：更改主节点的配置文件"></a>第五步：更改主节点的配置文件</h2><p>node01机器上面更改配置文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">vim &#x2F;opt&#x2F;cm-5.14.0&#x2F;etc&#x2F;cloudera-scm-agent&#x2F;config.ini</span><br><span class="line"></span><br><span class="line">server_host&#x3D;node01.hadoop.com</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/ClouderaManager/clip_image019.jpg" alt="img"></p>
+<h2 id="第六步：将-opt目录下的安装包发放到其他机器"><a href="#第六步：将-opt目录下的安装包发放到其他机器" class="headerlink" title="第六步：将/opt目录下的安装包发放到其他机器"></a>第六步：将/opt目录下的安装包发放到其他机器</h2><p>将第一台机器的安装包发放到其他机器</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cd &#x2F;opt</span><br><span class="line"></span><br><span class="line">scp -r cloudera&#x2F; cm-5.14.0&#x2F; node02:&#x2F;opt</span><br></pre></td></tr></table></figure>
+
+<h2 id="第七步：创建一些数据库备用"><a href="#第七步：创建一些数据库备用" class="headerlink" title="第七步：创建一些数据库备用"></a>第七步：创建一些数据库备用</h2><p>node02机器上面创建数据库</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">hive 数据库</span><br><span class="line"></span><br><span class="line">create database hive DEFAULT CHARSET utf8 COLLATE utf8_general_ci;</span><br><span class="line"></span><br><span class="line">集群监控数据库</span><br><span class="line"></span><br><span class="line">create database amon DEFAULT CHARSET utf8 COLLATE utf8_general_ci;</span><br><span class="line"></span><br><span class="line">hue 数据库</span><br><span class="line"></span><br><span class="line">create database hue DEFAULT CHARSET utf8 COLLATE utf8_general_ci;</span><br><span class="line"></span><br><span class="line">oozie 数据库</span><br><span class="line"></span><br><span class="line">create database oozie DEFAULT CHARSET utf8 COLLATE utf8_general_ci;</span><br></pre></td></tr></table></figure>
+
+<h2 id="第八步：准备数据库连接的驱动包"><a href="#第八步：准备数据库连接的驱动包" class="headerlink" title="第八步：准备数据库连接的驱动包"></a>第八步：准备数据库连接的驱动包</h2><p>在所有机器上面都准备一份数据库的连接驱动jar包放到/usr/share/java路径下</p>
+<p>准备一份mysql的驱动连接包，放到/usr/share/java路径下去</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">cd &#x2F;export&#x2F;softwares&#x2F;</span><br><span class="line"></span><br><span class="line">wget https:&#x2F;&#x2F;dev.mysql.com&#x2F;get&#x2F;Downloads&#x2F;Connector-J&#x2F;mysql-connector-java-5.1.45.tar.gz</span><br><span class="line"></span><br><span class="line">tar -zxvf mysql-connector-java-5.1.45.tar.gz</span><br><span class="line"></span><br><span class="line">cd &#x2F;export&#x2F;softwares&#x2F;mysql-connector-java-5.1.45</span><br><span class="line"></span><br><span class="line">cp mysql-connector-java-5.1.45-bin.jar &#x2F;usr&#x2F;share&#x2F;java&#x2F;mysql-connector-java.jar</span><br></pre></td></tr></table></figure>
+
+<p>拷贝驱动包到第二台机器</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cd &#x2F;usr&#x2F;share&#x2F;java</span><br><span class="line"></span><br><span class="line">scp mysql-connector-java.jar node02:$PWD</span><br></pre></td></tr></table></figure>
+
+<h2 id="第九步：为clouderaManager创建数据库"><a href="#第九步：为clouderaManager创建数据库" class="headerlink" title="第九步：为clouderaManager创建数据库"></a>第九步：为clouderaManager创建数据库</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;opt&#x2F;cm-5.14.0&#x2F;share&#x2F;cmf&#x2F;schema&#x2F;scm_prepare_database.sh mysql -hnode02  -uroot -p123456 --scm-host node01 scm root 123456</span><br></pre></td></tr></table></figure>
+
+<p>命令说明：/<strong>opt</strong>/<strong>cm</strong>-5.14.0/share/cmf/schema/scm_prepare_database.<strong>sh</strong> 数据库类型 -h数据库主机 –u数据库用户名 –p数据库密码 –scm-host <strong>cm</strong>主机  数据库名称  用户名  密码</p>
+<p><img src="/images/ClouderaManager/clip_image021.jpg" alt="img"></p>
+<h2 id="第十步：启动服务"><a href="#第十步：启动服务" class="headerlink" title="第十步：启动服务"></a>第十步：启动服务</h2><p>主节点启动clouderaManager Server与ClouderaManager  agent服务</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;opt&#x2F;cm-5.14.0&#x2F;etc&#x2F;init.d&#x2F;cloudera-scm-server start</span><br><span class="line"></span><br><span class="line">&#x2F;opt&#x2F;cm-5.14.0&#x2F;etc&#x2F;init.d&#x2F;cloudera-scm-agent start</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/ClouderaManager/clip_image023.jpg" alt="img"></p>
+<p>从节点node02启动ClouderaManager agent服务</p>
+<h2 id="第十一步：浏览器页面访问"><a href="#第十一步：浏览器页面访问" class="headerlink" title="第十一步：浏览器页面访问"></a>第十一步：浏览器页面访问</h2><p><a target="_blank" rel="noopener" href="http://node01:7180/cmf/login">http://node01:7180/cmf/login</a></p>
+<p>默认用户名admin</p>
+<p>密码 admin</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>HF
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://example.com/2017/07/15/ClouderaManager/" title="ClouderaManager">http://example.com/2017/07/15/ClouderaManager/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/ClouderaManager/" rel="tag"># ClouderaManager</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/07/14/kudu/" rel="prev" title="Kudu">
+      <i class="fa fa-chevron-left"></i> Kudu
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/07/16/Kafka/" rel="next" title="Kafka">
+      Kafka <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ClouderaManager"><span class="nav-number">1.</span> <span class="nav-text">ClouderaManager</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1%E3%80%81ClouderaManager%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84"><span class="nav-number">2.</span> <span class="nav-text">1、ClouderaManager整体架构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Cloudera-Management-Service"><span class="nav-number">2.1.</span> <span class="nav-text">Cloudera Management Service</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E6%A3%80%E6%B5%8B"><span class="nav-number">2.2.</span> <span class="nav-text">信号检测</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8A%B6%E6%80%81%E7%AE%A1%E7%90%86"><span class="nav-number">2.3.</span> <span class="nav-text">状态管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%92%8C%E5%AE%A2%E6%88%B7%E7%AB%AF%E9%85%8D%E7%BD%AE"><span class="nav-number">2.4.</span> <span class="nav-text">服务器和客户端配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86"><span class="nav-number">2.5.</span> <span class="nav-text">进程管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BB%E6%9C%BA%E7%AE%A1%E7%90%86"><span class="nav-number">2.6.</span> <span class="nav-text">主机管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E5%85%A8"><span class="nav-number">2.7.</span> <span class="nav-text">安全</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2%E3%80%81clouderaManager%E7%8E%AF%E5%A2%83%E5%AE%89%E8%A3%85%E5%89%8D%E5%87%86%E5%A4%87"><span class="nav-number">3.</span> <span class="nav-text">2、clouderaManager环境安装前准备</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1%E3%80%81%E4%B8%A4%E5%8F%B0%E6%9C%BA%E5%99%A8%E6%9B%B4%E6%94%B9%E4%B8%BB%E6%9C%BA%E5%90%8D"><span class="nav-number">3.1.</span> <span class="nav-text">2.1、两台机器更改主机名</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2%E3%80%81%E6%9B%B4%E6%94%B9%E4%B8%BB%E6%9C%BA%E5%90%8D%E4%B8%8EIP%E5%9C%B0%E5%9D%80%E7%9A%84%E6%98%A0%E5%B0%84"><span class="nav-number">3.2.</span> <span class="nav-text">2.2、更改主机名与IP地址的映射</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3%E3%80%81%E4%B8%A4%E5%8F%B0%E6%9C%BA%E5%99%A8%E5%85%B3%E9%97%AD%E9%98%B2%E7%81%AB%E5%A2%99"><span class="nav-number">3.3.</span> <span class="nav-text">2.3、两台机器关闭防火墙</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-4%E3%80%81%E4%B8%A4%E5%8F%B0%E6%9C%BA%E5%99%A8%E5%85%B3%E9%97%ADselinux"><span class="nav-number">3.4.</span> <span class="nav-text">2.4、两台机器关闭selinux</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-5%E3%80%81%E4%B8%A4%E5%8F%B0%E6%9C%BA%E5%99%A8%E5%AE%89%E8%A3%85jdk"><span class="nav-number">3.5.</span> <span class="nav-text">2.5、两台机器安装jdk</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-6%E3%80%81%E4%B8%A4%E5%8F%B0%E6%9C%BA%E5%99%A8%E5%AE%9E%E7%8E%B0SSH%E5%85%8D%E5%AF%86%E7%A0%81%E7%99%BB%E5%BD%95"><span class="nav-number">3.6.</span> <span class="nav-text">2.6、两台机器实现SSH免密码登录</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E6%AD%A5%EF%BC%9A%E4%B8%A4%E5%8F%B0%E5%99%A8%E7%94%9F%E6%88%90%E5%85%AC%E9%92%A5%E4%B8%8E%E7%A7%81%E9%92%A5"><span class="nav-number">3.6.1.</span> <span class="nav-text">第一步：两台器生成公钥与私钥</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E6%AD%A5%EF%BC%9A%E4%B8%A4%E5%8F%B0%E6%9C%BA%E5%99%A8%E5%B0%86%E5%85%AC%E9%92%A5%E6%8B%B7%E8%B4%9D%E5%88%B0%E5%90%8C%E4%B8%80%E4%B8%AA%E6%96%87%E4%BB%B6%E5%BD%93%E4%B8%AD%E5%8E%BB"><span class="nav-number">3.6.2.</span> <span class="nav-text">第二步：两台机器将公钥拷贝到同一个文件当中去</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%B8%89%E6%AD%A5%EF%BC%9A%E6%8B%B7%E8%B4%9Dauthorized-keys%E5%88%B0%E5%85%B6%E4%BB%96%E6%9C%BA%E5%99%A8"><span class="nav-number">3.6.3.</span> <span class="nav-text">第三步：拷贝authorized_keys到其他机器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-7%E3%80%81%E7%AC%AC%E4%BA%8C%E5%8F%B0%E6%9C%BA%E5%99%A8%E5%AE%89%E8%A3%85mysql%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="nav-number">3.7.</span> <span class="nav-text">2.7、第二台机器安装mysql数据库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-8%E3%80%81%E8%A7%A3%E9%99%A4linux%E7%B3%BB%E7%BB%9F%E6%89%93%E5%BC%80%E6%96%87%E4%BB%B6%E6%9C%80%E5%A4%A7%E6%95%B0%E9%87%8F%E7%9A%84%E9%99%90%E5%88%B6"><span class="nav-number">3.8.</span> <span class="nav-text">2.8、解除linux系统打开文件最大数量的限制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-9%E3%80%81%E8%AE%BE%E7%BD%AElinux%E4%BA%A4%E6%8D%A2%E5%8C%BA%E5%86%85%E5%AD%98"><span class="nav-number">3.9.</span> <span class="nav-text">2.9、设置linux交换区内存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-10%E3%80%81%E4%B8%A4%E5%8F%B0%E6%9C%BA%E5%99%A8%E6%97%B6%E9%92%9F%E5%90%8C%E6%AD%A5"><span class="nav-number">3.10.</span> <span class="nav-text">2.10、两台机器时钟同步</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3%E3%80%81clouderaManager%E5%AE%89%E8%A3%85%E8%B5%84%E6%BA%90%E4%B8%8B%E8%BD%BD"><span class="nav-number">4.</span> <span class="nav-text">3、clouderaManager安装资源下载</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E6%AD%A5%EF%BC%9A%E4%B8%8B%E8%BD%BD%E5%AE%89%E8%A3%85%E8%B5%84%E6%BA%90%E5%B9%B6%E4%B8%8A%E4%BC%A0%E5%88%B0%E6%9C%8D%E5%8A%A1%E5%99%A8"><span class="nav-number">4.1.</span> <span class="nav-text">第一步：下载安装资源并上传到服务器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E6%AD%A5%EF%BC%9A%E8%A7%A3%E5%8E%8B%E5%8E%8B%E7%BC%A9%E5%8C%85%E5%88%B0%E6%8C%87%E5%AE%9A%E8%B7%AF%E5%BE%84"><span class="nav-number">4.2.</span> <span class="nav-text">第二步：解压压缩包到指定路径</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%89%E6%AD%A5%EF%BC%9A%E5%B0%86%E6%88%91%E4%BB%AC%E7%9A%84parcel%E5%8C%85%E7%9A%84%E4%B8%89%E4%B8%AA%E6%96%87%E4%BB%B6%E6%8B%B7%E8%B4%9D%E5%88%B0%E5%AF%B9%E5%BA%94%E8%B7%AF%E5%BE%84"><span class="nav-number">4.3.</span> <span class="nav-text">第三步：将我们的parcel包的三个文件拷贝到对应路径</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E5%9B%9B%E6%AD%A5%EF%BC%9A%E6%89%80%E6%9C%89%E8%8A%82%E7%82%B9%E6%B7%BB%E5%8A%A0%E6%99%AE%E9%80%9A%E7%94%A8%E6%88%B7%E5%B9%B6%E7%BB%99%E4%B8%8Esudo%E6%9D%83%E9%99%90"><span class="nav-number">4.4.</span> <span class="nav-text">第四步：所有节点添加普通用户并给与sudo权限</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%BA%94%E6%AD%A5%EF%BC%9A%E6%9B%B4%E6%94%B9%E4%B8%BB%E8%8A%82%E7%82%B9%E7%9A%84%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="nav-number">4.5.</span> <span class="nav-text">第五步：更改主节点的配置文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E5%85%AD%E6%AD%A5%EF%BC%9A%E5%B0%86-opt%E7%9B%AE%E5%BD%95%E4%B8%8B%E7%9A%84%E5%AE%89%E8%A3%85%E5%8C%85%E5%8F%91%E6%94%BE%E5%88%B0%E5%85%B6%E4%BB%96%E6%9C%BA%E5%99%A8"><span class="nav-number">4.6.</span> <span class="nav-text">第六步：将&#x2F;opt目录下的安装包发放到其他机器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%83%E6%AD%A5%EF%BC%9A%E5%88%9B%E5%BB%BA%E4%B8%80%E4%BA%9B%E6%95%B0%E6%8D%AE%E5%BA%93%E5%A4%87%E7%94%A8"><span class="nav-number">4.7.</span> <span class="nav-text">第七步：创建一些数据库备用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E5%85%AB%E6%AD%A5%EF%BC%9A%E5%87%86%E5%A4%87%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%9E%E6%8E%A5%E7%9A%84%E9%A9%B1%E5%8A%A8%E5%8C%85"><span class="nav-number">4.8.</span> <span class="nav-text">第八步：准备数据库连接的驱动包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B9%9D%E6%AD%A5%EF%BC%9A%E4%B8%BAclouderaManager%E5%88%9B%E5%BB%BA%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="nav-number">4.9.</span> <span class="nav-text">第九步：为clouderaManager创建数据库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E5%8D%81%E6%AD%A5%EF%BC%9A%E5%90%AF%E5%8A%A8%E6%9C%8D%E5%8A%A1"><span class="nav-number">4.10.</span> <span class="nav-text">第十步：启动服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E5%8D%81%E4%B8%80%E6%AD%A5%EF%BC%9A%E6%B5%8F%E8%A7%88%E5%99%A8%E9%A1%B5%E9%9D%A2%E8%AE%BF%E9%97%AE"><span class="nav-number">4.11.</span> <span class="nav-text">第十一步：浏览器页面访问</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="HF"
+      src="/images/hexo.jpg">
+  <p class="site-author-name" itemprop="name">HF</p>
+  <div class="site-description" itemprop="description">第二名就是头号输家</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">105</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      推荐阅读
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="http://www.54tianzhisheng.cn/tags/Flink/" title="http:&#x2F;&#x2F;www.54tianzhisheng.cn&#x2F;tags&#x2F;Flink&#x2F;" rel="noopener" target="_blank">Flink</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://nginxconfig.io/" title="https:&#x2F;&#x2F;nginxconfig.io&#x2F;" rel="noopener" target="_blank">Nginxconfig</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://linux.51yip.com/" title="http:&#x2F;&#x2F;linux.51yip.com&#x2F;" rel="noopener" target="_blank">Linux命令手册</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://echarts.baidu.com/index.html" title="https:&#x2F;&#x2F;echarts.baidu.com&#x2F;index.html" rel="noopener" target="_blank">echarts可视化库</a>
+        </li>
+    </ul>
+  </div>
+<div style="">
+  <canvas id="canvas" style="width:60%;">当前浏览器不支持canvas，请更换浏览器后再试</canvas>
+</div>
+<script>
+(function(){
+
+   var digit=
+    [
+        [
+            [0,0,1,1,1,0,0],
+            [0,1,1,0,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,0,1,1,0],
+            [0,0,1,1,1,0,0]
+        ],//0
+        [
+            [0,0,0,1,1,0,0],
+            [0,1,1,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [1,1,1,1,1,1,1]
+        ],//1
+        [
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,0,1,1,0,0,0],
+            [0,1,1,0,0,0,0],
+            [1,1,0,0,0,0,0],
+            [1,1,0,0,0,1,1],
+            [1,1,1,1,1,1,1]
+        ],//2
+        [
+            [1,1,1,1,1,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//3
+        [
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,1,0],
+            [0,0,1,1,1,1,0],
+            [0,1,1,0,1,1,0],
+            [1,1,0,0,1,1,0],
+            [1,1,1,1,1,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,1,1]
+        ],//4
+        [
+            [1,1,1,1,1,1,1],
+            [1,1,0,0,0,0,0],
+            [1,1,0,0,0,0,0],
+            [1,1,1,1,1,1,0],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//5
+        [
+            [0,0,0,0,1,1,0],
+            [0,0,1,1,0,0,0],
+            [0,1,1,0,0,0,0],
+            [1,1,0,0,0,0,0],
+            [1,1,0,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//6
+        [
+            [1,1,1,1,1,1,1],
+            [1,1,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,1,1,0,0,0],
+            [0,0,1,1,0,0,0],
+            [0,0,1,1,0,0,0],
+            [0,0,1,1,0,0,0]
+        ],//7
+        [
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//8
+        [
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,1,1,0,0,0,0]
+        ],//9
+        [
+            [0,0,0,0,0,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,0,0,0,0,0]
+        ]//:
+    ];
+
+var canvas = document.getElementById('canvas');
+
+if(canvas.getContext){
+    var cxt = canvas.getContext('2d');
+    //声明canvas的宽高
+    var H = 100,W = 700;
+    canvas.height = H;
+    canvas.width = W;
+    cxt.fillStyle = '#f00';
+    cxt.fillRect(10,10,50,50);
+
+    //存储时间数据
+    var data = [];
+    //存储运动的小球
+    var balls = [];
+    //设置粒子半径
+    var R = canvas.height/20-1;
+    (function(){
+        var temp = /(\d)(\d):(\d)(\d):(\d)(\d)/.exec(new Date());
+        //存储时间数字，由十位小时、个位小时、冒号、十位分钟、个位分钟、冒号、十位秒钟、个位秒钟这7个数字组成
+        data.push(temp[1],temp[2],10,temp[3],temp[4],10,temp[5],temp[6]);
+    })();
+
+    /*生成点阵数字*/
+    function renderDigit(index,num){
+        for(var i = 0; i < digit[num].length; i++){
+            for(var j = 0; j < digit[num][i].length; j++){
+                if(digit[num][i][j] == 1){
+                    cxt.beginPath();
+                    cxt.arc(14*(R+2)*index + j*2*(R+1)+(R+1),i*2*(R+1)+(R+1),R,0,2*Math.PI);
+                    cxt.closePath();
+                    cxt.fill();
+                }
+            }
+        }
+    }
+
+    /*更新时钟*/
+    function updateDigitTime(){
+        var changeNumArray = [];
+        var temp = /(\d)(\d):(\d)(\d):(\d)(\d)/.exec(new Date());
+        var NewData = [];
+        NewData.push(temp[1],temp[2],10,temp[3],temp[4],10,temp[5],temp[6]);
+        for(var i = data.length-1; i >=0 ; i--){
+            //时间发生变化
+            if(NewData[i] !== data[i]){
+                //将变化的数字值和在data数组中的索引存储在changeNumArray数组中
+                changeNumArray.push(i+'_'+(Number(data[i])+1)%10);
+            }
+        }
+        //增加小球
+        for(var i = 0; i< changeNumArray.length; i++){
+            addBalls.apply(this,changeNumArray[i].split('_'));
+        }
+        data = NewData.concat();
+    }
+
+    /*更新小球状态*/
+    function updateBalls(){
+        for(var i = 0; i < balls.length; i++){
+            balls[i].stepY += balls[i].disY;
+            balls[i].x += balls[i].stepX;
+            balls[i].y += balls[i].stepY;
+            if(balls[i].x > W + R || balls[i].y > H + R){
+                balls.splice(i,1);
+                i--;
+            }
+        }
+    }
+
+    /*增加要运动的小球*/
+    function addBalls(index,num){
+        var numArray = [1,2,3];
+        var colorArray =  ["#3BE","#09C","#A6C","#93C","#9C0","#690","#FB3","#F80","#F44","#C00"];
+        for(var i = 0; i < digit[num].length; i++){
+            for(var j = 0; j < digit[num][i].length; j++){
+                if(digit[num][i][j] == 1){
+                    var ball = {
+                        x:14*(R+2)*index + j*2*(R+1)+(R+1),
+                        y:i*2*(R+1)+(R+1),
+                        stepX:Math.floor(Math.random() * 4 -2),
+                        stepY:-2*numArray[Math.floor(Math.random()*numArray.length)],
+                        color:colorArray[Math.floor(Math.random()*colorArray.length)],
+                        disY:1
+                    };
+                    balls.push(ball);
+                }
+            }
+        }
+    }
+
+    /*渲染*/
+    function render(){
+        //重置画布宽度，达到清空画布的效果
+        canvas.height = 100;
+        //渲染时钟
+        for(var i = 0; i < data.length; i++){
+            renderDigit(i,data[i]);
+        }
+        //渲染小球
+        for(var i = 0; i < balls.length; i++){
+            cxt.beginPath();
+            cxt.arc(balls[i].x,balls[i].y,R,0,2*Math.PI);
+            cxt.fillStyle = balls[i].color;
+            cxt.closePath();
+            cxt.fill();
+        }
+    }
+
+    clearInterval(oTimer);
+    var oTimer = setInterval(function(){
+        //更新时钟
+        updateDigitTime();
+        //更新小球状态
+        updateBalls();
+        //渲染
+        render();
+    },50);
+}
+
+})();
+</script>
+      </div>
+
+    
+          <script type="text/javascript" charset="utf-8" src="/js/tagcloud.js"></script>
+         <script type="text/javascript" charset="utf-8" src="/js/tagcanvas.js"></script>
+           <div class="widget-wrap">
+        <h3 class="widget-title">Tag Cloud</h3>
+        <div id="myCanvasContainer" class="widget tagcloud">
+            <canvas width="250" height="250" id="resCanvas" style="width=100%">
+                <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Azkaban/" rel="tag">Azkaban</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Blog/" rel="tag">Blog</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ClickHouse/" rel="tag">ClickHouse</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ClouderaManager/" rel="tag">ClouderaManager</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ElSearch/" rel="tag">ElSearch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flink/" rel="tag">Flink</a><span class="tag-list-count">17</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flume/" rel="tag">Flume</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Git/" rel="tag">Git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/" rel="tag">Hadoop</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hbase/" rel="tag">Hbase</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hexo/" rel="tag">Hexo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hive/" rel="tag">Hive</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hue/" rel="tag">Hue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Impala/" rel="tag">Impala</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/" rel="tag">Java</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Jvm/" rel="tag">Jvm</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kafka/" rel="tag">Kafka</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kettle/" rel="tag">Kettle</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kudu/" rel="tag">Kudu</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/" rel="tag">Linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Livy/" rel="tag">Livy</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mysql/" rel="tag">Mysql</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Oozie/" rel="tag">Oozie</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redis/" rel="tag">Redis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scala/" rel="tag">Scala</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Shell/" rel="tag">Shell</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spark/" rel="tag">Spark</a><span class="tag-list-count">14</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Sqoop/" rel="tag">Sqoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web/" rel="tag">Web</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ZK/" rel="tag">ZK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E4%BB%93/" rel="tag">数仓</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/" rel="tag">数据分析</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%8F%AF%E8%A7%86%E5%8C%96/" rel="tag">数据可视化</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E6%B9%96/" rel="tag">数据湖</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" rel="tag">数据结构与算法</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag">机器学习</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BB%9F%E8%AE%A1/" rel="tag">统计</a><span class="tag-list-count">1</span></li></ul>
+            </canvas>
+        </div>
+    </div>
+    
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright" style=" text-align:center;">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HF</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">1.6m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">24:05</span>
+</div>
+
+  <!-- 网站运行时间的设置 -->
+<div class="run_time" style=" text-align:center;">
+  <span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+  <script>
+    var now = new Date(); 
+    function createtime() { 
+        var grt= new Date("07/23/2017 10:00:00");//此处修改你的建站时间或者网站上线时间 
+        now.setTime(now.getTime()+250); 
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days); 
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours); 
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum); 
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;} 
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum); 
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;} 
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 "; 
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒"; 
+    } 
+    setInterval("createtime()",250);
+  </script>
+</div>
+        
+<div class="busuanzi-count" style=" text-align:center;">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      我的第 <span class="busuanzi-value" id="busuanzi_value_site_uv"></span> 位朋友，
+    </span>
+  
+
+
+
+  
+    <span class="site-pv">
+      历经 <span class="busuanzi-value" id="busuanzi_value_site_pv"></span> 次回眸才与你相遇
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div class="moon-menu-item" onclick="back2bottom()">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div class="moon-menu-item" onclick="back2top()">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/clicklove.js"></script>
+<!-- 雪花特效 -->
+<script type="text/javascript" src="/js/jquery.js"></script>
+<script type="text/javascript" src="/js/jquery.min.js"></script>
+<script type="text/javascript" src="/js/snow.js"></script>

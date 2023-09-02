@@ -9,9 +9,7 @@ encrypt:
 enc_pwd:
 ---
 
-​					                               						Apache Flume
-
-# 一 概述
+## 一 概述
 
 ​	flume是一个高可用,高可靠的,分布式的海量日志采集,聚合和传输的软件.特别指的是数据流转的过程，或者说是数据搬运的过程。把数据从一个存储介质通过flume传递到另一个存储介质中。
 
@@ -19,7 +17,7 @@ enc_pwd:
 
 ​	flume支持定义各类数据发送方,用于收集各种类型数据,同时，Flume支持定制各种数据接受方，用于最终存储数据。一般的采集需求，通过对flume的简单配置即可实现。针对特殊场景也具备良好的自定义扩展能力。因此，flume可以适用于大部分的日常数据采集场景。
 
-# 二 运行机制
+## 二 运行机制
 
 ![img](/images/flume/flume运行机制.png)
 
@@ -56,7 +54,7 @@ enc_pwd:
 
 ![img](/images/flume/复杂架构.png)
 
-# 三 安装部署
+## 三 安装部署
 
 ​	上传安装包到数据源所在节点上然后解压  tar -zxvf apache-flume-1.8.0-bin.tar.gz然后进入flume的目录，修改conf下的flume-env.sh，在里面配置JAVA_HOME
 
@@ -77,7 +75,7 @@ flume开发步骤
  --name  agent进程名字 要跟采集方案中保持一致
 ```
 
-# 四 测试环境:
+## 四 测试环境:
 
 在conf目录下配置:vi   netcat-logger.conf
 
@@ -120,7 +118,7 @@ bin/flume-ng agent --conf conf --conf-file conf/netcat-logger.conf --name a1 -Df
 
 telnetanget-hostname  port   （telnet localhost 44444）
 
-# 五 采集目录到hdfs:
+## 五 采集目录到hdfs:
 
 需求:**服务器的某特定目录下，会不断产生新的文件，每当有新文件出现，就需要把文件采集到HDFS中去**
 
@@ -202,7 +200,7 @@ trasactionCapacity：每次最大可以从source中拿到或者送到sink中的e
 
 测试 :往源目录里存入文件
 
-# 六  采集文件到HDFS
+## 六  采集文件到HDFS
 
 需求:比如业务系统使用log4j生成的日志，日志内容不断增加，需要把追加到日志文件中的数据实时采集到hdfs
 
@@ -322,11 +320,9 @@ while true; do date >> /root/logs/test.log;done
 使用该脚本模拟数据实时变化的过程
 ```
 
+## 七 Flume的load-balance、failover
 
-
-# 七 Flume的load-balance、failover
-
-## 1 负载均衡
+### 1 负载均衡
 
 - 所谓的负载均衡 用于解决一个进程或者程序处理不了所有请求 多个进程一起处理的场景
 - 同一个请求只能交给一个进行处理 避免数据重复
@@ -523,9 +519,9 @@ bin/flume-ng agent -c conf -f conf/exec-avro.conf -n agent1 -Dflume.root.logger=
 
 第二节点与第三节点配置 同load-balance的
 
-# 八 flume拦截器
+## 八 flume拦截器
 
-## 1 静态拦截器 日志的采集与汇总
+### 1 静态拦截器 日志的采集与汇总
 
 需求:
 
@@ -677,7 +673,7 @@ bin/flume-ng agent -c conf -f conf/avro_source_hdfs_sink.conf -name a1 -Dflume.r
 
 bin/flume-ng agent -c conf -f conf/exec_source_avro_sink.conf -name a1 -Dflume.root.logger=DEBUG,console      
 
-## 2 自定义拦截器
+### 2 自定义拦截器
 
 拦截器简介:
 
@@ -1102,9 +1098,9 @@ a1.sinks.s1.hdfs.idleTimeout =60
 bin/flume-ng agent -c conf -f conf/spool-interceptor-hdfs.conf -n a1 -Dflume.root.logger=INFO,console
 ~~~
 
-#九 自定义组件
+## 九 自定义组件
 
-## 1flume自定义source
+### 1flume自定义source
 
 ### 说明:
 
@@ -1649,7 +1645,7 @@ a1.sinks.k1.channel = c1
 bin/flume-ng agent -c conf -fconf/mysqlsource.conf -n a1 -Dflume.root.logger=INFO,console
 ~~~
 
-## 2flume自定义sink
+### 2flume自定义sink
 
 ###说明:
 

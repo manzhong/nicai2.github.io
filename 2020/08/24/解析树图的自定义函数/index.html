@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":false,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="一 解析树图 采用hive 的udf或udtf构建解析树图，当树图不大的时候可以，但是当树图很大时，效率不高，因为它需要将整个树加载到内存中。  对于复杂的树形结构分析，建议使用更专业的图处理工具或框架，如Apache Giraph、Apache Flink的Gelly库或Spark的GraphX库等。这些工具提供了更强大和高效的图算法实现。  二 UDF ​ 这种适合处理树图不大的数据结构，需要">
+<meta property="og:type" content="article">
+<meta property="og:title" content="解析树图的自定义函数">
+<meta property="og:url" content="http://example.com/2020/08/24/%E8%A7%A3%E6%9E%90%E6%A0%91%E5%9B%BE%E7%9A%84%E8%87%AA%E5%AE%9A%E4%B9%89%E5%87%BD%E6%95%B0/index.html">
+<meta property="og:site_name" content="春雨里洗过的太阳">
+<meta property="og:description" content="一 解析树图 采用hive 的udf或udtf构建解析树图，当树图不大的时候可以，但是当树图很大时，效率不高，因为它需要将整个树加载到内存中。  对于复杂的树形结构分析，建议使用更专业的图处理工具或框架，如Apache Giraph、Apache Flink的Gelly库或Spark的GraphX库等。这些工具提供了更强大和高效的图算法实现。  二 UDF ​ 这种适合处理树图不大的数据结构，需要">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-08-24T14:20:09.000Z">
+<meta property="article:modified_time" content="2024-05-23T18:42:37.520Z">
+<meta property="article:author" content="HF">
+<meta property="article:tag" content="Hive">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2020/08/24/%E8%A7%A3%E6%9E%90%E6%A0%91%E5%9B%BE%E7%9A%84%E8%87%AA%E5%AE%9A%E4%B9%89%E5%87%BD%E6%95%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<link rel="stylesheet" type="text/css" href="/css/injector.css" />
+  <title>解析树图的自定义函数 | 春雨里洗过的太阳</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">春雨里洗过的太阳</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">世间所有的相遇，都是久别重逢</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/08/24/%E8%A7%A3%E6%9E%90%E6%A0%91%E5%9B%BE%E7%9A%84%E8%87%AA%E5%AE%9A%E4%B9%89%E5%87%BD%E6%95%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/hexo.jpg">
+      <meta itemprop="name" content="HF">
+      <meta itemprop="description" content="第二名就是头号输家">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="春雨里洗过的太阳">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          解析树图的自定义函数
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-08-24 22:20:09" itemprop="dateCreated datePublished" datetime="2020-08-24T22:20:09+08:00">2020-08-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-05-24 02:42:37" itemprop="dateModified" datetime="2024-05-24T02:42:37+08:00">2024-05-24</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Hive/" itemprop="url" rel="index"><span itemprop="name">Hive</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>10k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>9 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="一-解析树图"><a href="#一-解析树图" class="headerlink" title="一 解析树图"></a>一 解析树图</h2><p>采用hive 的udf或udtf构建解析树图，当树图不大的时候可以，但是当树图很大时，效率不高，因为它需要将整个树加载到内存中。</p>
+<p>对于复杂的树形结构分析，建议使用更专业的图处理工具或框架，如Apache Giraph、Apache Flink的Gelly库或Spark的GraphX库等。这些工具提供了更强大和高效的图算法实现。</p>
+<h2 id="二-UDF"><a href="#二-UDF" class="headerlink" title="二 UDF"></a>二 UDF</h2><p>​    这种适合处理树图不大的数据结构，需要将整个关系整合成一个map，效率不高。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.lx.hive.udf;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.hive.ql.exec.UDF;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.io.Text;</span><br><span class="line"><span class="keyword">import</span> org.codehaus.groovy.util.ListHashMap;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 输入整颗树 输出树的所有路径 udf</span></span><br><span class="line"><span class="comment">//SELECT explode(tree_path(map(</span></span><br><span class="line"><span class="comment">//        &#x27;A&#x27;, null,</span></span><br><span class="line"><span class="comment">//        &#x27;B&#x27;, &#x27;A&#x27;,</span></span><br><span class="line"><span class="comment">//        &#x27;C&#x27;, &#x27;A&#x27;,</span></span><br><span class="line"><span class="comment">//        &#x27;D&#x27;, &#x27;B&#x27;,</span></span><br><span class="line"><span class="comment">//        &#x27;E&#x27;, &#x27;B&#x27;,</span></span><br><span class="line"><span class="comment">//        &#x27;F&#x27;, &#x27;C&#x27;</span></span><br><span class="line"><span class="comment">//        ))) AS path;</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TreePathUDF</span> <span class="keyword">extends</span> <span class="title">UDF</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> List&lt;Text&gt; <span class="title">evaluate</span><span class="params">(Map&lt;String, String&gt; tree)</span> </span>&#123;</span><br><span class="line">        List&lt;Text&gt; paths = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        buildPaths(<span class="string">&quot;&quot;</span>, tree, paths);</span><br><span class="line">        <span class="keyword">return</span> paths;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">buildPaths</span><span class="params">(String currentPath, Map&lt;String, String&gt; tree, List&lt;Text&gt; paths)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (Map.Entry&lt;String, String&gt; entry : tree.entrySet()) &#123;</span><br><span class="line">            String nodeId = entry.getKey();</span><br><span class="line">            String parentId = entry.getValue();</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (parentId == <span class="keyword">null</span> || <span class="string">&quot;&quot;</span>.equals(parentId)) &#123; <span class="comment">// Root node</span></span><br><span class="line">                buildPathsFromNode(nodeId, <span class="string">&quot;&quot;</span>, tree, paths);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">buildPathsFromNode</span><span class="params">(String nodeId, String currentPath, Map&lt;String, String&gt; tree, List&lt;Text&gt; paths)</span> </span>&#123;</span><br><span class="line">        String newPath = currentPath.isEmpty() ? nodeId : currentPath + <span class="string">&quot;-&gt;&quot;</span> + nodeId;</span><br><span class="line">        paths.add(<span class="keyword">new</span> Text(newPath));</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (Map.Entry&lt;String, String&gt; entry : tree.entrySet()) &#123;</span><br><span class="line">            <span class="keyword">if</span> (entry.getValue() != <span class="keyword">null</span> &amp;&amp; entry.getValue().equals(nodeId)) &#123;</span><br><span class="line">                buildPathsFromNode(entry.getKey(), newPath, tree, paths);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">	      <span class="comment">// hashmap的k不可重复，故使用IdentityHashMap 这里内部比较k比较的是存储地址，不是值</span></span><br><span class="line">        <span class="comment">// 上面udf 传入的map 的k需要全部 new String() 功能未摘录进来，自行处理</span></span><br><span class="line">        Map&lt;String, String&gt; tree = <span class="keyword">new</span> IdentityHashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        tree.put(<span class="string">&quot;1&quot;</span>, <span class="string">&quot;&quot;</span>);</span><br><span class="line">        tree.put(<span class="string">&quot;2&quot;</span>, <span class="string">&quot;&quot;</span>);</span><br><span class="line">        tree.put(<span class="keyword">new</span> String(<span class="string">&quot;3&quot;</span>), <span class="string">&quot;1&quot;</span>);</span><br><span class="line">        tree.put(<span class="keyword">new</span> String(<span class="string">&quot;3&quot;</span>), <span class="string">&quot;2&quot;</span>);</span><br><span class="line">        tree.put(<span class="string">&quot;4&quot;</span>, <span class="string">&quot;1&quot;</span>);</span><br><span class="line">        tree.put(<span class="string">&quot;5&quot;</span>, <span class="string">&quot;2&quot;</span>);</span><br><span class="line">        tree.put(<span class="keyword">new</span> String(<span class="string">&quot;7&quot;</span>), <span class="string">&quot;3&quot;</span>);</span><br><span class="line">        tree.put(<span class="string">&quot;8&quot;</span>, <span class="string">&quot;3&quot;</span>);</span><br><span class="line">        tree.put(<span class="keyword">new</span> String(<span class="string">&quot;7&quot;</span>), <span class="string">&quot;5&quot;</span>);</span><br><span class="line">        tree.put(<span class="keyword">new</span> String(<span class="string">&quot;7&quot;</span>), <span class="string">&quot;4&quot;</span>);</span><br><span class="line">        tree.put(<span class="string">&quot;11&quot;</span>, <span class="string">&quot;6&quot;</span>);</span><br><span class="line">        tree.put(<span class="string">&quot;12&quot;</span>, <span class="string">&quot;6&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//        for (Map.Entry&lt;String, String&gt; entry : tree.entrySet())&#123;</span></span><br><span class="line"><span class="comment">//            System.out.println(entry.getKey() + &quot; &quot; + entry.getValue());</span></span><br><span class="line"><span class="comment">//        &#125;</span></span><br><span class="line"></span><br><span class="line">        List&lt;Text&gt; evaluate = evaluate(tree);</span><br><span class="line">        <span class="keyword">for</span> (Text text : evaluate) &#123;</span><br><span class="line">            System.out.println(text);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="三-UDTF"><a href="#三-UDTF" class="headerlink" title="三 UDTF"></a>三 UDTF</h2><p>在下面的代码中，我们假设输入数据是一个包含<code>id</code>和<code>parent_id</code>字段的结构体。<code>process</code>方法会读取每一行输入，构建子节点映射（<code>childrenMap</code>），其中键是父节点ID，值是其所有子节点的列表。然后，它调用<code>generatePaths</code>方法来递归地生成所有从根到叶的路径，并使用<code>forward</code>方法将每条路径作为输出。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.lx.hive.udf;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.hive.ql.exec.UDFArgumentException;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.hive.ql.metadata.HiveException;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.hive.ql.udf.generic.GenericUDTF;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.hive.serde2.objectinspector.*;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"><span class="keyword">import</span> java.util.Stack;</span><br><span class="line"><span class="comment">//ADD JAR /path/to/your/compiled/TreePathUDTF.jar;</span></span><br><span class="line"><span class="comment">//        CREATE TEMPORARY FUNCTION tree_path_udtf AS &#x27;your.package.TreePathUDTF&#x27;;</span></span><br><span class="line"><span class="comment">//SELECT path FROM your_table LATERAL VIEW tree_path_udtf(id, parent_id) paths AS path;</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TreePathUDTF</span> <span class="keyword">extends</span> <span class="title">GenericUDTF</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> StructObjectInspector <span class="title">initialize</span><span class="params">(ObjectInspector[] args)</span> <span class="keyword">throws</span> UDFArgumentException </span>&#123;</span><br><span class="line">        <span class="comment">// Assume args[0] is the id and args[1] is the parent_id</span></span><br><span class="line">        <span class="keyword">if</span> (args.length != <span class="number">2</span> || args[<span class="number">0</span>].getCategory() != ObjectInspector.Category.PRIMITIVE</span><br><span class="line">                || args[<span class="number">1</span>].getCategory() != ObjectInspector.Category.PRIMITIVE) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> UDFArgumentException(<span class="string">&quot;TreePathUDTF requires two primitive arguments: id and parent_id.&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Define the output schema</span></span><br><span class="line">        List&lt;String&gt; fieldNames = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        List&lt;ObjectInspector&gt; fieldTypes = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        fieldNames.add(<span class="string">&quot;path&quot;</span>);</span><br><span class="line">        fieldTypes.add(PrimitiveObjectInspectorFactory.javaStringObjectInspector);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> ObjectInspectorFactory.getStandardStructObjectInspector(</span><br><span class="line">                fieldNames, fieldTypes</span><br><span class="line">        );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">process</span><span class="params">(Object[] args)</span> <span class="keyword">throws</span> HiveException </span>&#123;</span><br><span class="line">        <span class="comment">// Build the tree structure in memory</span></span><br><span class="line">        Map&lt;String, List&lt;String&gt;&gt; tree = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">        String currentId = args[<span class="number">0</span>].toString();</span><br><span class="line">        String parentId = args[<span class="number">1</span>] == <span class="keyword">null</span> ? <span class="keyword">null</span> : args[<span class="number">1</span>].toString();</span><br><span class="line"></span><br><span class="line">        tree.putIfAbsent(parentId, <span class="keyword">new</span> ArrayList&lt;&gt;());</span><br><span class="line">        tree.get(parentId).add(currentId);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Generate all paths using DFS</span></span><br><span class="line">        generatePaths(tree, <span class="keyword">null</span>, <span class="keyword">new</span> StringBuilder(), <span class="keyword">new</span> Stack&lt;&gt;());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">generatePaths</span><span class="params">(Map&lt;String, List&lt;String&gt;&gt; tree, String currentNode, StringBuilder pathBuilder, Stack&lt;String&gt; pathStack)</span> <span class="keyword">throws</span> HiveException </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (currentNode != <span class="keyword">null</span>) &#123;</span><br><span class="line">            pathStack.push(currentNode);</span><br><span class="line">            pathBuilder.append(currentNode);</span><br><span class="line">            <span class="keyword">if</span> (!pathBuilder.toString().isEmpty()) &#123;</span><br><span class="line">                pathBuilder.append(<span class="string">&quot;-&gt;&quot;</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// If this is a leaf node, output the path</span></span><br><span class="line">        <span class="keyword">if</span> (!tree.containsKey(currentNode) || tree.get(currentNode).isEmpty()) &#123;</span><br><span class="line">            String path = pathBuilder.toString();</span><br><span class="line">            <span class="comment">// Remove the last &quot;-&gt;&quot; if exists</span></span><br><span class="line">            <span class="keyword">if</span> (path.endsWith(<span class="string">&quot;-&gt;&quot;</span>)) &#123;</span><br><span class="line">                path = path.substring(<span class="number">0</span>, path.length() - <span class="number">2</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            forward(path);</span><br><span class="line">            pathStack.pop();</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Recursively process children</span></span><br><span class="line">        <span class="keyword">for</span> (String child : tree.get(currentNode)) &#123;</span><br><span class="line">            generatePaths(tree, child, pathBuilder, pathStack);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (currentNode != <span class="keyword">null</span>) &#123;</span><br><span class="line">            pathBuilder.setLength(pathBuilder.length() - currentNode.length() - <span class="number">2</span>); <span class="comment">// Remove the current node and &quot;-&gt;&quot; from the path</span></span><br><span class="line">            pathStack.pop();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">close</span><span class="params">()</span> <span class="keyword">throws</span> HiveException </span>&#123;</span><br><span class="line">        <span class="comment">// Clean up resources if needed</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="三-python"><a href="#三-python" class="headerlink" title="三 python"></a>三 python</h2><p>​    Hive原生并不支持Python UDF直接返回多行（即UDTF的功能），这通常需要使用Java或其他支持的语言来实现。不过，我们可以通过一些变通方法，在Python UDF中返回一种结构化格式（如JSON或CSV格式的字符串），然后在Hive查询中解析这些格式来获得多行输出。</p>
+<p>​    当时测试写了三种方案，上面u d t f测试效果最好，故下面的并未完成测试。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># find_paths.py  </span></span><br><span class="line"><span class="keyword">import</span> sys  </span><br><span class="line">  </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">find_all_paths</span>(<span class="params">edges, start_node</span>):</span>  </span><br><span class="line">    paths = []  </span><br><span class="line">    stack = [(start_node, [start_node])]  </span><br><span class="line">    <span class="keyword">while</span> stack:  </span><br><span class="line">        node, path = stack.pop()  </span><br><span class="line">        <span class="keyword">if</span> node <span class="keyword">is</span> <span class="literal">None</span>:  <span class="comment"># Sentinel value indicating a path end  </span></span><br><span class="line">            paths.append(path[:<span class="number">-1</span>])  <span class="comment"># Exclude the sentinel from the path  </span></span><br><span class="line">            <span class="keyword">continue</span>  </span><br><span class="line">        paths.append(path)  </span><br><span class="line">        <span class="keyword">for</span> child <span class="keyword">in</span> edges.get(node, []):  </span><br><span class="line">            stack.append((child, path + [child]))  </span><br><span class="line">        stack.append((<span class="literal">None</span>, path))  <span class="comment"># Add a sentinel to mark the path end  </span></span><br><span class="line">    <span class="keyword">return</span> paths  </span><br><span class="line">  </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span>():</span>  </span><br><span class="line">    edges = &#123;&#125;  </span><br><span class="line">    <span class="keyword">for</span> line <span class="keyword">in</span> sys.stdin:  </span><br><span class="line">        parent, child = line.strip().split(<span class="string">&#x27;\t&#x27;</span>)  </span><br><span class="line">        <span class="keyword">if</span> parent == <span class="string">&#x27;NULL&#x27;</span>:  <span class="comment"># Assuming the root node&#x27;s parent is marked as &#x27;NULL&#x27;  </span></span><br><span class="line">            parent = <span class="literal">None</span>  </span><br><span class="line">        edges.setdefault(parent, []).append(child)  </span><br><span class="line">      </span><br><span class="line">    all_paths = find_all_paths(edges, <span class="literal">None</span>)  <span class="comment"># Assuming the tree starts from a root node with no parent (None)  </span></span><br><span class="line">    <span class="keyword">for</span> path <span class="keyword">in</span> all_paths:  </span><br><span class="line">        print(<span class="string">&#x27;-&gt;&#x27;</span>.join(path))  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:  </span><br><span class="line">    main()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">ADD FILE /path/to/find_paths.py;  -- 替换为你的Python脚本的实际路径  </span><br><span class="line">  </span><br><span class="line">SELECT TRANSFORM (parent, child)  </span><br><span class="line">USING <span class="string">&#x27;python find_paths.py&#x27;</span>  </span><br><span class="line">AS path  </span><br><span class="line">FROM tree_data;</span><br><span class="line">------------------------------------------===================================<span class="number">2</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># tree_paths_udf.py  </span></span><br><span class="line"><span class="keyword">import</span> json  </span><br><span class="line">  </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">find_all_paths</span>(<span class="params">edges, start_node=None</span>):</span>  </span><br><span class="line">    <span class="string">&quot;&quot;&quot;  </span></span><br><span class="line"><span class="string">    Find all paths from the start_node to the leaves.  </span></span><br><span class="line"><span class="string">    If start_node is None, it starts from the root nodes (nodes without parent).  </span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span>  </span><br><span class="line">    <span class="comment"># Build adjacency list representation of the tree  </span></span><br><span class="line">    adjacency_list = &#123;&#125;  </span><br><span class="line">    <span class="keyword">for</span> edge <span class="keyword">in</span> edges:  </span><br><span class="line">        parent, child = edge[<span class="string">&#x27;parent&#x27;</span>], edge[<span class="string">&#x27;child&#x27;</span>]  </span><br><span class="line">        adjacency_list.setdefault(parent, []).append(child)  </span><br><span class="line">      </span><br><span class="line">    <span class="comment"># DFS to find all paths  </span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">dfs</span>(<span class="params">node, path, paths</span>):</span>  </span><br><span class="line">        path.append(node)  </span><br><span class="line">        <span class="keyword">if</span> node <span class="keyword">not</span> <span class="keyword">in</span> adjacency_list:  </span><br><span class="line">            paths.append(list(path))  </span><br><span class="line">        <span class="keyword">else</span>:  </span><br><span class="line">            <span class="keyword">for</span> child <span class="keyword">in</span> adjacency_list[node]:  </span><br><span class="line">                dfs(child, path, paths)  </span><br><span class="line">        path.pop()  </span><br><span class="line">      </span><br><span class="line">    paths = []  </span><br><span class="line">    <span class="keyword">if</span> start_node:  </span><br><span class="line">        dfs(start_node, [], paths)  </span><br><span class="line">    <span class="keyword">else</span>:  </span><br><span class="line">        <span class="comment"># If no start_node is specified, start from all root nodes  </span></span><br><span class="line">        root_nodes = set(adjacency_list.keys()) - set(child <span class="keyword">for</span> children <span class="keyword">in</span> adjacency_list.values() <span class="keyword">for</span> child <span class="keyword">in</span> children)  </span><br><span class="line">        <span class="keyword">for</span> root <span class="keyword">in</span> root_nodes:  </span><br><span class="line">            dfs(root, [], paths)  </span><br><span class="line">      </span><br><span class="line">    <span class="keyword">return</span> json.dumps(paths)  </span><br><span class="line">  </span><br><span class="line"><span class="comment"># This function will be called by Hive  </span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">tree_paths</span>(<span class="params">edges_json</span>):</span>  </span><br><span class="line">    edges = json.loads(edges_json)  </span><br><span class="line">    <span class="keyword">return</span> find_all_paths(edges)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">ADD FILE hdfs:///path/to/your/tree_paths_udf.zip;  -- 或者上传的Python可执行文件路径  </span><br><span class="line">  </span><br><span class="line">CREATE TEMPORARY FUNCTION tree_paths_udf AS <span class="string">&#x27;tree_paths&#x27;</span>  </span><br><span class="line">USING <span class="string">&#x27;python tree_paths_udf.zip&#x27;</span>;  -- 根据你的上传文件类型调整这里</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">WITH edges AS (  </span><br><span class="line">    SELECT CONCAT(<span class="string">&#x27;&#123;&quot;parent&quot;: &quot;&#x27;</span>, parent, <span class="string">&#x27;&quot;, &quot;child&quot;: &quot;&#x27;</span>, child, <span class="string">&#x27;&quot;&#125;&#x27;</span>) AS edge_json  </span><br><span class="line">    FROM parent_child_relations  </span><br><span class="line">)  </span><br><span class="line">SELECT   </span><br><span class="line">    path  </span><br><span class="line">FROM (  </span><br><span class="line">    SELECT   </span><br><span class="line">        explode(split(regexp_replace(tree_paths_udf(concat(<span class="string">&#x27;[&#x27;</span>, collect_list(edge_json), <span class="string">&#x27;]&#x27;</span>)), <span class="string">&#x27;\\\\&quot;&#x27;</span>, <span class="string">&#x27;&quot;&#x27;</span>), <span class="string">&#x27;,&#x27;</span>)) AS path_json  </span><br><span class="line">    FROM edges  </span><br><span class="line">) t  </span><br><span class="line">LATERAL VIEW json_tuple(path_json, <span class="string">&#x27;value&#x27;</span>) exploded_table AS path;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">============================================================</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> sys  </span><br><span class="line">  </span><br><span class="line"><span class="comment"># 定义一个全局变量来存储树结构  </span></span><br><span class="line">tree = &#123;&#125;  </span><br><span class="line">  </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">build_tree</span>(<span class="params">parent_id, child_id</span>):</span>  </span><br><span class="line">    <span class="string">&quot;&quot;&quot;  </span></span><br><span class="line"><span class="string">    构建树形结构  </span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span>  </span><br><span class="line">    <span class="keyword">if</span> parent_id <span class="keyword">not</span> <span class="keyword">in</span> tree:  </span><br><span class="line">        tree[parent_id] = []  </span><br><span class="line">    tree[parent_id].append(child_id)  </span><br><span class="line">  </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">find_all_paths</span>(<span class="params">node, path=[]</span>):</span>  </span><br><span class="line">    <span class="string">&quot;&quot;&quot;  </span></span><br><span class="line"><span class="string">    递归查找所有从根到叶的路径  </span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span>  </span><br><span class="line">    path = path + [node]  </span><br><span class="line">    <span class="keyword">if</span> node <span class="keyword">not</span> <span class="keyword">in</span> tree:  </span><br><span class="line">        <span class="keyword">yield</span> path  </span><br><span class="line">    <span class="keyword">for</span> child <span class="keyword">in</span> tree.get(node, []):  </span><br><span class="line">        <span class="keyword">yield</span> <span class="keyword">from</span> find_all_paths(child, path)  </span><br><span class="line">  </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span>():</span>  </span><br><span class="line">    <span class="string">&quot;&quot;&quot;  </span></span><br><span class="line"><span class="string">    主函数，读取标准输入并输出所有路径  </span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span>  </span><br><span class="line">    <span class="keyword">for</span> line <span class="keyword">in</span> sys.stdin:  </span><br><span class="line">        parent_id, child_id = line.strip().split()  </span><br><span class="line">        build_tree(parent_id, child_id)  </span><br><span class="line">      </span><br><span class="line">    <span class="comment"># 假设根节点的parent_id为&#x27;root&#x27;或者可以指定一个特定的起始节点  </span></span><br><span class="line">    root_node = <span class="string">&#x27;root&#x27;</span>  </span><br><span class="line">    <span class="keyword">for</span> path <span class="keyword">in</span> find_all_paths(root_node):  </span><br><span class="line">        print(<span class="string">&#x27;-&gt;&#x27;</span>.join(path))  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:  </span><br><span class="line">    main()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">ADD FILE /path/to/find_paths.py;  </span><br><span class="line">  </span><br><span class="line">CREATE TABLE all_paths AS  </span><br><span class="line">SELECT TRANSFORM (parent_id, child_id)  </span><br><span class="line">USING <span class="string">&#x27;python find_paths.py&#x27;</span>  </span><br><span class="line">AS path  </span><br><span class="line">FROM parent_child_relations;</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>HF
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://example.com/2020/08/24/%E8%A7%A3%E6%9E%90%E6%A0%91%E5%9B%BE%E7%9A%84%E8%87%AA%E5%AE%9A%E4%B9%89%E5%87%BD%E6%95%B0/" title="解析树图的自定义函数">http://example.com/2020/08/24/解析树图的自定义函数/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Hive/" rel="tag"># Hive</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/08/20/spark%E5%8E%9F%E7%90%86%E6%B5%85%E6%9E%90/" rel="prev" title="Spark原理浅析">
+      <i class="fa fa-chevron-left"></i> Spark原理浅析
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/09/12/Flink%E7%9A%84%E5%9F%BA%E7%A1%80/" rel="next" title="Flink的基础">
+      Flink的基础 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80-%E8%A7%A3%E6%9E%90%E6%A0%91%E5%9B%BE"><span class="nav-number">1.</span> <span class="nav-text">一 解析树图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C-UDF"><span class="nav-number">2.</span> <span class="nav-text">二 UDF</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89-UDTF"><span class="nav-number">3.</span> <span class="nav-text">三 UDTF</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89-python"><span class="nav-number">4.</span> <span class="nav-text">三 python</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="HF"
+      src="/images/hexo.jpg">
+  <p class="site-author-name" itemprop="name">HF</p>
+  <div class="site-description" itemprop="description">第二名就是头号输家</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">97</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-CN" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      推荐阅读
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="http://www.54tianzhisheng.cn/tags/Flink/" title="http:&#x2F;&#x2F;www.54tianzhisheng.cn&#x2F;tags&#x2F;Flink&#x2F;" rel="noopener" target="_blank">Flink</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://nginxconfig.io/" title="https:&#x2F;&#x2F;nginxconfig.io&#x2F;" rel="noopener" target="_blank">Nginxconfig</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://linux.51yip.com/" title="http:&#x2F;&#x2F;linux.51yip.com&#x2F;" rel="noopener" target="_blank">Linux命令手册</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://echarts.baidu.com/index.html" title="https:&#x2F;&#x2F;echarts.baidu.com&#x2F;index.html" rel="noopener" target="_blank">echarts可视化库</a>
+        </li>
+    </ul>
+  </div>
+<div style="">
+  <canvas id="canvas" style="width:60%;">当前浏览器不支持canvas，请更换浏览器后再试</canvas>
+</div>
+<script>
+(function(){
+
+   var digit=
+    [
+        [
+            [0,0,1,1,1,0,0],
+            [0,1,1,0,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,0,1,1,0],
+            [0,0,1,1,1,0,0]
+        ],//0
+        [
+            [0,0,0,1,1,0,0],
+            [0,1,1,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [1,1,1,1,1,1,1]
+        ],//1
+        [
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,0,1,1,0,0,0],
+            [0,1,1,0,0,0,0],
+            [1,1,0,0,0,0,0],
+            [1,1,0,0,0,1,1],
+            [1,1,1,1,1,1,1]
+        ],//2
+        [
+            [1,1,1,1,1,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//3
+        [
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,1,0],
+            [0,0,1,1,1,1,0],
+            [0,1,1,0,1,1,0],
+            [1,1,0,0,1,1,0],
+            [1,1,1,1,1,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,1,1]
+        ],//4
+        [
+            [1,1,1,1,1,1,1],
+            [1,1,0,0,0,0,0],
+            [1,1,0,0,0,0,0],
+            [1,1,1,1,1,1,0],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//5
+        [
+            [0,0,0,0,1,1,0],
+            [0,0,1,1,0,0,0],
+            [0,1,1,0,0,0,0],
+            [1,1,0,0,0,0,0],
+            [1,1,0,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//6
+        [
+            [1,1,1,1,1,1,1],
+            [1,1,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,1,1,0,0,0],
+            [0,0,1,1,0,0,0],
+            [0,0,1,1,0,0,0],
+            [0,0,1,1,0,0,0]
+        ],//7
+        [
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//8
+        [
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,1,1,0,0,0,0]
+        ],//9
+        [
+            [0,0,0,0,0,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,0,0,0,0,0]
+        ]//:
+    ];
+
+var canvas = document.getElementById('canvas');
+
+if(canvas.getContext){
+    var cxt = canvas.getContext('2d');
+    //声明canvas的宽高
+    var H = 100,W = 700;
+    canvas.height = H;
+    canvas.width = W;
+    cxt.fillStyle = '#f00';
+    cxt.fillRect(10,10,50,50);
+
+    //存储时间数据
+    var data = [];
+    //存储运动的小球
+    var balls = [];
+    //设置粒子半径
+    var R = canvas.height/20-1;
+    (function(){
+        var temp = /(\d)(\d):(\d)(\d):(\d)(\d)/.exec(new Date());
+        //存储时间数字，由十位小时、个位小时、冒号、十位分钟、个位分钟、冒号、十位秒钟、个位秒钟这7个数字组成
+        data.push(temp[1],temp[2],10,temp[3],temp[4],10,temp[5],temp[6]);
+    })();
+
+    /*生成点阵数字*/
+    function renderDigit(index,num){
+        for(var i = 0; i < digit[num].length; i++){
+            for(var j = 0; j < digit[num][i].length; j++){
+                if(digit[num][i][j] == 1){
+                    cxt.beginPath();
+                    cxt.arc(14*(R+2)*index + j*2*(R+1)+(R+1),i*2*(R+1)+(R+1),R,0,2*Math.PI);
+                    cxt.closePath();
+                    cxt.fill();
+                }
+            }
+        }
+    }
+
+    /*更新时钟*/
+    function updateDigitTime(){
+        var changeNumArray = [];
+        var temp = /(\d)(\d):(\d)(\d):(\d)(\d)/.exec(new Date());
+        var NewData = [];
+        NewData.push(temp[1],temp[2],10,temp[3],temp[4],10,temp[5],temp[6]);
+        for(var i = data.length-1; i >=0 ; i--){
+            //时间发生变化
+            if(NewData[i] !== data[i]){
+                //将变化的数字值和在data数组中的索引存储在changeNumArray数组中
+                changeNumArray.push(i+'_'+(Number(data[i])+1)%10);
+            }
+        }
+        //增加小球
+        for(var i = 0; i< changeNumArray.length; i++){
+            addBalls.apply(this,changeNumArray[i].split('_'));
+        }
+        data = NewData.concat();
+    }
+
+    /*更新小球状态*/
+    function updateBalls(){
+        for(var i = 0; i < balls.length; i++){
+            balls[i].stepY += balls[i].disY;
+            balls[i].x += balls[i].stepX;
+            balls[i].y += balls[i].stepY;
+            if(balls[i].x > W + R || balls[i].y > H + R){
+                balls.splice(i,1);
+                i--;
+            }
+        }
+    }
+
+    /*增加要运动的小球*/
+    function addBalls(index,num){
+        var numArray = [1,2,3];
+        var colorArray =  ["#3BE","#09C","#A6C","#93C","#9C0","#690","#FB3","#F80","#F44","#C00"];
+        for(var i = 0; i < digit[num].length; i++){
+            for(var j = 0; j < digit[num][i].length; j++){
+                if(digit[num][i][j] == 1){
+                    var ball = {
+                        x:14*(R+2)*index + j*2*(R+1)+(R+1),
+                        y:i*2*(R+1)+(R+1),
+                        stepX:Math.floor(Math.random() * 4 -2),
+                        stepY:-2*numArray[Math.floor(Math.random()*numArray.length)],
+                        color:colorArray[Math.floor(Math.random()*colorArray.length)],
+                        disY:1
+                    };
+                    balls.push(ball);
+                }
+            }
+        }
+    }
+
+    /*渲染*/
+    function render(){
+        //重置画布宽度，达到清空画布的效果
+        canvas.height = 100;
+        //渲染时钟
+        for(var i = 0; i < data.length; i++){
+            renderDigit(i,data[i]);
+        }
+        //渲染小球
+        for(var i = 0; i < balls.length; i++){
+            cxt.beginPath();
+            cxt.arc(balls[i].x,balls[i].y,R,0,2*Math.PI);
+            cxt.fillStyle = balls[i].color;
+            cxt.closePath();
+            cxt.fill();
+        }
+    }
+
+    clearInterval(oTimer);
+    var oTimer = setInterval(function(){
+        //更新时钟
+        updateDigitTime();
+        //更新小球状态
+        updateBalls();
+        //渲染
+        render();
+    },50);
+}
+
+})();
+</script>
+      </div>
+
+    
+          <script type="text/javascript" charset="utf-8" src="/js/tagcloud.js"></script>
+         <script type="text/javascript" charset="utf-8" src="/js/tagcanvas.js"></script>
+           <div class="widget-wrap">
+        <h3 class="widget-title">Tag Cloud</h3>
+        <div id="myCanvasContainer" class="widget tagcloud">
+            <canvas width="250" height="250" id="resCanvas" style="width=100%">
+                <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ClickHouse/" rel="tag">ClickHouse</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ElSearch/" rel="tag">ElSearch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flink/" rel="tag">Flink</a><span class="tag-list-count">17</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flume/" rel="tag">Flume</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Git/" rel="tag">Git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/" rel="tag">Hadoop</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hbase/" rel="tag">Hbase</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hive/" rel="tag">Hive</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Impala/" rel="tag">Impala</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kafka/" rel="tag">Kafka</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/" rel="tag">Linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Livy/" rel="tag">Livy</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mysql/" rel="tag">Mysql</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Oozie/" rel="tag">Oozie</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redis/" rel="tag">Redis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scala/" rel="tag">Scala</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Shell/" rel="tag">Shell</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spark/" rel="tag">Spark</a><span class="tag-list-count">14</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Sqoop/" rel="tag">Sqoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ZK/" rel="tag">ZK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8E%86%E5%8F%B2/" rel="tag">历史</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E4%BB%93/" rel="tag">数仓</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/" rel="tag">数据分析</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%8F%AF%E8%A7%86%E5%8C%96/" rel="tag">数据可视化</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" rel="tag">数据结构与算法</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag">机器学习</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BB%8F%E6%B5%8E%E4%B8%8E%E6%8A%95%E8%B5%84/" rel="tag">经济与投资</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BB%9F%E8%AE%A1/" rel="tag">统计</a><span class="tag-list-count">1</span></li></ul>
+            </canvas>
+        </div>
+    </div>
+    
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright" style=" text-align:center;">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HF</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">1.5m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">23:17</span>
+</div>
+
+  <!-- 网站运行时间的设置 -->
+<div class="run_time" style=" text-align:center;">
+  <span id="timeDate">载入天数...</span><span id="times">载入时分秒...</span>
+  <script>
+    var now = new Date(); 
+    function createtime() { 
+        var grt= new Date("07/23/2017 10:00:00");//此处修改你的建站时间或者网站上线时间 
+        now.setTime(now.getTime()+250); 
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days); 
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours); 
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum); 
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;} 
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum); 
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;} 
+        document.getElementById("timeDate").innerHTML = "本站已安全运行 "+dnum+" 天 "; 
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒"; 
+    } 
+    setInterval("createtime()",250);
+  </script>
+</div>
+        
+<div class="busuanzi-count" style=" text-align:center;">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      我的第 <span class="busuanzi-value" id="busuanzi_value_site_uv"></span> 位朋友，
+    </span>
+  
+
+
+
+  
+    <span class="site-pv">
+      历经 <span class="busuanzi-value" id="busuanzi_value_site_pv"></span> 次回眸才与你相遇
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div class="moon-menu-item" onclick="back2bottom()">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div class="moon-menu-item" onclick="back2top()">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/clicklove.js"></script>
+<!-- 雪花特效 -->
+<script type="text/javascript" src="/js/jquery.js"></script>
+<script type="text/javascript" src="/js/jquery.min.js"></script>
+<script type="text/javascript" src="/js/snow.js"></script>
